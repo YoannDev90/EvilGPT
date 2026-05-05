@@ -1,0 +1,11 @@
+[
+  "electronhub/mistral-small-24b-instruct:free",
+  "paxsenix/mistral-small-3.1-24b",
+  "navy/mistral-small-latest",
+  "mnn/mistral-small-latest",
+  "mistral/mistral-small-latest",
+  "meganova/mistralai/Mistral-Small-3.2-24B-Instruct-2506",
+  "zanity/mistral-medium",
+  "evolvex/mistralai/mistral-medium-3-instruct",
+  "aqua/mistral"
+]

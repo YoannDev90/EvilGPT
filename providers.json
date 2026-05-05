@@ -1,0 +1,47 @@
+[
+  {
+    "provider": "ELECTRONHUB",
+    "env_key": "ELECTRONHUB_API_KEY",
+    "api_base": "https://api.electronhub.ai/v1"
+  },
+  {
+    "provider": "MEGANOVA",
+    "env_key": "MEGANOVA_API_KEY",
+    "api_base": "https://api.meganova.ai/v1"
+  },
+  {
+    "provider": "MISTRAL",
+    "env_key": "MISTRAL_API_KEY",
+    "api_base": "https://api.mistral.ai/v1"
+  },
+  {
+    "provider": "MNN",
+    "env_key": "MNN_API_KEY",
+    "api_base": "https://api2.mnnai.ru/v1"
+  },
+  {
+    "provider": "NAVY",
+    "env_key": "NAVY_API_KEY",
+    "api_base": "https://api.navy/v1"
+  },
+  {
+    "provider": "PAXSENIX",
+    "env_key": "PAXSENIX_API_KEY",
+    "api_base": "https://api.paxsenix.org/v1"
+  },
+  {
+    "provider": "ZANITY",
+    "env_key": "ZANITY_API_KEY",
+    "api_base": "https://api.zanity.xyz/v1/"
+  },
+  {
+    "provider": "EVOLVEX",
+    "env_key": "EVOLVEX_API_KEY",
+    "api_base": "https://api.evolvex.gg/v1"
+  },
+  {
+    "provider": "AQUA",
+    "env_key": "AQUA_API_KEY",
+    "api_base": "https://api.aquadevs.com/v1"
+  }
+]
