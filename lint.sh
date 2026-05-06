@@ -7,30 +7,37 @@ isort .
 
 # Print project tree (filtered)
 if command -v tree >/dev/null 2>&1; then
-	echo "\nProject tree:" 
-	tree -a -I ".venv|.git|__pycache__" || true
+	echo "\nProject tree:"
+	IGNORE_FILE=.gitignore
+	EXCLUDES=".git"
+	if [ -f "$IGNORE_FILE" ]; then
+		# read non-empty, non-comment, non-negation lines
+		GITIGNORE_EXCLUDES=$(grep -vE '^\s*(#|$|!)' "$IGNORE_FILE" | sed 's:^\./::; s:/*$::' | tr '\n' '|' | sed 's:|$::')
+		if [ -n "$GITIGNORE_EXCLUDES" ]; then
+			EXCLUDES="$EXCLUDES|$GITIGNORE_EXCLUDES"
+		fi
+	fi
+	# fallback defaults if resulting pattern empty
+	if [ -z "$EXCLUDES" ]; then
+		EXCLUDES=".git|.venv|__pycache__"
+	fi
+
+	tree -a -I "$EXCLUDES" || true
+
 	# Also update README.md section between <!-- TREE-START --> and <!-- TREE-END -->
 	TMP_TREE=$(mktemp)
-	tree -a -I ".venv|.git|__pycache__" > "$TMP_TREE" || true
-
-	# Build new block file
+	tree -a -I "$EXCLUDES" > "$TMP_TREE" || true
 	TMP_BLOCK=$(mktemp)
 	{
-		echo "<!-- TREE-START -->"
 		echo '```'
 		cat "$TMP_TREE"
 		echo '```'
 		echo "<!-- TREE-END -->"
 	} > "$TMP_BLOCK"
-
-	# Replace section in README.md
 	README=README.md
 	if grep -q "<!-- TREE-START -->" "$README"; then
-		# head to start marker
 		sed -n '1,/<!-- TREE-START -->/p' "$README" > "$README.tmp"
-		# append new block
 		cat "$TMP_BLOCK" >> "$README.tmp"
-		# append rest after end marker
 		sed -n '/<!-- TREE-END -->/,$p' "$README" | sed '1d' >> "$README.tmp"
 		mv "$README.tmp" "$README"
 	fi

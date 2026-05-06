@@ -72,7 +72,6 @@ Logged in as BotName (ID: 123456789)
 Below is current snapshot of repository. This section is auto-updated by `./lint.sh` on demand.
 
 <!-- TREE-START -->
-<!-- TREE-START -->
 ```
 .
 ├── assets
@@ -91,7 +90,6 @@ Below is current snapshot of repository. This section is auto-updated by `./lint
 │   ├── models.json
 │   ├── providers.json
 │   └── system_prompt.txt
-├── .env
 ├── .github
 │   └── workflows
 │       └── pre-commit.yml
@@ -104,17 +102,6 @@ Below is current snapshot of repository. This section is auto-updated by `./lint
 │   └── memory.py
 ├── README.md
 ├── requirements.txt
-├── .ruff_cache
-│   ├── 0.15.12
-│   │   ├── 14824776415786149569
-│   │   ├── 15501241403982131337
-│   │   ├── 16887018037993356279
-│   │   ├── 17650361020177699969
-│   │   ├── 2307436613803362126
-│   │   ├── 4327350051982258829
-│   │   └── 681954528530788787
-│   ├── CACHEDIR.TAG
-│   └── .gitignore
 └── utils
     ├── handlers
     │   ├── codeblock.py
@@ -124,7 +111,7 @@ Below is current snapshot of repository. This section is auto-updated by `./lint
     ├── logger.py
     └── web_search.py
 
-12 directories, 37 files
+10 directories, 27 files
 ```
 <!-- TREE-END -->
 
