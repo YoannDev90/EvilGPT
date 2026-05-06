@@ -1,21 +1,21 @@
 import json
 from utils.web_search import get_web_context
-from microsandbox.python import PythonSandbox
+import microsandbox
 from utils.logger import get_logger
 
 logger = get_logger(__name__)
 
-# Définition des outils pour LiteLLM / OpenAI format
+# Tools definition for LiteLLM / OpenAI format
 TOOLS = [
     {
         "type": "function",
         "function": {
             "name": "web_search",
-            "description": "Recherche des informations sur le web via DuckDuckGo.",
+            "description": "Search for information on the web via DuckDuckGo.",
             "parameters": {
                 "type": "object",
                 "properties": {
-                    "query": {"type": "string", "description": "La recherche à effectuer."}
+                    "query": {"type": "string", "description": "The search query to perform."}
                 },
                 "required": ["query"]
             }
@@ -25,11 +25,11 @@ TOOLS = [
         "type": "function",
         "function": {
             "name": "execute_python",
-            "description": "Exécute du code Python dans un environnement sécurisé (sandbox).",
+            "description": "Execute Python code in a secure sandbox environment.",
             "parameters": {
                 "type": "object",
                 "properties": {
-                    "code": {"type": "string", "description": "Le code Python à exécuter."}
+                    "code": {"type": "string", "description": "The Python code to execute."}
                 },
                 "required": ["code"]
             }
@@ -38,7 +38,7 @@ TOOLS = [
 ]
 
 async def handle_tool_call(tool_name: str, args: dict) -> str:
-    """Exécute l'outil demandé et retourne le résultat sous forme de string."""
+    """Execute the requested tool and return the result as a string."""
     try:
         if tool_name == "web_search":
             query = args.get("query")
@@ -48,19 +48,30 @@ async def handle_tool_call(tool_name: str, args: dict) -> str:
         elif tool_name == "execute_python":
             code = args.get("code")
             logger.info(f"Tool Call: execute_python")
-            # Utilisation de microsandbox
-            sb = PythonSandbox()
-            result = sb.run(code)
+            
+            # Using microsandbox (Standard API)
+            # Use default python image
+            sb = microsandbox.Sandbox(
+                image=microsandbox.Image(name="python:3.12-slim")
+            )
+            
+            # Install if missing (first time)
+            if not microsandbox.is_installed():
+                microsandbox.install()
+
+            handle = sb.start()
+            result = handle.exec(["python", "-c", code])
             
             output = []
-            if result.stdout: output.append(f"STDOUT:\n{result.stdout}")
-            if result.stderr: output.append(f"STDERR:\n{result.stderr}")
-            if result.exit_code != 0: output.append(f"Exit Code: {result.exit_code}")
+            if result.stdout: output.append(f"STDOUT:\n{result.stdout.decode('utf-8', errors='replace')}")
+            if result.stderr: output.append(f"STDERR:\n{result.stderr.decode('utf-8', errors='replace')}")
+            if result.exit_status != 0: output.append(f"Exit Status: {result.exit_status}")
             
-            return "\n".join(output) if output else "Code exécuté avec succès (pas d'output)."
+            handle.stop()
+            return "\n".join(output) if output else "Code executed successfully (no output)."
             
     except Exception as e:
         logger.error(f"Error in tool {tool_name}: {e}")
-        return f"Erreur lors de l'exécution de l'outil {tool_name}: {str(e)}"
+        return f"Error during tool {tool_name} execution: {str(e)}"
     
-    return "Outil inconnu."
+    return "Unknown tool."

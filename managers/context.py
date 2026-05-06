@@ -23,15 +23,15 @@ async def get_server_context(guild: discord.Guild):
 
 def format_context_for_prompt(context: dict):
     """Format the gathered context into a string for the system prompt."""
-    lines = [f"Informations sur le serveur Discord actuel '{context['server_name']}':"]
+    lines = [f"Information about the current Discord server '{context['server_name']}':"]
     if context.get('members'):
-        lines.append(f"- Membres ({context['member_count']}): {', '.join(context['members'])}")
+        lines.append(f"- Members ({context['member_count']}): {', '.join(context['members'])}")
     else:
-        lines.append(f"- Nombre total de membres: {context['member_count']}")
+        lines.append(f"- Total member count: {context['member_count']}")
         
     if context['emojis']:
-        lines.append(f"- Quelques émojis disponibles: {' '.join(context['emojis'])}")
+        lines.append(f"- Some available emojis: {' '.join(context['emojis'])}")
     if context['roles']:
-        lines.append(f"- Rôles principaux: {', '.join(context['roles'])}")
+        lines.append(f"- Main roles: {', '.join(context['roles'])}")
     
     return "\n".join(lines)
