@@ -141,19 +141,23 @@ The bot automatically selects the most appropriate model based on:
 
 ## 📦 Dependencies
 
-- `discord.py>=2.3` - Discord API wrapper
-- `litellm>=1.0` - LLM provider abstraction
-- `python-dotenv>=1.0` - Environment variable management
-- `requests>=2.31` - HTTP requests library
+<!--DEPS-START-->
+```markdown
+- `discord.py` - A Python wrapper for the Discord API (latest: 2.7.1)
+- `python-dotenv` - Read key-value pairs from a .env file and set them as environment variables (latest: 1.2.2)
+- `litellm` - Library to easily interface with LLM API providers (latest: 1.83.14)
+- `requests` - Python HTTP for Humans. (latest: 2.33.1)
+- `colorama` - Cross-platform colored terminal text. (latest: 0.4.6)
+- `cairosvg` - A Simple SVG Converter based on Cairo (latest: 2.9.0)
+- `Pillow` - Python Imaging Library (fork) (latest: 12.2.0)
+- `pilmoji` - Pilmoji is an emoji renderer for Pillow, Python's imaging library. (latest: 2.0.5)
+- `ddgs` - Dux Distributed Global Search. A metasearch library that aggregates results from diverse web search services. (latest: 9.14.2)
+- `microsandbox` - Python SDK for microsandbox — secure, fast microVM-based sandboxing. (latest: 0.4.4)
+- `aiohttp` - Async http client/server framework (asyncio) (latest: 3.13.5)
+```
+<!--DEPS-END-->
 
 ## 🛠️ Development
-
-### Logging
-The bot uses Python's standard logging module. Adjust the log level in `main.py`:
-```python
-setup_logging(logging.DEBUG)  # For detailed logs
-setup_logging(logging.INFO)   # For standard logs
-```
 
 ### Linting & CI
 
