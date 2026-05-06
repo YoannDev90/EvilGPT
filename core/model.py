@@ -24,20 +24,29 @@ def generate_answer(messages: list, retries: int = 2) -> Answer:
     if not models:
         return Answer("Désolé, aucune configuration d'IA disponible.")
 
+    # Sort models or pick one that isn't known to be down
     chosen = _select_model(models)
     
-    # LiteLLM needs the provider prefix for fallbacks too if they are custom
-    fallbacks = [f"openai/{m.id}" if "/" in m.id else m.id for m in models if m.id != chosen.id]
+    # LiteLLM needs the provider prefix precisely. 
+    # For custom providers like 'paxsenix', 'mnn' etc., we use 'openai/' prefix 
+    # because they follow OpenAI API format.
+    fallbacks = [f"openai/{m.id}" if "/" not in m.id else m.id for m in models if m.id != chosen.id]
+
+    # Remove duplicates and ensure format consistency
+    fallbacks = list(dict.fromkeys(fallbacks))
 
     start_time = time.time()
     try:
+        # LiteLLM: custom providers with non-standard IDs might need explicit naming
+        model_name = f"openai/{chosen.id}" if "/" not in chosen.id else chosen.id
+        
         resp = litellm.completion(
-            model=f"openai/{chosen.id}",
+            model=model_name,
             base_url=chosen.api_base,
             api_key=chosen.api_key,
             messages=messages,
             fallbacks=fallbacks,
-            timeout=30,
+            timeout=15, # Reduced timeout for faster fallbacks
         )
         
         content = ""
@@ -50,4 +59,5 @@ def generate_answer(messages: list, retries: int = 2) -> Answer:
         return ans
     except Exception as e:
         logger.error("Error generating answer: %s", e)
-        return Answer("Une erreur s'est produite lors de la génération de la réponse.")
+        # Fallback to a very basic response if even LiteLLM fallbacks fail
+        return Answer("Toutes mes sources de haine sont saturées. Réessaie plus tard.")

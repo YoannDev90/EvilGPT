@@ -52,8 +52,9 @@ def get_models() -> List[Model]:
         parts = m_id.split("/")
         if len(parts) >= 1:
             prov_name = parts[0].lower()
+            model_name = parts[1] if len(parts) > 1 else m_id
             if prov_name in providers and providers[prov_name].api_key:
-                models.append(Model(m_id, providers[prov_name]))
+                models.append(Model(model_name, providers[prov_name]))
     
     logger.info("Loaded %d models with valid API keys", len(models))
     return models
