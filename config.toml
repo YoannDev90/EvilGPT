@@ -1,0 +1,7 @@
+[logging]
+level = "INFO"
+format = "%(asctime)s - %(name)s - %(message)s"
+enable_file_logging = true
+log_file = "logs/evilgpt.log"
+enable_discord_logging = true
+discord_webhook = "https://discord.com/api/webhooks/<URL>"

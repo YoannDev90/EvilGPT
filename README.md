@@ -107,12 +107,16 @@ Below is current snapshot of repository. This section is auto-updated by `./lint
 ```
 .
 ├── assets
-│   └── fonts
-│       ├── NotoSans-BoldItalic.ttf
-│       ├── NotoSans-Bold.ttf
-│       ├── NotoSans-Italic.ttf
-│       └── NotoSans-Regular.ttf
+│   ├── fonts
+│   │   ├── NotoSans-BoldItalic.ttf
+│   │   ├── NotoSans-Bold.ttf
+│   │   ├── NotoSans-Italic.ttf
+│   │   └── NotoSans-Regular.ttf
+│   └── images
+│       ├── evilgpt.png
+│       └── evilgpt.svg
 ├── bot.py
+├── config.toml
 ├── core
 │   ├── config.py
 │   ├── model.py
@@ -143,7 +147,7 @@ Below is current snapshot of repository. This section is auto-updated by `./lint
     ├── logger.py
     └── web_search.py
 
-10 directories, 27 files
+11 directories, 30 files
 ```
 <!-- TREE-END -->
 
@@ -185,7 +189,6 @@ The bot automatically selects the most appropriate model based on:
 - `pilmoji` - Pilmoji is an emoji renderer for Pillow, Python's imaging library. (latest: 2.0.5)
 - `ddgs` - Dux Distributed Global Search. A metasearch library that aggregates results from diverse web search services. (latest: 9.14.2)
 - `microsandbox` - Python SDK for microsandbox — secure, fast microVM-based sandboxing. (latest: 0.4.4)
-- `aiohttp` - Async http client/server framework (asyncio) (latest: 3.13.5)
 ```
 <!--DEPS-END-->
 
