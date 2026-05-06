@@ -9,6 +9,7 @@ litellm.suppress_logging_worker_warnings = True
 
 from core.models_loader import get_models, Model
 from core.config import cfg
+from core.tools import TOOLS, handle_tool_call
 from utils.logger import get_logger
 
 logger = get_logger(__name__)
@@ -34,16 +35,11 @@ async def generate_answer(messages: list, stream: bool = False):
     chosen = _select_model(models)
     
     # Prépare les fallbacks sans inclure le modèle principal
-    # Tous les serveurs utilisent l'API OpenAI compatible directement
     fallbacks_configs = []
     for m in models:
         if m.id == chosen.id:
             continue
-        
-        # On utilise le préfixe 'openai/' car tous les serveurs (même ceux de Mistral)
-        # sont utilisés via leur interface compatible OpenAI (base_url + api_key standard)
         model_name = f"openai/{m.id}" if "/" not in m.id else m.id
-        
         fallbacks_configs.append({
             "model": model_name,
             "base_url": m.api_base,
@@ -55,19 +51,61 @@ async def generate_answer(messages: list, stream: bool = False):
         # Forcer le préfixe 'openai/' pour garantir que LiteLLM utilise le endpoint standard
         model_name = f"openai/{chosen.id}" if "/" not in chosen.id else chosen.id
         
+        # Premier appel pour voir si l'IA veut appeler un outil
         resp = await litellm.acompletion(
             model=model_name,
             base_url=chosen.api_base,
             api_key=chosen.api_key,
             messages=messages,
+            tools=TOOLS,
+            tool_choice="auto",
             fallbacks=fallbacks_configs,
-            timeout=20, # Augmenté car certains proxies sont lents
-            max_tokens=2000,
-            stream=stream
+            timeout=25
         )
+
+        message = resp.choices[0].message
         
-        if stream:
-            return resp
+        # Si tool_calls est présent, on les exécute
+        if hasattr(message, "tool_calls") and message.tool_calls:
+            messages.append(message) # Ajouter la réponse de l'assistant contenant les tool_calls
+            
+            for tool_call in message.tool_calls:
+                import json
+                function_name = tool_call.function.name
+                arguments = json.loads(tool_call.function.arguments)
+                
+                result = await handle_tool_call(function_name, arguments)
+                
+                messages.append({
+                    "tool_call_id": tool_call.id,
+                    "role": "tool",
+                    "name": function_name,
+                    "content": result
+                })
+            
+            # Deuxième appel après avoir ajouté les résultats des outils
+            # Pour la réponse finale au tool calling, on peut streamer si demandé
+            resp = await litellm.acompletion(
+                model=model_name,
+                base_url=chosen.api_base,
+                api_key=chosen.api_key,
+                messages=messages,
+                fallbacks=fallbacks_configs,
+                timeout=25,
+                stream=stream
+            )
+            
+            if stream:
+                return resp
+        else:
+            # Si on voulait du stream dès le début et qu'aucun outil n'est appelé, 
+            # il faut relancer avec stream=True (LiteLLM ne permet pas de streamer le tool calling facilement en un coup)
+            if stream:
+                return await litellm.acompletion(
+                    model=model_name, base_url=chosen.api_base, api_key=chosen.api_key,
+                    messages=messages, fallbacks=fallbacks_configs,
+                    timeout=25, stream=True
+                )
 
         content = ""
         if hasattr(resp, "choices") and resp.choices:
@@ -79,4 +117,5 @@ async def generate_answer(messages: list, stream: bool = False):
         return ans
     except Exception as e:
         logger.error("Error generating answer: %s", e)
-        return Answer("Toutes mes sources de haine sont saturées. Réessaie plus tard.")
+        return Answer("Toutes mes sources de haine sont saturées (ou une erreur d'outil est survenue).")
+
