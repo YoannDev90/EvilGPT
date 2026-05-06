@@ -34,21 +34,25 @@ async def generate_answer(messages: list, stream: bool = False):
     chosen = _select_model(models)
     
     # Prépare les fallbacks sans inclure le modèle principal
-    # Important : LiteLLM a besoin que chaque fallback ait sa propre api_base/api_key
-    # On va donc passer une liste de dictionnaires pour les fallbacks
+    # Tous les serveurs utilisent l'API OpenAI compatible directement
     fallbacks_configs = []
     for m in models:
         if m.id == chosen.id:
             continue
+        
+        # On utilise le préfixe 'openai/' car tous les serveurs (même ceux de Mistral)
+        # sont utilisés via leur interface compatible OpenAI (base_url + api_key standard)
+        model_name = f"openai/{m.id}" if "/" not in m.id else m.id
+        
         fallbacks_configs.append({
-            "model": f"openai/{m.id}" if "/" not in m.id else m.id,
-            "api_base": m.api_base,
+            "model": model_name,
+            "base_url": m.api_base,
             "api_key": m.api_key
         })
 
     start_time = time.time()
     try:
-        # LiteLLM: custom providers with non-standard IDs might need explicit naming
+        # Forcer le préfixe 'openai/' pour garantir que LiteLLM utilise le endpoint standard
         model_name = f"openai/{chosen.id}" if "/" not in chosen.id else chosen.id
         
         resp = await litellm.acompletion(
@@ -56,8 +60,8 @@ async def generate_answer(messages: list, stream: bool = False):
             base_url=chosen.api_base,
             api_key=chosen.api_key,
             messages=messages,
-            fallbacks=fallbacks_configs, # Utilise la liste de configs complète
-            timeout=10,
+            fallbacks=fallbacks_configs,
+            timeout=20, # Augmenté car certains proxies sont lents
             max_tokens=2000,
             stream=stream
         )
