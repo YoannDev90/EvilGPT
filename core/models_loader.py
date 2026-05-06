@@ -23,6 +23,38 @@ class Model:
         self.api_base = provider.api_base
         self.api_key = provider.api_key
 
+
+def get_model_catalog() -> List[Dict[str, str]]:
+    providers = _load_providers()
+    if not os.path.exists(cfg.MODELS_PATH):
+        logger.error("Models file not found: %s", cfg.MODELS_PATH)
+        return []
+
+    with open(cfg.MODELS_PATH, "r", encoding="utf-8") as f:
+        models_data = json.load(f)
+
+    catalog = []
+    for m_id in models_data:
+        parts = m_id.split("/", 1)
+        if len(parts) != 2:
+            continue
+
+        prov_name = parts[0].lower()
+        model_name = parts[1]
+        provider = providers.get(prov_name)
+
+        catalog.append(
+            {
+                "provider": prov_name,
+                "model": model_name,
+                "litellm_id": f"openai/{model_name}",
+                "api_base": provider.api_base if provider else "",
+                "api_key_set": bool(provider and provider.api_key),
+            }
+        )
+
+    return catalog
+
 def _load_providers() -> Dict[str, Provider]:
     if not os.path.exists(cfg.PROVIDERS_PATH):
         logger.error("Providers file not found: %s", cfg.PROVIDERS_PATH)

@@ -3,8 +3,9 @@ import re
 from typing import Optional, List, Any, Tuple
 import discord
 from core.config import cfg
+from utils.logger import get_logger
 
-logger = logging.getLogger(__name__)
+logger = get_logger(__name__)
 
 from utils.handlers.codeblock import (send_code_block, send_code_block_with_return)
 from utils.handlers.latex import (LATEX_TO_EMOJI, detect_latex)

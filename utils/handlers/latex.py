@@ -3,13 +3,14 @@ import re
 import urllib.parse
 import io
 import requests
+from utils.logger import get_logger
 # Note: cairosvg might need installation: pip install cairosvg
 try:
     import cairosvg
 except ImportError:
     cairosvg = None
 
-logger = logging.getLogger(__name__)
+logger = get_logger(__name__)
 
 LATEX_TO_EMOJI = {
     r"\alpha": "α", r"\beta": "β", r"\gamma": "γ", r"\delta": "δ", r"\epsilon": "ε",

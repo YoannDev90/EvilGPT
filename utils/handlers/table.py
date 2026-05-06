@@ -7,6 +7,7 @@ from urllib.parse import urlparse
 
 from PIL import Image, ImageDraw, ImageFont
 from pilmoji import Pilmoji
+from utils.logger import get_logger
 
 # On essaie d'importer la config, sinon on fallback sur un logger par défaut
 try:
@@ -15,7 +16,7 @@ try:
 except ImportError:
     LOGGER_NAME = __name__
 
-logger = logging.getLogger(LOGGER_NAME)
+logger = get_logger(__name__)
 
 URL_REGEX = r'\[([^\]]+)\]\((https?://[^\s\)]+)\)|(https?://[^\s\)]+)'
 TABLE_IMAGE_PLACEHOLDER = "__TABLE_IMG"

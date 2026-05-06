@@ -39,7 +39,7 @@ async def generate_answer(messages: list, stream: bool = False):
     for m in models:
         if m.id == chosen.id:
             continue
-        model_name = f"openai/{m.id}" if "/" not in m.id else m.id
+        model_name = f"openai/{m.id}"
         fallbacks_configs.append({
             "model": model_name,
             "base_url": m.api_base,
@@ -48,8 +48,8 @@ async def generate_answer(messages: list, stream: bool = False):
 
     start_time = time.time()
     try:
-        # Forcer le préfixe 'openai/' pour garantir que LiteLLM utilise le endpoint standard
-        model_name = f"openai/{chosen.id}" if "/" not in chosen.id else chosen.id
+        # Forcer le préfixe 'openai/' pour chaque endpoint OpenAI-compatible.
+        model_name = f"openai/{chosen.id}"
         
         # Premier appel pour voir si l'IA veut appeler un outil
         resp = await litellm.acompletion(
@@ -67,7 +67,24 @@ async def generate_answer(messages: list, stream: bool = False):
         
         # Si tool_calls est présent, on les exécute
         if hasattr(message, "tool_calls") and message.tool_calls:
-            messages.append(message) # Ajouter la réponse de l'assistant contenant les tool_calls
+            assistant_message = {
+                "role": "assistant",
+                "content": message.content or "",
+            }
+            if message.tool_calls:
+                assistant_message["tool_calls"] = [
+                    {
+                        "id": tool_call.id,
+                        "type": getattr(tool_call, "type", "function"),
+                        "function": {
+                            "name": tool_call.function.name,
+                            "arguments": tool_call.function.arguments,
+                        },
+                    }
+                    for tool_call in message.tool_calls
+                ]
+
+            messages.append(assistant_message)
             
             for tool_call in message.tool_calls:
                 import json
