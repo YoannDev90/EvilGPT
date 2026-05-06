@@ -1,86 +1,79 @@
 import asyncio
-import logging
-from typing import Set
-
+from core.config import cfg, read_system_prompt
+from core.model import generate_answer
+from managers.memory import MemoryManager
+from managers.context import get_server_context, format_context_for_prompt
+from utils.logger import get_logger, setup_logging
 import discord
-from discord import Message
 
-from config import BOT_TOKEN
-from ai_utils.ai_model import generate_answer
+setup_logging()
+logger = get_logger(__name__)
 
-logger = logging.getLogger(__name__)
-
-# minimal intents
 intents = discord.Intents.default()
 intents.message_content = True
+intents.members = True
 
-
-class MinimalBot(discord.Client):
-    def __init__(self, *, intents: discord.Intents):
-        super().__init__(intents=intents)
-        self._processing: Set[int] = set()
+class EvilBot(discord.Client):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.memory = MemoryManager(max_history=15)
+        self._processing = set()
 
     async def on_ready(self):
-        logger.info(f"Logged in as {self.user} (ID: {self.user.id})")
+        logger.info("EvilGPT est en ligne ! Connecté en tant que %s (ID: %s)", self.user, self.user.id)
 
-    async def on_message(self, message: Message):
-        import time
-        msg_recv_ts = time.time()
-        
-        # ignore bots and DMs
+    async def on_message(self, message):
         if message.author.bot or message.guild is None:
-            logger.debug("Ignoring bot/DM message")
             return
 
+        # Trigger on mention OR if it's a direct message (DMs aren't guilds, but handled above)
+        # However, to respond to ALL messages in a channel without mention:
+        # Just remove the mentioned_in check.
+        
         uid = message.author.id
         if uid in self._processing:
-            logger.warning("User %s already processing, ignoring message", uid)
             return
 
         self._processing.add(uid)
         try:
-            logger.info("[%.3f] Message received from %s: %s", msg_recv_ts, message.author, message.content[:50])
+            async with message.channel.typing():
+                # 1. Gather context
+                server_ctx = await get_server_context(message.guild)
+                ctx_str = format_context_for_prompt(server_ctx)
+                
+                # 2. Prepare prompt
+                system_base = read_system_prompt()
+                system_payload = f"{system_base}\n\nContexte actuel :\n{ctx_str}\n\nL'utilisateur s'appelle {message.author.display_name}."
+                
+                # 3. Handle history
+                history = self.memory.get_history(uid)
+                
+                messages = [{"role": "system", "content": system_payload}]
+                for h in history:
+                    messages.append({"role": h["role"], "content": h["content"]})
+                messages.append({"role": "user", "content": message.content})
 
-            # build simple messages payload for litellm-style API
-            messages = [{"role": "user", "content": message.content}]
-            logger.debug("[%.3f] Payload built", time.time())
+                # 4. Generate Answer
+                loop = asyncio.get_running_loop()
+                ans = await loop.run_in_executor(None, generate_answer, messages)
 
-            # run generate_answer in thread to avoid blocking event loop
-            loop = asyncio.get_running_loop()
-            logger.info("[%.3f] Submitting to thread pool", time.time())
-            ans = await loop.run_in_executor(None, generate_answer, messages)
-            exec_ts = time.time()
-            logger.info("[%.3f] AI response received after %.2fs", exec_ts, exec_ts - msg_recv_ts)
+                if ans and ans.content:
+                    self.memory.add_message(uid, "user", message.content)
+                    self.memory.add_message(uid, "assistant", ans.content)
+                    await message.reply(ans.content)
+                    logger.info("Réponse envoyée à %s | Modèle: %s | Temps: %.2fs", message.author, ans.model, ans.response_time or 0)
+                else:
+                    await message.reply("Je n'ai rien à te dire pour le moment.")
 
-            # send reply
-            if ans and ans.content:
-                logger.debug("[%.3f] Sending reply (%d chars)", time.time(), len(ans.content))
-                await message.channel.send(ans.content)
-                logger.info("[%.3f] Reply sent after %.2fs total", time.time(), time.time() - msg_recv_ts)
-            else:
-                logger.warning("[%.3f] Empty response", time.time())
-                await message.channel.send("(no answer)")
-
-        except Exception as exc:
-            logger.exception("[%.3f] Error handling message: %s", time.time(), exc)
-            try:
-                await message.channel.send("Erreur interne lors du traitement du message.")
-            except Exception:
-                pass
+        except Exception as e:
+            logger.error("Erreur lors du traitement du message: %s", e, exc_info=True)
+            await message.channel.send("Une erreur interne m'empêche de répondre.")
         finally:
             self._processing.discard(uid)
-            logger.debug("[%.3f] Message processing complete for user %s", time.time(), uid)
-
-
-client = MinimalBot(intents=intents)
-
 
 def run_bot():
-    if not BOT_TOKEN:
-        raise RuntimeError("BOT_TOKEN not set in environment")
-    client.run(BOT_TOKEN)
-
-
-if __name__ == "__main__":
-    logging.basicConfig(level=logging.INFO)
-    run_bot()
+    if not cfg.BOT_TOKEN:
+        logger.error("BOT_TOKEN est manquant dans l'environnement !")
+        return
+    client = EvilBot(intents=intents)
+    client.run(cfg.BOT_TOKEN)

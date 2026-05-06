@@ -2,3 +2,4 @@ discord.py>=2.3
 python-dotenv>=1.0
 litellm>=1.0
 requests>=2.31
+colorama>=0.4.6

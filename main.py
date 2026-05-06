@@ -1,22 +1,14 @@
-import logging
-import sys
-
 from bot import run_bot
+from utils.logger import setup_logging, get_logger
 
-
-def setup_logging(level=logging.INFO):
-    logging.basicConfig(level=level, format="%(asctime)s - %(levelname)s - %(message)s")
-
+setup_logging()
+logger = get_logger(__name__)
 
 if __name__ == "__main__":
-    setup_logging(logging.INFO)
-    logger = logging.getLogger(__name__)
     try:
-        logger.info("Starting EvilGPT Discord bot...")
+        logger.info("Démarrage de l'application EvilGPT...")
         run_bot()
     except KeyboardInterrupt:
-        logger.info("Bot stopped by user")
-        sys.exit(0)
+        logger.info("Arrêt demandé par l'utilisateur.")
     except Exception as e:
-        logger.error("Fatal error: %s", e, exc_info=True)
-        sys.exit(1)
+        logger.error("Erreur fatale: %s", e, exc_info=True)
