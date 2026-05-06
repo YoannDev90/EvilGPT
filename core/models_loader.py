@@ -49,10 +49,10 @@ def get_models() -> List[Model]:
     
     models = []
     for m_id in models_data:
-        parts = m_id.split("/")
-        if len(parts) >= 1:
+        parts = m_id.split("/", 1)
+        if len(parts) == 2:
             prov_name = parts[0].lower()
-            model_name = parts[1] if len(parts) > 1 else m_id
+            model_name = parts[1]
             if prov_name in providers and providers[prov_name].api_key:
                 models.append(Model(model_name, providers[prov_name]))
     
