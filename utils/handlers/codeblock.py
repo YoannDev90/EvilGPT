@@ -1,6 +1,9 @@
 import discord
 
-async def send_code_block_with_return(channel, code_block: str, max_length: int = 2000, bot=None):
+
+async def send_code_block_with_return(
+    channel, code_block: str, max_length: int = 2000, bot=None
+):
     first_line_end = code_block.find("\n")
     if first_line_end == -1:
         language = ""
@@ -11,6 +14,7 @@ async def send_code_block_with_return(channel, code_block: str, max_length: int 
 
     if language.lower() in ["latex", "tex"]:
         from utils.handlers.messages import MessageSender
+
         return await MessageSender(channel, bot).send_latex_image(code_block)
 
     code_lines = code.splitlines(keepends=True)
@@ -18,7 +22,7 @@ async def send_code_block_with_return(channel, code_block: str, max_length: int 
     code_suffix = "```"
     current_code = code_prefix
     last_message = None
-    
+
     for line in code_lines:
         if len(current_code) + len(line) + len(code_suffix) > max_length:
             current_code += code_suffix
@@ -30,6 +34,7 @@ async def send_code_block_with_return(channel, code_block: str, max_length: int 
         current_code += code_suffix
         last_message = await channel.send(current_code)
     return last_message
+
 
 async def send_code_block(channel, code_block: str, max_length: int = 2000, bot=None):
     await send_code_block_with_return(channel, code_block, max_length, bot)

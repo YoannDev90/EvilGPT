@@ -1,24 +1,34 @@
 import logging
 import re
-from typing import Optional, List, Any, Tuple
+from typing import Any, List, Optional, Tuple
+
 import discord
+
 from core.config import cfg
 from utils.logger import get_logger
 
 logger = get_logger(__name__)
 
-from utils.handlers.codeblock import (send_code_block, send_code_block_with_return)
-from utils.handlers.latex import (LATEX_TO_EMOJI, detect_latex)
-from utils.handlers.table import (TABLE_IMAGE_PLACEHOLDER, detect_and_convert_tables)
+from utils.handlers.codeblock import (send_code_block,
+                                      send_code_block_with_return)
+from utils.handlers.latex import LATEX_TO_EMOJI, detect_latex
+from utils.handlers.table import (TABLE_IMAGE_PLACEHOLDER,
+                                  detect_and_convert_tables)
+
 
 class MessageSender:
-    def __init__(self, channel: discord.abc.Messageable, bot: Optional[discord.Client] = None, max_length: int = 2000):
+    def __init__(
+        self,
+        channel: discord.abc.Messageable,
+        bot: Optional[discord.Client] = None,
+        max_length: int = 2000,
+    ):
         self.channel = channel
         self.bot = bot
         self.max_length = max_length
 
     def _get_target_channel(self) -> discord.abc.Messageable:
-        if self.bot and hasattr(self.channel, 'id'):
+        if self.bot and hasattr(self.channel, "id"):
             return self.bot.get_channel(self.channel.id) or self.channel
         return self.channel
 
@@ -35,7 +45,7 @@ class MessageSender:
                     last_message = await target.send(current_message.rstrip())
                     current_message = ""
                 for i in range(0, len(line), self.max_length):
-                    chunk = line[i:i + self.max_length]
+                    chunk = line[i : i + self.max_length]
                     last_message = await target.send(chunk.rstrip())
             elif len(current_message) + len(line) > self.max_length:
                 if current_message:
@@ -49,6 +59,7 @@ class MessageSender:
 
     async def send_latex_image(self, latex_match: str) -> Optional[discord.Message]:
         from utils.handlers.latex import convert_latex_to_png
+
         latex = self._clean_latex(latex_match)
         result, success = convert_latex_to_png(latex)
         target = self._get_target_channel()
@@ -81,7 +92,8 @@ class MessageSender:
         last_message = None
         for match in matches:
             start = text.find(match, last_end)
-            if start == -1: continue
+            if start == -1:
+                continue
             current_text += text[last_end:start]
             latex = self._clean_latex(match)
             if latex in LATEX_TO_EMOJI:
@@ -97,7 +109,9 @@ class MessageSender:
             last_message = await self.send_text_chunks(current_text)
         return last_message
 
-    async def process_and_send(self, response: str) -> Tuple[Optional[discord.Message], List[dict]]:
+    async def process_and_send(
+        self, response: str
+    ) -> Tuple[Optional[discord.Message], List[dict]]:
         response, table_images, table_data = detect_and_convert_tables(response)
         placeholder_escaped = re.escape(TABLE_IMAGE_PLACEHOLDER)
         pattern = re.compile(f"({placeholder_escaped}_\\d+__)|(```[\\s\\S]*?```)")
@@ -105,10 +119,11 @@ class MessageSender:
         target = self._get_target_channel()
         last_message = None
         for part in parts:
-            if not part: continue
+            if not part:
+                continue
             if part.startswith(TABLE_IMAGE_PLACEHOLDER) and part.endswith("__"):
                 try:
-                    idx_str = part[len(TABLE_IMAGE_PLACEHOLDER)+1:-2]
+                    idx_str = part[len(TABLE_IMAGE_PLACEHOLDER) + 1 : -2]
                     idx = int(idx_str)
                     if idx < len(table_images):
                         img_buffer = table_images[idx]
@@ -122,7 +137,9 @@ class MessageSender:
                     last_message = await self.send_text_with_latex(part)
             elif part.startswith("```") and part.endswith("```"):
                 if TABLE_IMAGE_PLACEHOLDER not in part:
-                    last_message = await send_code_block_with_return(target, part, self.max_length, bot=self.bot)
+                    last_message = await send_code_block_with_return(
+                        target, part, self.max_length, bot=self.bot
+                    )
             else:
                 last_message = await self.send_text_with_latex(part)
         return last_message, table_data

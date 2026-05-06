@@ -1,46 +1,76 @@
-import requests
+import re
+from typing import Dict, List
+
+from ddgs import DDGS
+
 from utils.logger import get_logger
 
 logger = get_logger(__name__)
 
-def search_ddg(query: str, max_results: int = 3) -> str:
-    """
-    Recherche simple via DuckDuckGo (version HTML/Lite sans API key).
-    """
-    try:
-        # On utilise l'URL 'lite' de DDG qui est plus facile à scraper sans JS
-        url = "https://duckduckgo.com/html/"
-        headers = {
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
-        }
-        params = {"q": query}
-        
-        response = requests.get(url, params=params, headers=headers, timeout=10)
-        response.raise_for_status()
-        
-        # Note: Pour un vrai bot on utiliserait BeautifulSoup, mais on va faire une extraction 
-        # minimaliste ou suggérer d'installer duckduckgo-search pour plus de fiabilité.
-        # Ici on va simuler une réponse si le scraping échoue ou est trop complexe sans BS4.
-        
-        return f"[Recherche Web pour: {query}] - Erreur de parsing HTML (besoin de duckduckgo-search)"
-    except Exception as e:
-        logger.error(f"DDG Search error: {e}")
-        return "Impossible de fouiller le web pour le moment."
 
-def get_web_context(query: str) -> str:
-    # Pour l'instant on prépare la structure, l'idéal est d'installer duckduckgo-search
-    # qui est gratuit et sans clé.
-    from duckduckgo_search import DDGS
+def search_ddg(query: str, max_results: int = 3) -> List[Dict[str, str]]:
+    """Return list of search result dicts using ddgs.text: {title, body, href}.
+    If ddgs not available, returns empty list.
+    """
+    if not DDGS:
+        logger.error("ddgs library not installed; run pip install ddgs")
+        return []
+
     try:
         with DDGS() as ddgs:
-            results = list(ddgs.text(query, max_results=3))
-            if not results:
-                return "Aucun résultat trouvé sur le web."
-            
-            ctx = "Résultats de recherche récents :\n"
-            for r in results:
-                ctx += f"- {r['title']}: {r['body']} (Source: {r['href']})\n"
-            return ctx
+            items = list(ddgs.text(query, max_results=max_results))
+            results = []
+            for it in items:
+                results.append(
+                    {
+                        "title": it.get("title", ""),
+                        "body": it.get("body", ""),
+                        "href": it.get("href", ""),
+                    }
+                )
+            return results
     except Exception as e:
-        logger.error(f"Search Web Error: {e}")
-        return "Erreur lors de la recherche DuckDuckGo."
+        logger.error("DDG Search error: %s", e)
+        return []
+
+
+def _extract_with_ddgs(url: str, fmt: str = "text_plain") -> str:
+    """Use DDGS.extract to get content. Returns empty string on failure."""
+    if not DDGS:
+        return ""
+    try:
+        with DDGS() as ddgs:
+            extracted = ddgs.extract(url, fmt=fmt)
+            if isinstance(extracted, dict):
+                content = extracted.get("content", "")
+            else:
+                content = extracted or ""
+            content = re.sub(r"\s+", " ", content).strip()
+            return content
+    except Exception as e:
+        logger.debug("ddgs.extract failed for %s: %s", url, e)
+        return ""
+
+
+def get_web_context(query: str, max_results: int = 3) -> str:
+    """Perform search + extract each result using ddgs.extract and return formatted context string."""
+    results = search_ddg(query, max_results=max_results)
+    if not results:
+        return "Aucun résultat trouvé sur le web (ou ddgs non installé)."
+
+    ctx_lines = ["Résultats de recherche récents :"]
+    for r in results:
+        title = r.get("title") or "(no title)"
+        href = r.get("href") or ""
+        brief = r.get("body") or ""
+
+        # Try ddgs.extract for better snippet
+        if href:
+            fetched = _extract_with_ddgs(href, fmt="text_plain")
+            if fetched:
+                brief = fetched
+
+        line = f"- {title}: {brief} (Source: {href})"
+        ctx_lines.append(line)
+
+    return "\n".join(ctx_lines)

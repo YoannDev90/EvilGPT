@@ -1,6 +1,6 @@
 from bot import run_bot
-from utils.logger import setup_logging, get_logger
 from core.models_loader import get_model_catalog
+from utils.logger import get_logger, setup_logging
 
 setup_logging()
 logger = get_logger(__name__)
@@ -19,6 +19,7 @@ def print_model_catalog():
         litellm_id = entry["litellm_id"]
         print(f"{status:<12} {provider:<16} {model:<44} {litellm_id}")
     print("-" * 86)
+
 
 if __name__ == "__main__":
     try:

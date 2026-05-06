@@ -1,15 +1,20 @@
 import collections
 import time
 
+
 class MemoryManager:
     def __init__(self, max_history=10):
         # user_id -> deque of messages
-        self.history = collections.defaultdict(lambda: collections.deque(maxlen=max_history))
+        self.history = collections.defaultdict(
+            lambda: collections.deque(maxlen=max_history)
+        )
         # user_id -> dict of "facts" or metadata
         self.metadata = collections.defaultdict(lambda: {"mood": "sarcastic"})
 
     def add_message(self, user_id, role, content):
-        self.history[user_id].append({"role": role, "content": content, "timestamp": time.time()})
+        self.history[user_id].append(
+            {"role": role, "content": content, "timestamp": time.time()}
+        )
 
     def get_history(self, user_id):
         return list(self.history[user_id])

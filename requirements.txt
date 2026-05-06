@@ -6,6 +6,6 @@ colorama
 cairosvg
 Pillow
 pilmoji
-duckduckgo_search
+ddgs
 microsandbox
 aiohttp
