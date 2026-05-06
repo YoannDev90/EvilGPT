@@ -69,24 +69,66 @@ Logged in as BotName (ID: 123456789)
 ```
 
 ## 📁 Project Structure
+Below is current snapshot of repository. This section is auto-updated by `./lint.sh` on demand.
 
+<!-- TREE-START -->
+<!-- TREE-START -->
 ```
-EvilGPT/
-├── main.py                 # Entry point and logging setup
-├── bot.py                  # Discord bot implementation
-├── config.py               # Configuration management
-├── requirements.txt        # Python dependencies
-├── providers.json          # API provider configurations
-├── models.json             # Available AI models
-├── ai_utils/
-│   ├── __init__.py
-│   ├── ai_model.py         # AI model selection and response generation
-│   └── get_models.py       # Model and provider loading
-└── discord_utils/
-    ├── __init__.py
-    ├── get_emojis.py       # Emoji utilities
-    └── get_members.py      # Member utilities
+.
+├── assets
+│   └── fonts
+│       ├── NotoSans-BoldItalic.ttf
+│       ├── NotoSans-Bold.ttf
+│       ├── NotoSans-Italic.ttf
+│       └── NotoSans-Regular.ttf
+├── bot.py
+├── core
+│   ├── config.py
+│   ├── model.py
+│   ├── models_loader.py
+│   └── tools.py
+├── data
+│   ├── models.json
+│   ├── providers.json
+│   └── system_prompt.txt
+├── .env
+├── .github
+│   └── workflows
+│       └── pre-commit.yml
+├── .gitignore
+├── LICENSE
+├── lint.sh
+├── main.py
+├── managers
+│   ├── context.py
+│   └── memory.py
+├── README.md
+├── requirements.txt
+├── .ruff_cache
+│   ├── 0.15.12
+│   │   ├── 14824776415786149569
+│   │   ├── 15501241403982131337
+│   │   ├── 16887018037993356279
+│   │   ├── 17650361020177699969
+│   │   ├── 2307436613803362126
+│   │   ├── 4327350051982258829
+│   │   └── 681954528530788787
+│   ├── CACHEDIR.TAG
+│   └── .gitignore
+└── utils
+    ├── handlers
+    │   ├── codeblock.py
+    │   ├── latex.py
+    │   ├── messages.py
+    │   └── table.py
+    ├── logger.py
+    └── web_search.py
+
+12 directories, 37 files
 ```
+<!-- TREE-END -->
+
+Run `./lint.sh` to format code and regenerate this project tree snapshot. CI runs the same script on every push/PR.
 
 ## 🔧 Technical Details
 
@@ -124,6 +166,25 @@ The bot uses Python's standard logging module. Adjust the log level in `main.py`
 ```python
 setup_logging(logging.DEBUG)  # For detailed logs
 setup_logging(logging.INFO)   # For standard logs
+```
+
+### Linting & CI
+
+- Project provides `lint.sh` at repo root. It runs `ruff format` and `isort .` to format and sort imports.
+- Run locally before commit:
+
+```bash
+./lint.sh
+```
+
+- CI: GitHub Actions workflow runs `lint.sh` on `push` and `pull_request` to `main` and feature branches. Fix issues locally and push again.
+
+If you prefer to install linters manually:
+
+```bash
+pip install ruff isort
+ruff format
+isort .
 ```
 
 ### Adding New Providers
