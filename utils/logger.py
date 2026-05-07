@@ -15,6 +15,7 @@ class EvilGPTFilter(logging.Filter):
     def filter(self, record: logging.LogRecord) -> bool:
         return record.name == LOGGER_NAME
 
+
 class ColoredFormatter(logging.Formatter):
     COLORS = {
         logging.DEBUG: Fore.CYAN,
@@ -123,7 +124,7 @@ class DiscordWebhookHandler(Handler):
             print(f"Failed to send log to Discord webhook: {exc}")
             try:
                 # Use discord-webhook package for sending
-                from discord_webhook import DiscordWebhook, DiscordEmbed
+                from discord_webhook import DiscordEmbed, DiscordWebhook
 
                 message = self.format(record)
 
@@ -133,7 +134,11 @@ class DiscordWebhookHandler(Handler):
                     webhook.execute()
                     return
 
-                embed = DiscordEmbed(title=f"{record.filename}", description=message[:4096], color=self._level_color(record.levelno))
+                embed = DiscordEmbed(
+                    title=f"{record.filename}",
+                    description=message[:4096],
+                    color=self._level_color(record.levelno),
+                )
                 webhook = DiscordWebhook(url=self.webhook_url)
                 webhook.add_embed(embed)
                 webhook.execute()

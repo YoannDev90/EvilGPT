@@ -223,7 +223,9 @@ def load_config(config_path: Optional[str] = None) -> Tuple[Config, LoggingConfi
         cfg.WEBHOOK_URL = logging_conf.discord_webhook
     else:
         # combine base + posturl if present
-        root_webhook_base = raw.get("webhook_base") or raw.get("webhook", {}).get("base")
+        root_webhook_base = raw.get("webhook_base") or raw.get("webhook", {}).get(
+            "base"
+        )
         if root_webhook_base:
             # If base contains placeholder, replace with env WEBHOOK_URL
             if "<URL>" in root_webhook_base:
@@ -233,7 +235,9 @@ def load_config(config_path: Optional[str] = None) -> Tuple[Config, LoggingConfi
                     cfg.WEBHOOK_URL = _normalize_webhook_url(substituted)
             elif cfg.WEBHOOK_POSTURL:
                 cfg.WEBHOOK_URL = (
-                    root_webhook_base.rstrip("/") + "/" + cfg.WEBHOOK_POSTURL.lstrip("/")
+                    root_webhook_base.rstrip("/")
+                    + "/"
+                    + cfg.WEBHOOK_POSTURL.lstrip("/")
                 )
 
     cfg.CONFIG_PATH = toml_path
