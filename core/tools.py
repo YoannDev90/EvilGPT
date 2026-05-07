@@ -60,7 +60,7 @@ async def handle_tool_call(tool_name: str, args: dict) -> str:
 
             # Using microsandbox (Standard API)
             # Use default python image
-            sb = microsandbox.Sandbox(image=microsandbox.Image(name="python:3.12-slim"))
+            sb = microsandbox.Sandbox(image="python:3.10-slim", timeout=10)
 
             # Install if missing (first time)
             if not microsandbox.is_installed():

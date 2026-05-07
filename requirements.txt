@@ -10,3 +10,4 @@ ddgs
 microsandbox
 aiohttp
 discord-webhook
+cocoindex

@@ -43,6 +43,8 @@ A powerful Discord bot integrating AI models to respond intelligently to user me
 - **Comprehensive Logging**: Detailed logging for debugging and monitoring
 - **Thread-Safe**: Prevents multiple concurrent requests from the same user
 - **Dynamic Model Selection**: Automatically selects the best model based on capabilities
+- **Persistent Memory**: Conversation history stays in a local CocoIndex-backed SQLite store
+- **Transparent Deletion**: Use `/memory list`, `/memory delete`, and `/memory clear` to inspect or purge stored turns
 
 ## 🚀 Quick Start
 
@@ -174,6 +176,7 @@ The bot automatically selects the most appropriate model based on:
 - Fallback model selection
 - Token counting and usage tracking
 - Performance timing
+- Persistent conversation memory with per-turn deletion
 
 ## 📦 Dependencies
 
@@ -229,6 +232,7 @@ isort .
 - Users cannot send multiple concurrent requests (prevents API overload)
 - Message content intent must be enabled for the bot to work
 - API keys and tokens should never be committed to version control
+- Local memory state lives under `data/memory_state.json` and syncs into a local SQLite store through CocoIndex
 
 ## 📝 License
 

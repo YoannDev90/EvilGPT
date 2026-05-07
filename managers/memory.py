@@ -1,31 +1,305 @@
-import collections
+from __future__ import annotations
+
+import asyncio
+import json
 import time
+import uuid
+from dataclasses import asdict, dataclass, field
+from pathlib import Path
+from typing import Any, AsyncIterator, Iterable
+
+import cocoindex as coco
+from cocoindex.connectors import sqlite as coco_sqlite
+
+from core.config import cfg
+
+BASE_DIR = Path(cfg.BASE_DIR)
+STATE_PATH = BASE_DIR / "data" / "memory_state.json"
+SQLITE_PATH = BASE_DIR / "data" / "memory.sqlite"
+COCOINDEX_DB_PATH = BASE_DIR / "data" / "cocoindex_memory.db"
+
+MEMORY_STORE_KEY = coco.ContextKey["MemoryManager"]("evilgpt_memory_store")
+MEMORY_DB_KEY = coco.ContextKey[coco_sqlite.ManagedConnection]("evilgpt_memory_db")
+
+_ACTIVE_MEMORY_MANAGER: "MemoryManager | None" = None
+
+
+@dataclass(slots=True)
+class MemoryTurn:
+    turn_id: str
+    user_id: int
+    user_name: str
+    guild_id: int | None
+    channel_id: int | None
+    user_content: str
+    assistant_content: str | None = None
+    created_at: float = field(default_factory=time.time)
+    updated_at: float = field(default_factory=time.time)
+
+
+@dataclass(slots=True)
+class UserMetadataRecord:
+    user_id: int
+    mood: str = "sarcastic"
+    updated_at: float = field(default_factory=time.time)
+
+
+def _ensure_parent_dir(path: Path) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+
+
+@coco.lifespan
+async def memory_lifespan(builder: coco.EnvironmentBuilder) -> AsyncIterator[None]:
+    manager = _ACTIVE_MEMORY_MANAGER
+    if manager is None:
+        raise RuntimeError("MemoryManager is not initialized.")
+
+    builder.settings.db_path = manager.cocoindex_db_path
+
+    with coco_sqlite.managed_connection(manager.sqlite_path, load_vec=False) as conn:
+        builder.provide(MEMORY_STORE_KEY, manager)
+        builder.provide(MEMORY_DB_KEY, conn)
+        yield
+
+
+@coco.fn
+async def memory_app_main() -> None:
+    store = coco.use_context(MEMORY_STORE_KEY)
+
+    turn_schema = await coco_sqlite.TableSchema.from_class(
+        MemoryTurn, primary_key=["turn_id"]
+    )
+    metadata_schema = await coco_sqlite.TableSchema.from_class(
+        UserMetadataRecord, primary_key=["user_id"]
+    )
+
+    turn_table = await coco_sqlite.mount_table_target(
+        MEMORY_DB_KEY,
+        "memory_turns",
+        turn_schema,
+    )
+    metadata_table = await coco_sqlite.mount_table_target(
+        MEMORY_DB_KEY,
+        "memory_metadata",
+        metadata_schema,
+    )
+
+    for turn in store.iter_turns():
+        turn_table.declare_row(row=turn)
+
+    for record in store.iter_metadata_records():
+        metadata_table.declare_row(row=record)
 
 
 class MemoryManager:
-    def __init__(self, max_history=10):
-        # user_id -> deque of messages
-        self.history = collections.defaultdict(
-            lambda: collections.deque(maxlen=max_history)
+    def __init__(
+        self,
+        max_history: int = 15,
+        *,
+        state_path: Path | str = STATE_PATH,
+        sqlite_path: Path | str = SQLITE_PATH,
+        cocoindex_db_path: Path | str = COCOINDEX_DB_PATH,
+    ) -> None:
+        global _ACTIVE_MEMORY_MANAGER
+
+        _ACTIVE_MEMORY_MANAGER = self
+        self.max_history = max_history
+        self.state_path = Path(state_path)
+        self.sqlite_path = Path(sqlite_path)
+        self.cocoindex_db_path = Path(cocoindex_db_path)
+        self._turns: dict[str, MemoryTurn] = {}
+        self._metadata: dict[int, UserMetadataRecord] = {}
+        self._sync_lock = asyncio.Lock()
+        self._app = coco.App(coco.AppConfig(name="EvilGPTMemory"), memory_app_main)
+
+        _ensure_parent_dir(self.state_path)
+        _ensure_parent_dir(self.sqlite_path)
+        _ensure_parent_dir(self.cocoindex_db_path)
+        self._load_state()
+
+    def _load_state(self) -> None:
+        if not self.state_path.exists():
+            return
+
+        try:
+            with self.state_path.open("r", encoding="utf-8") as handle:
+                payload = json.load(handle)
+        except Exception:
+            return
+
+        turns = payload.get("turns", []) if isinstance(payload, dict) else []
+        metadata = payload.get("metadata", []) if isinstance(payload, dict) else []
+
+        for item in turns:
+            try:
+                turn = MemoryTurn(**item)
+            except Exception:
+                continue
+            self._turns[turn.turn_id] = turn
+
+        for item in metadata:
+            try:
+                record = UserMetadataRecord(**item)
+            except Exception:
+                continue
+            self._metadata[record.user_id] = record
+
+    def _save_state(self) -> None:
+        payload = {
+            "turns": [asdict(turn) for turn in self.iter_turns()],
+            "metadata": [asdict(record) for record in self.iter_metadata_records()],
+        }
+        tmp_path = self.state_path.with_suffix(".json.tmp")
+        with tmp_path.open("w", encoding="utf-8") as handle:
+            json.dump(payload, handle, ensure_ascii=True, indent=2)
+        tmp_path.replace(self.state_path)
+
+    def _sorted_turns(self) -> list[MemoryTurn]:
+        return sorted(self._turns.values(), key=lambda turn: (turn.created_at, turn.turn_id))
+
+    def iter_turns(self) -> Iterable[MemoryTurn]:
+        return self._sorted_turns()
+
+    def iter_metadata_records(self) -> Iterable[UserMetadataRecord]:
+        return sorted(self._metadata.values(), key=lambda record: record.user_id)
+
+    def _resolve_turn_id(self, turn_id: str) -> str:
+        if turn_id in self._turns:
+            return turn_id
+
+        matches = [existing_id for existing_id in self._turns if existing_id.startswith(turn_id)]
+        if not matches:
+            raise KeyError(turn_id)
+        if len(matches) > 1:
+            raise ValueError(f"Turn ID '{turn_id}' is ambiguous.")
+        return matches[0]
+
+    def get_metadata(self, user_id: int, key: str | None = None) -> Any:
+        record = self._metadata.get(user_id)
+        if key is None:
+            return {"mood": record.mood if record else "sarcastic"}
+        if record is None:
+            if key == "mood":
+                return "sarcastic"
+            return None
+        return getattr(record, key, None)
+
+    def set_metadata(self, user_id: int, key: str, value: Any) -> None:
+        if key != "mood":
+            raise ValueError(f"Unsupported metadata key: {key}")
+        record = self._metadata.get(user_id)
+        if record is None:
+            record = UserMetadataRecord(user_id=user_id)
+            self._metadata[user_id] = record
+        record.mood = str(value)
+        record.updated_at = time.time()
+
+    def get_turn(self, turn_id: str) -> MemoryTurn:
+        return self._turns[self._resolve_turn_id(turn_id)]
+
+    def list_turns(self, user_id: int | None = None, limit: int = 10) -> list[MemoryTurn]:
+        turns = list(self.iter_turns())
+        if user_id is not None:
+            turns = [turn for turn in turns if turn.user_id == user_id]
+        return turns[-max(0, limit) :]
+
+    def get_history(self, user_id: int, limit: int | None = None) -> list[dict[str, str]]:
+        turns = [turn for turn in self.iter_turns() if turn.user_id == user_id]
+        if limit is not None:
+            turns = turns[-max(0, limit) :]
+
+        messages: list[dict[str, str]] = []
+        for turn in turns:
+            messages.append({"role": "user", "content": turn.user_content})
+            if turn.assistant_content:
+                messages.append({"role": "assistant", "content": turn.assistant_content})
+        return messages
+
+    def record_exchange(
+        self,
+        *,
+        user_id: int,
+        user_name: str,
+        user_content: str,
+        assistant_content: str,
+        guild_id: int | None,
+        channel_id: int | None,
+        turn_id: str | None = None,
+    ) -> str:
+        turn = MemoryTurn(
+            turn_id=turn_id or uuid.uuid4().hex,
+            user_id=user_id,
+            user_name=user_name,
+            guild_id=guild_id,
+            channel_id=channel_id,
+            user_content=user_content,
+            assistant_content=assistant_content,
         )
-        # user_id -> dict of "facts" or metadata
-        self.metadata = collections.defaultdict(lambda: {"mood": "sarcastic"})
+        self._turns[turn.turn_id] = turn
+        return turn.turn_id
 
-    def add_message(self, user_id, role, content):
-        self.history[user_id].append(
-            {"role": role, "content": content, "timestamp": time.time()}
-        )
+    def delete_turn(self, turn_id: str) -> MemoryTurn:
+        resolved = self._resolve_turn_id(turn_id)
+        return self._turns.pop(resolved)
 
-    def get_history(self, user_id):
-        return list(self.history[user_id])
+    def clear_history(self, user_id: int | None = None) -> int:
+        if user_id is None:
+            removed = len(self._turns)
+            self._turns.clear()
+            return removed
 
-    def clear_history(self, user_id):
-        self.history[user_id].clear()
+        removed_turn_ids = [turn_id for turn_id, turn in self._turns.items() if turn.user_id == user_id]
+        for turn_id in removed_turn_ids:
+            self._turns.pop(turn_id, None)
+        return len(removed_turn_ids)
 
-    def set_metadata(self, user_id, key, value):
-        self.metadata[user_id][key] = value
+    async def sync(self) -> None:
+        async with self._sync_lock:
+            self._save_state()
+            await self._app.update()
 
-    def get_metadata(self, user_id, key=None):
-        if key:
-            return self.metadata[user_id].get(key)
-        return self.metadata[user_id]
+    async def bootstrap(self) -> None:
+        await self.sync()
+
+    async def record_and_sync(
+        self,
+        *,
+        user_id: int,
+        user_name: str,
+        user_content: str,
+        assistant_content: str,
+        guild_id: int | None,
+        channel_id: int | None,
+    ) -> str:
+        async with self._sync_lock:
+            turn_id = self.record_exchange(
+                user_id=user_id,
+                user_name=user_name,
+                user_content=user_content,
+                assistant_content=assistant_content,
+                guild_id=guild_id,
+                channel_id=channel_id,
+            )
+            self._save_state()
+            await self._app.update()
+            return turn_id
+
+    async def set_metadata_and_sync(self, user_id: int, key: str, value: Any) -> None:
+        async with self._sync_lock:
+            self.set_metadata(user_id, key, value)
+            self._save_state()
+            await self._app.update()
+
+    async def delete_turn_and_sync(self, turn_id: str) -> MemoryTurn:
+        async with self._sync_lock:
+            turn = self.delete_turn(turn_id)
+            self._save_state()
+            await self._app.update()
+            return turn
+
+    async def clear_history_and_sync(self, user_id: int | None = None) -> int:
+        async with self._sync_lock:
+            removed = self.clear_history(user_id)
+            self._save_state()
+            await self._app.update()
+            return removed

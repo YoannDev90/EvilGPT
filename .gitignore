@@ -64,6 +64,11 @@ cover/
 local_settings.py
 db.sqlite3
 db.sqlite3-journal
+data/memory_state.json
+data/memory.sqlite
+data/cocoindex_memory.db
+data/*.sqlite-journal
+data/*.db-journal
 
 # Flask stuff:
 instance/

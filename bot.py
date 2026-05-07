@@ -28,6 +28,7 @@ class EvilBot(discord.Client):
         self.tree = app_commands.CommandTree(self)
 
     async def setup_hook(self):
+        await self.memory.bootstrap()
         # Setup commands and sync tree
         await self.setup_commands()
         await self.tree.sync()
@@ -78,7 +79,7 @@ class EvilBot(discord.Client):
             )
 
             # Handle history
-            history = self.memory.get_history(uid)
+            history = self.memory.get_history(uid, limit=self.memory.max_history)
 
             messages = [{"role": "system", "content": system_payload}]
             for h in history:
@@ -123,8 +124,14 @@ class EvilBot(discord.Client):
                     await sender.process_and_send(current_buffer)
 
             if full_content:
-                self.memory.add_message(uid, "user", message.content)
-                self.memory.add_message(uid, "assistant", full_content)
+                await self.memory.record_and_sync(
+                    user_id=uid,
+                    user_name=message.author.display_name,
+                    user_content=message.content,
+                    assistant_content=full_content,
+                    guild_id=message.guild.id if message.guild else None,
+                    channel_id=message.channel.id if hasattr(message.channel, "id") else None,
+                )
                 logger.info("Réponse streamée (par blocs) envoyée à %s", message.author)
 
         except Exception as e:
@@ -136,6 +143,92 @@ class EvilBot(discord.Client):
             self._processing.discard(uid)
 
     async def setup_commands(self):
+        memory_group = app_commands.Group(name="memory", description="Gère la mémoire persistante")
+
+        self.tree.add_command(memory_group)
+
+        def _format_turn(turn) -> str:
+            created = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(turn.created_at))
+            user_snippet = turn.user_content.replace("\n", " ")[:120]
+            assistant_snippet = (turn.assistant_content or "").replace("\n", " ")[:120]
+            lines = [
+                f"{turn.turn_id[:8]} | {created} | {turn.user_name} ({turn.user_id})",
+                f"  user: {user_snippet}",
+            ]
+            if assistant_snippet:
+                lines.append(f"  bot : {assistant_snippet}")
+            return "\n".join(lines)
+
+        @memory_group.command(name="list", description="Liste les derniers tours en mémoire")
+        @app_commands.describe(limit="Nombre de tours à afficher", user="Utilisateur cible optionnel")
+        async def memory_list(
+            interaction: discord.Interaction,
+            limit: int = 10,
+            user: discord.Member | None = None,
+        ):
+            target_user = user or interaction.user
+            if target_user.id != interaction.user.id and not interaction.user.guild_permissions.manage_messages:
+                await interaction.response.send_message(
+                    "Permission requise pour voir la mémoire d'un autre utilisateur.",
+                    ephemeral=True,
+                )
+                return
+
+            turns = self.memory.list_turns(target_user.id, limit=max(1, min(limit, 20)))
+            if not turns:
+                await interaction.response.send_message(
+                    "Aucun tour en mémoire pour ce compte.", ephemeral=True
+                )
+                return
+
+            content = "\n\n".join(_format_turn(turn) for turn in turns)
+            if len(content) > 1900:
+                content = content[:1900] + "\n..."
+            await interaction.response.send_message(f"```text\n{content}\n```", ephemeral=True)
+
+        @memory_group.command(name="delete", description="Supprime un tour précis de l'historique")
+        @app_commands.describe(turn_id="ID du tour à supprimer")
+        async def memory_delete(interaction: discord.Interaction, turn_id: str):
+            try:
+                turn = self.memory.get_turn(turn_id)
+            except KeyError:
+                await interaction.response.send_message(
+                    "ID introuvable.", ephemeral=True
+                )
+                return
+
+            if turn.user_id != interaction.user.id and not interaction.user.guild_permissions.manage_messages:
+                await interaction.response.send_message(
+                    "Permission requise pour supprimer la mémoire d'un autre utilisateur.",
+                    ephemeral=True,
+                )
+                return
+
+            deleted = await self.memory.delete_turn_and_sync(turn.turn_id)
+            await interaction.response.send_message(
+                f"Tour `{deleted.turn_id[:8]}` supprimé.", ephemeral=True
+            )
+
+        @memory_group.command(name="clear", description="Vide l'historique d'un utilisateur ou le tien")
+        @app_commands.describe(user="Utilisateur cible optionnel")
+        async def memory_clear(
+            interaction: discord.Interaction,
+            user: discord.Member | None = None,
+        ):
+            target_user = user or interaction.user
+            if target_user.id != interaction.user.id and not interaction.user.guild_permissions.manage_messages:
+                await interaction.response.send_message(
+                    "Permission requise pour vider la mémoire d'un autre utilisateur.",
+                    ephemeral=True,
+                )
+                return
+
+            removed = await self.memory.clear_history_and_sync(target_user.id)
+            await interaction.response.send_message(
+                f"{removed} tour(s) supprimé(s) pour {target_user.display_name}.",
+                ephemeral=True,
+            )
+
         @self.tree.command(name="set-mood", description="Change l'humeur de l'EvilGPT")
         @app_commands.describe(mood="L'humeur souhaitée")
         @app_commands.choices(
@@ -146,7 +239,7 @@ class EvilBot(discord.Client):
             ]
         )
         async def set_mood(interaction: discord.Interaction, mood: str):
-            self.memory.set_metadata(interaction.user.id, "mood", mood)
+            await self.memory.set_metadata_and_sync(interaction.user.id, "mood", mood)
             mood_names = {
                 "sarcastic": "Sarcastique",
                 "aggressive": "Debugger Agressif",
