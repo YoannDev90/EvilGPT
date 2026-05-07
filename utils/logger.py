@@ -13,8 +13,7 @@ LOGGER_NAME = "EvilGPT"
 
 class EvilGPTFilter(logging.Filter):
     def filter(self, record: logging.LogRecord) -> bool:
-        return record.name == LOGGER_NAME or record.name.startswith(f"{LOGGER_NAME}.")
-
+        return record.name == LOGGER_NAME
 
 class ColoredFormatter(logging.Formatter):
     COLORS = {
@@ -122,6 +121,25 @@ class DiscordWebhookHandler(Handler):
                     break
         except Exception as exc:
             print(f"Failed to send log to Discord webhook: {exc}")
+            try:
+                # Use discord-webhook package for sending
+                from discord_webhook import DiscordWebhook, DiscordEmbed
+
+                message = self.format(record)
+
+                # If message short enough, send as content; otherwise use embed description
+                if len(message) <= 1900:
+                    webhook = DiscordWebhook(url=self.webhook_url, content=message)
+                    webhook.execute()
+                    return
+
+                embed = DiscordEmbed(title=f"{record.filename}", description=message[:4096], color=self._level_color(record.levelno))
+                webhook = DiscordWebhook(url=self.webhook_url)
+                webhook.add_embed(embed)
+                webhook.execute()
+            except Exception as exc:
+                # Do not attempt fallback; just print error for debugging
+                print(f"Failed to send log to Discord webhook (discord-webhook): {exc}")
 
 
 def _is_real_webhook_url(url: Optional[str]) -> bool:

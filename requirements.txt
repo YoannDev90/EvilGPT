@@ -9,3 +9,4 @@ pilmoji
 ddgs
 microsandbox
 aiohttp
+discord-webhook

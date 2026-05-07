@@ -145,8 +145,12 @@ def _first_table(items: Any) -> Dict[str, Any]:
 def _normalize_webhook_url(url: Optional[str]) -> Optional[str]:
     if not url:
         return None
+    # If the configured url contains a placeholder, substitute with env var WEBHOOK_URL
     if "<URL>" in url:
-        return None
+        env_val = os.getenv("WEBHOOK_URL")
+        if not env_val:
+            return None
+        url = url.replace("<URL>", env_val)
     if url.startswith("http://") or url.startswith("https://"):
         return url
     return f"https://discord.com/api/webhooks/{url.lstrip('/')}"
@@ -219,13 +223,18 @@ def load_config(config_path: Optional[str] = None) -> Tuple[Config, LoggingConfi
         cfg.WEBHOOK_URL = logging_conf.discord_webhook
     else:
         # combine base + posturl if present
-        root_webhook_base = raw.get("webhook_base") or raw.get("webhook", {}).get(
-            "base"
-        )
-        if root_webhook_base and cfg.WEBHOOK_POSTURL:
-            cfg.WEBHOOK_URL = (
-                root_webhook_base.rstrip("/") + "/" + cfg.WEBHOOK_POSTURL.lstrip("/")
-            )
+        root_webhook_base = raw.get("webhook_base") or raw.get("webhook", {}).get("base")
+        if root_webhook_base:
+            # If base contains placeholder, replace with env WEBHOOK_URL
+            if "<URL>" in root_webhook_base:
+                env_val = os.getenv("WEBHOOK_URL")
+                if env_val:
+                    substituted = root_webhook_base.replace("<URL>", env_val)
+                    cfg.WEBHOOK_URL = _normalize_webhook_url(substituted)
+            elif cfg.WEBHOOK_POSTURL:
+                cfg.WEBHOOK_URL = (
+                    root_webhook_base.rstrip("/") + "/" + cfg.WEBHOOK_POSTURL.lstrip("/")
+                )
 
     cfg.CONFIG_PATH = toml_path
     return cfg, logging_conf
