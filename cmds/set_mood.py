@@ -22,4 +22,6 @@ async def setup(tree: app_commands.CommandTree, bot):
             "nihilist": "Nihilist",
             "jester": "Chaotic Jester",
         }
-        await interaction.response.send_message(f"Humeur changée en : **{mood_names[mood]}**. Prépare-toi à souffrir.")
+        await interaction.response.send_message(
+            f"Humeur changée en : **{mood_names[mood]}**. Prépare-toi à souffrir."
+        )

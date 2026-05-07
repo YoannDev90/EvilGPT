@@ -155,7 +155,9 @@ class MemoryManager:
         tmp_path.replace(self.state_path)
 
     def _sorted_turns(self) -> list[MemoryTurn]:
-        return sorted(self._turns.values(), key=lambda turn: (turn.created_at, turn.turn_id))
+        return sorted(
+            self._turns.values(), key=lambda turn: (turn.created_at, turn.turn_id)
+        )
 
     def iter_turns(self) -> Iterable[MemoryTurn]:
         return self._sorted_turns()
@@ -167,7 +169,11 @@ class MemoryManager:
         if turn_id in self._turns:
             return turn_id
 
-        matches = [existing_id for existing_id in self._turns if existing_id.startswith(turn_id)]
+        matches = [
+            existing_id
+            for existing_id in self._turns
+            if existing_id.startswith(turn_id)
+        ]
         if not matches:
             raise KeyError(turn_id)
         if len(matches) > 1:
@@ -197,13 +203,17 @@ class MemoryManager:
     def get_turn(self, turn_id: str) -> MemoryTurn:
         return self._turns[self._resolve_turn_id(turn_id)]
 
-    def list_turns(self, user_id: int | None = None, limit: int = 10) -> list[MemoryTurn]:
+    def list_turns(
+        self, user_id: int | None = None, limit: int = 10
+    ) -> list[MemoryTurn]:
         turns = list(self.iter_turns())
         if user_id is not None:
             turns = [turn for turn in turns if turn.user_id == user_id]
         return turns[-max(0, limit) :]
 
-    def get_history(self, user_id: int, limit: int | None = None) -> list[dict[str, str]]:
+    def get_history(
+        self, user_id: int, limit: int | None = None
+    ) -> list[dict[str, str]]:
         turns = [turn for turn in self.iter_turns() if turn.user_id == user_id]
         if limit is not None:
             turns = turns[-max(0, limit) :]
@@ -212,7 +222,9 @@ class MemoryManager:
         for turn in turns:
             messages.append({"role": "user", "content": turn.user_content})
             if turn.assistant_content:
-                messages.append({"role": "assistant", "content": turn.assistant_content})
+                messages.append(
+                    {"role": "assistant", "content": turn.assistant_content}
+                )
         return messages
 
     def record_exchange(
@@ -248,7 +260,9 @@ class MemoryManager:
             self._turns.clear()
             return removed
 
-        removed_turn_ids = [turn_id for turn_id, turn in self._turns.items() if turn.user_id == user_id]
+        removed_turn_ids = [
+            turn_id for turn_id, turn in self._turns.items() if turn.user_id == user_id
+        ]
         for turn_id in removed_turn_ids:
             self._turns.pop(turn_id, None)
         return len(removed_turn_ids)

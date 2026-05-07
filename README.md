@@ -118,6 +118,13 @@ Below is current snapshot of repository. This section is auto-updated by `./lint
 │       ├── evilgpt.png
 │       └── evilgpt.svg
 ├── bot.py
+├── cmds
+│   ├── __init__.py
+│   ├── loader.py
+│   ├── memory_clear.py
+│   ├── memory_delete.py
+│   ├── memory_list.py
+│   └── set_mood.py
 ├── config.toml
 ├── core
 │   ├── config.py
@@ -125,7 +132,20 @@ Below is current snapshot of repository. This section is auto-updated by `./lint
 │   ├── models_loader.py
 │   └── tools.py
 ├── data
+│   ├── cocoindex_memory.db
+│   │   └── mdb
+│   │       ├── data.mdb
+│   │       └── lock.mdb
+│   ├── memory.sqlite
+│   ├── memory_state.json
 │   ├── models.json
+│   ├── moods
+│   │   ├── aggressive.txt
+│   │   ├── jester.txt
+│   │   ├── mastermind.txt
+│   │   ├── neutral.txt
+│   │   ├── nihilist.txt
+│   │   └── sarcastic.txt
 │   ├── providers.json
 │   └── system_prompt.txt
 ├── .github
@@ -149,7 +169,7 @@ Below is current snapshot of repository. This section is auto-updated by `./lint
     ├── logger.py
     └── web_search.py
 
-11 directories, 30 files
+15 directories, 46 files
 ```
 <!-- TREE-END -->
 
@@ -193,6 +213,7 @@ The bot automatically selects the most appropriate model based on:
 - `ddgs` - Dux Distributed Global Search. A metasearch library that aggregates results from diverse web search services. (latest: 9.14.2)
 - `microsandbox` - Python SDK for microsandbox — secure, fast microVM-based sandboxing. (latest: 0.4.5)
 - `aiohttp` - Async http client/server framework (asyncio) (latest: 3.13.5)
+- `discord-webhook` - Easily send Discord webhooks with Python (latest: 1.4.1)
 ```
 <!--DEPS-END-->
 

@@ -1,15 +1,15 @@
 import asyncio
 import time
+from pathlib import Path
 
 import discord
 from discord import app_commands
 
+from cmds import loader as cmds_loader
 from core.config import cfg, read_mood_prompt
 from core.model import Answer, generate_answer
 from managers.context import format_context_for_prompt, get_server_context
 from managers.memory import MemoryManager
-from cmds import loader as cmds_loader
-from pathlib import Path
 from utils.handlers.messages import MessageSender
 from utils.logger import get_logger, setup_logging
 from utils.web_search import get_web_context
@@ -131,7 +131,9 @@ class EvilBot(discord.Client):
                     user_content=message.content,
                     assistant_content=full_content,
                     guild_id=message.guild.id if message.guild else None,
-                    channel_id=message.channel.id if hasattr(message.channel, "id") else None,
+                    channel_id=message.channel.id
+                    if hasattr(message.channel, "id")
+                    else None,
                 )
                 logger.info("Réponse streamée (par blocs) envoyée à %s", message.author)
 
