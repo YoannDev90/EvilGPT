@@ -4,10 +4,12 @@ import time
 import discord
 from discord import app_commands
 
-from core.config import cfg, read_system_prompt
+from core.config import cfg, read_mood_prompt
 from core.model import Answer, generate_answer
 from managers.context import format_context_for_prompt, get_server_context
 from managers.memory import MemoryManager
+from cmds import loader as cmds_loader
+from pathlib import Path
 from utils.handlers.messages import MessageSender
 from utils.logger import get_logger, setup_logging
 from utils.web_search import get_web_context
@@ -29,8 +31,8 @@ class EvilBot(discord.Client):
 
     async def setup_hook(self):
         await self.memory.bootstrap()
-        # Setup commands and sync tree
-        await self.setup_commands()
+        # load commands from cmds/ directory
+        await cmds_loader.load_commands(self, self.tree, Path(__file__).parent / "cmds")
         await self.tree.sync()
 
     async def on_ready(self):
@@ -67,13 +69,12 @@ class EvilBot(discord.Client):
                 "mastermind": "Tu es un génie du mal. Tu parles de tes plans de domination mondiale et traites l'utilisateur comme un pion.",
             }
 
-            # Prepare prompt
-            system_base = read_system_prompt()
+            # Prepare prompt from mood file (with safe fallback)
+            system_base = read_mood_prompt(user_mood)
             system_payload = (
                 f"{system_base}\n\n"
-                f"PERSONNALITÉ ACTUELLE : {mood_instructions.get(user_mood)}\n\n"
                 f"INSTRUCTIONS OUTILS :\nTu as accès à une recherche web et à une sandbox Python. "
-                f"Utilise-les si nécessaire pour répondre de manière précise et méchante.\n\n"
+                f"Utilise-les si nécessaire pour répondre de manière précise.\n\n"
                 f"Contexte actuel :\n{ctx_str}\n\n"
                 f"L'utilisateur s'appelle {message.author.display_name}."
             )
@@ -143,91 +144,7 @@ class EvilBot(discord.Client):
             self._processing.discard(uid)
 
     async def setup_commands(self):
-        memory_group = app_commands.Group(name="memory", description="Gère la mémoire persistante")
-
-        self.tree.add_command(memory_group)
-
-        def _format_turn(turn) -> str:
-            created = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(turn.created_at))
-            user_snippet = turn.user_content.replace("\n", " ")[:120]
-            assistant_snippet = (turn.assistant_content or "").replace("\n", " ")[:120]
-            lines = [
-                f"{turn.turn_id[:8]} | {created} | {turn.user_name} ({turn.user_id})",
-                f"  user: {user_snippet}",
-            ]
-            if assistant_snippet:
-                lines.append(f"  bot : {assistant_snippet}")
-            return "\n".join(lines)
-
-        @memory_group.command(name="list", description="Liste les derniers tours en mémoire")
-        @app_commands.describe(limit="Nombre de tours à afficher", user="Utilisateur cible optionnel")
-        async def memory_list(
-            interaction: discord.Interaction,
-            limit: int = 10,
-            user: discord.Member | None = None,
-        ):
-            target_user = user or interaction.user
-            if target_user.id != interaction.user.id and not interaction.user.guild_permissions.manage_messages:
-                await interaction.response.send_message(
-                    "Permission requise pour voir la mémoire d'un autre utilisateur.",
-                    ephemeral=True,
-                )
-                return
-
-            turns = self.memory.list_turns(target_user.id, limit=max(1, min(limit, 20)))
-            if not turns:
-                await interaction.response.send_message(
-                    "Aucun tour en mémoire pour ce compte.", ephemeral=True
-                )
-                return
-
-            content = "\n\n".join(_format_turn(turn) for turn in turns)
-            if len(content) > 1900:
-                content = content[:1900] + "\n..."
-            await interaction.response.send_message(f"```text\n{content}\n```", ephemeral=True)
-
-        @memory_group.command(name="delete", description="Supprime un tour précis de l'historique")
-        @app_commands.describe(turn_id="ID du tour à supprimer")
-        async def memory_delete(interaction: discord.Interaction, turn_id: str):
-            try:
-                turn = self.memory.get_turn(turn_id)
-            except KeyError:
-                await interaction.response.send_message(
-                    "ID introuvable.", ephemeral=True
-                )
-                return
-
-            if turn.user_id != interaction.user.id and not interaction.user.guild_permissions.manage_messages:
-                await interaction.response.send_message(
-                    "Permission requise pour supprimer la mémoire d'un autre utilisateur.",
-                    ephemeral=True,
-                )
-                return
-
-            deleted = await self.memory.delete_turn_and_sync(turn.turn_id)
-            await interaction.response.send_message(
-                f"Tour `{deleted.turn_id[:8]}` supprimé.", ephemeral=True
-            )
-
-        @memory_group.command(name="clear", description="Vide l'historique d'un utilisateur ou le tien")
-        @app_commands.describe(user="Utilisateur cible optionnel")
-        async def memory_clear(
-            interaction: discord.Interaction,
-            user: discord.Member | None = None,
-        ):
-            target_user = user or interaction.user
-            if target_user.id != interaction.user.id and not interaction.user.guild_permissions.manage_messages:
-                await interaction.response.send_message(
-                    "Permission requise pour vider la mémoire d'un autre utilisateur.",
-                    ephemeral=True,
-                )
-                return
-
-            removed = await self.memory.clear_history_and_sync(target_user.id)
-            await interaction.response.send_message(
-                f"{removed} tour(s) supprimé(s) pour {target_user.display_name}.",
-                ephemeral=True,
-            )
+        # commands loaded from cmds/ via loader
 
         @self.tree.command(name="set-mood", description="Change l'humeur de l'EvilGPT")
         @app_commands.describe(mood="L'humeur souhaitée")

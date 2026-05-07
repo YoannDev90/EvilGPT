@@ -131,6 +131,7 @@ class Config:
     SYSTEM_PROMPT_PATH: str = os.path.join(BASE_DIR, "data", "system_prompt.txt")
     PROVIDERS_PATH: str = os.path.join(BASE_DIR, "data", "providers.json")
     MODELS_PATH: str = os.path.join(BASE_DIR, "data", "models.json")
+    MOODS_DIR: str = os.path.join(BASE_DIR, "data", "moods")
     CONFIG_PATH: str = DEFAULT_CONFIG_PATH
 
 
@@ -251,5 +252,25 @@ cfg, logging_cfg = load_config()
 def read_system_prompt() -> Optional[str]:
     if os.path.exists(cfg.SYSTEM_PROMPT_PATH):
         with open(cfg.SYSTEM_PROMPT_PATH, "r", encoding="utf-8") as f:
+            return f.read().strip()
+    return None
+
+
+def read_mood_prompt(mood: str | None) -> Optional[str]:
+    """Read a mood-specific system prompt from `data/moods/<mood>.txt`.
+
+    If `mood` is None or the file does not exist, fallback to `neutral.txt`.
+    """
+    moods_dir = os.path.join(BASE_DIR, "data", "moods")
+    if mood:
+        path = os.path.join(moods_dir, f"{mood}.txt")
+        if os.path.exists(path):
+            with open(path, "r", encoding="utf-8") as f:
+                return f.read().strip()
+
+    # fallback to neutral
+    fallback = os.path.join(moods_dir, "neutral.txt")
+    if os.path.exists(fallback):
+        with open(fallback, "r", encoding="utf-8") as f:
             return f.read().strip()
     return None
