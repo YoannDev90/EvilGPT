@@ -128,6 +128,7 @@ Below is current snapshot of repository. This section is auto-updated by `./lint
 ├── config.toml
 ├── core
 │   ├── config.py
+│   ├── internal_mcp.py
 │   ├── model.py
 │   ├── models_loader.py
 │   └── tools.py
@@ -136,6 +137,7 @@ Below is current snapshot of repository. This section is auto-updated by `./lint
 │   │   └── mdb
 │   │       ├── data.mdb
 │   │       └── lock.mdb
+│   ├── mcp.json
 │   ├── memory.sqlite
 │   ├── memory_state.json
 │   ├── models.json
@@ -146,8 +148,7 @@ Below is current snapshot of repository. This section is auto-updated by `./lint
 │   │   ├── neutral.txt
 │   │   ├── nihilist.txt
 │   │   └── sarcastic.txt
-│   ├── providers.json
-│   └── system_prompt.txt
+│   └── providers.json
 ├── .github
 │   └── workflows
 │       └── pre-commit.yml
@@ -157,6 +158,7 @@ Below is current snapshot of repository. This section is auto-updated by `./lint
 ├── main.py
 ├── managers
 │   ├── context.py
+│   ├── mcp.py
 │   └── memory.py
 ├── README.md
 ├── requirements.txt
@@ -169,7 +171,7 @@ Below is current snapshot of repository. This section is auto-updated by `./lint
     ├── logger.py
     └── web_search.py
 
-15 directories, 46 files
+15 directories, 48 files
 ```
 <!-- TREE-END -->
 
@@ -214,6 +216,7 @@ The bot automatically selects the most appropriate model based on:
 - `microsandbox` - Python SDK for microsandbox — secure, fast microVM-based sandboxing. (latest: 0.4.5)
 - `aiohttp` - Async http client/server framework (asyncio) (latest: 3.13.5)
 - `discord-webhook` - Easily send Discord webhooks with Python (latest: 1.4.1)
+- `cocoindex` - With CocoIndex, users declare the transformation, CocoIndex creates & maintains an index, and keeps the derived index up to date based on source update, with minimal computation and changes. (latest: 1.0.3)
 ```
 <!--DEPS-END-->
 

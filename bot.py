@@ -9,6 +9,7 @@ from cmds import loader as cmds_loader
 from core.config import cfg, read_mood_prompt
 from core.model import Answer, generate_answer
 from managers.context import format_context_for_prompt, get_server_context
+from managers.mcp import mcp_manager
 from managers.memory import MemoryManager
 from utils.handlers.messages import MessageSender
 from utils.logger import get_logger, setup_logging
@@ -31,6 +32,7 @@ class EvilBot(discord.Client):
 
     async def setup_hook(self):
         await self.memory.bootstrap()
+        await mcp_manager.initialize()
         # load commands from cmds/ directory
         await cmds_loader.load_commands(self, self.tree, Path(__file__).parent / "cmds")
         await self.tree.sync()

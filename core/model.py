@@ -24,7 +24,7 @@ for _n in ("LiteLLM", "litellm"):
 
 from core.config import cfg
 from core.models_loader import Model, get_models
-from core.tools import TOOLS, handle_tool_call
+from core.tools import get_combined_tools, handle_tool_call
 from utils.logger import get_logger
 
 logger = get_logger()
@@ -73,7 +73,7 @@ async def generate_answer(messages: list, stream: bool = False):
             base_url=chosen.api_base,
             api_key=chosen.api_key,
             messages=messages,
-            tools=TOOLS,
+            tools=get_combined_tools(),
             tool_choice="auto",
             fallbacks=fallbacks_configs,
             timeout=25,

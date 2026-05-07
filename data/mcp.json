@@ -1,0 +1,17 @@
+{
+  "mcpServers": {
+    "internal": {
+      "command": "python",
+      "args": [
+        "core/internal_mcp.py"
+      ]
+    },
+    "everything": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-everything"
+      ]
+    }
+  }
+}

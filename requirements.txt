@@ -11,3 +11,4 @@ microsandbox
 aiohttp
 discord-webhook
 cocoindex
+fastmcp
