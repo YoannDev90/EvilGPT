@@ -5,7 +5,7 @@ import microsandbox
 from utils.logger import get_logger
 from utils.web_search import get_web_context
 
-logger = get_logger(__name__)
+logger = get_logger()
 
 # Tools definition for LiteLLM / OpenAI format
 TOOLS = [

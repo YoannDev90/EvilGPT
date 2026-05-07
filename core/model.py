@@ -27,7 +27,7 @@ from core.models_loader import Model, get_models
 from core.tools import TOOLS, handle_tool_call
 from utils.logger import get_logger
 
-logger = get_logger(__name__)
+logger = get_logger()
 
 
 class Answer:

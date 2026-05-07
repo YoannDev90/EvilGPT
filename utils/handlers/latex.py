@@ -13,7 +13,7 @@ try:
 except ImportError:
     cairosvg = None
 
-logger = get_logger(__name__)
+logger = get_logger()
 
 LATEX_TO_EMOJI = {
     r"\alpha": "α",

@@ -5,7 +5,7 @@ from ddgs import DDGS
 
 from utils.logger import get_logger
 
-logger = get_logger(__name__)
+logger = get_logger()
 
 
 def search_ddg(query: str, max_results: int = 3) -> List[Dict[str, str]]:

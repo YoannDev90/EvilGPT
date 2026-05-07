@@ -1,6 +1,6 @@
 import os
 from dataclasses import dataclass
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Optional, Tuple
 
 try:
     import tomllib as _toml
@@ -59,13 +59,65 @@ def read_from_toml_config(
 
 
 @dataclass
-class LoggingConfig:
+class ConsoleLoggingConfig:
+    enable: bool = True
     level: str = "INFO"
-    format: str = "%(asctime)s - %(name)s - %(message)s"
+    console_format: str = "%(asctime)s - %(message)s"
+
+
+@dataclass
+class FileLoggingConfig:
     enable_file_logging: bool = True
     log_file: str = "logs/evilgpt.log"
+
+    # file logs can keep more context; filename is more useful than logger name
+    file_format: str = "%(asctime)s - %(filename)s - %(message)s"
+
+
+@dataclass
+class DiscordLoggingConfig:
     enable_discord_logging: bool = False
     discord_webhook: Optional[str] = None
+    discord_format: str = "%(asctime)s - %(filename)s\n%(message)s"
+
+
+@dataclass
+class LoggingConfig:
+    console: ConsoleLoggingConfig
+    file: FileLoggingConfig
+    discord: DiscordLoggingConfig
+
+    @property
+    def level(self) -> str:
+        return self.console.level
+
+    @property
+    def enable_file_logging(self) -> bool:
+        return self.file.enable_file_logging
+
+    @property
+    def log_file(self) -> str:
+        return self.file.log_file
+
+    @property
+    def enable_discord_logging(self) -> bool:
+        return self.discord.enable_discord_logging
+
+    @property
+    def discord_webhook(self) -> Optional[str]:
+        return self.discord.discord_webhook
+
+    @property
+    def console_format(self) -> str:
+        return self.console.console_format
+
+    @property
+    def file_format(self) -> str:
+        return self.file.file_format
+
+    @property
+    def discord_format(self) -> str:
+        return self.discord.discord_format
 
 
 @dataclass
@@ -82,28 +134,87 @@ class Config:
     CONFIG_PATH: str = DEFAULT_CONFIG_PATH
 
 
-def load_config(config_path: Optional[str] = None) -> (Config, LoggingConfig):
+def _first_table(items: Any) -> Dict[str, Any]:
+    if isinstance(items, list) and items:
+        return items[0] if isinstance(items[0], dict) else {}
+    if isinstance(items, dict):
+        return items
+    return {}
+
+
+def _normalize_webhook_url(url: Optional[str]) -> Optional[str]:
+    if not url:
+        return None
+    if "<URL>" in url:
+        return None
+    if url.startswith("http://") or url.startswith("https://"):
+        return url
+    return f"https://discord.com/api/webhooks/{url.lstrip('/')}"
+
+
+def load_config(config_path: Optional[str] = None) -> Tuple[Config, LoggingConfig]:
     toml_path = config_path or DEFAULT_CONFIG_PATH
     raw = _load_toml(toml_path)
 
-    # Logging
     raw_logging = raw.get("logging", {}) if isinstance(raw, dict) else {}
+    console_raw = _first_table(raw.get("console"))
+    file_raw = _first_table(raw.get("file"))
+    discord_raw = _first_table(raw.get("discord"))
+
+    # Backward compatibility with previous flat schema if present under [logging]
+    console_conf = ConsoleLoggingConfig(
+        enable=console_raw.get("enable", raw_logging.get("enable", True)),
+        level=console_raw.get("level", raw_logging.get("level", "INFO")),
+        console_format=console_raw.get(
+            "console_format",
+            raw_logging.get("console_format", "%(asctime)s - %(message)s"),
+        ),
+    )
+    file_conf = FileLoggingConfig(
+        enable_file_logging=file_raw.get(
+            "enable_file_logging", raw_logging.get("enable_file_logging", True)
+        ),
+        log_file=file_raw.get(
+            "log_file", raw_logging.get("log_file", "logs/evilgpt.log")
+        ),
+        file_format=file_raw.get(
+            "file_format",
+            raw_logging.get("file_format", "%(asctime)s - %(filename)s - %(message)s"),
+        ),
+    )
+    discord_conf = DiscordLoggingConfig(
+        enable_discord_logging=discord_raw.get(
+            "enable_discord_logging",
+            raw_logging.get("enable_discord_logging", False),
+        ),
+        discord_webhook=_normalize_webhook_url(
+            discord_raw.get("discord_webhook")
+            or raw_logging.get("discord_webhook")
+            or None
+        ),
+        discord_format=discord_raw.get(
+            "discord_format",
+            raw_logging.get(
+                "discord_format", "%(asctime)s - %(filename)s\n%(message)s"
+            ),
+        ),
+    )
+
     logging_conf = LoggingConfig(
-        level=raw_logging.get("level", "INFO"),
-        format=raw_logging.get("format", "%(asctime)s - %(name)s - %(message)s"),
-        enable_file_logging=raw_logging.get("enable_file_logging", True),
-        log_file=raw_logging.get("log_file", "logs/evilgpt.log"),
-        enable_discord_logging=raw_logging.get("enable_discord_logging", False),
-        discord_webhook=raw_logging.get("discord_webhook") or None,
+        console=console_conf,
+        file=file_conf,
+        discord=discord_conf,
     )
 
     cfg = Config()
     cfg.BOT_TOKEN = os.getenv("BOT_TOKEN")
     cfg.WEBHOOK_POSTURL = os.getenv("WEBHOOK_URL") or os.getenv("WEBHOOK_POSTURL")
 
+    env_webhook_url = _normalize_webhook_url(os.getenv("WEBHOOK_URL"))
+
     # Determine final webhook URL: priority - env WEBHOOK_URL, logging.discord_webhook, combine webhook_base + posturl
-    if os.getenv("WEBHOOK_URL"):
-        cfg.WEBHOOK_URL = os.getenv("WEBHOOK_URL")
+    if env_webhook_url:
+        cfg.WEBHOOK_URL = env_webhook_url
     elif logging_conf.discord_webhook:
         cfg.WEBHOOK_URL = logging_conf.discord_webhook
     else:

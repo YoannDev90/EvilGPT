@@ -7,7 +7,7 @@ import discord
 from core.config import cfg
 from utils.logger import get_logger
 
-logger = get_logger(__name__)
+logger = get_logger()
 
 from utils.handlers.codeblock import (send_code_block,
                                       send_code_block_with_return)

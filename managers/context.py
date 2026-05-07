@@ -2,7 +2,7 @@ import discord
 
 from utils.logger import get_logger
 
-logger = get_logger(__name__)
+logger = get_logger()
 
 
 async def get_server_context(guild: discord.Guild):

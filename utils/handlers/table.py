@@ -18,7 +18,7 @@ try:
 except ImportError:
     LOGGER_NAME = __name__
 
-logger = get_logger(__name__)
+logger = get_logger()
 
 URL_REGEX = r"\[([^\]]+)\]\((https?://[^\s\)]+)\)|(https?://[^\s\)]+)"
 TABLE_IMAGE_PLACEHOLDER = "__TABLE_IMG"

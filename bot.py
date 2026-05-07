@@ -13,7 +13,7 @@ from utils.logger import get_logger, setup_logging
 from utils.web_search import get_web_context
 
 setup_logging()
-logger = get_logger(__name__)
+logger = get_logger()
 
 intents = discord.Intents.default()
 intents.message_content = True

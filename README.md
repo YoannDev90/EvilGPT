@@ -188,7 +188,7 @@ The bot automatically selects the most appropriate model based on:
 - `Pillow` - Python Imaging Library (fork) (latest: 12.2.0)
 - `pilmoji` - Pilmoji is an emoji renderer for Pillow, Python's imaging library. (latest: 2.0.5)
 - `ddgs` - Dux Distributed Global Search. A metasearch library that aggregates results from diverse web search services. (latest: 9.14.2)
-- `microsandbox` - Python SDK for microsandbox — secure, fast microVM-based sandboxing. (latest: 0.4.4)
+- `microsandbox` - Python SDK for microsandbox — secure, fast microVM-based sandboxing. (latest: 0.4.5)
 ```
 <!--DEPS-END-->
 

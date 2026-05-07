@@ -1,7 +1,13 @@
 [logging]
+[[console]]
+enable = true
 level = "INFO"
-format = "%(asctime)s - %(name)s - %(message)s"
+console_format = "%(asctime)s - %(message)s"
+[[file]]
 enable_file_logging = true
 log_file = "logs/evilgpt.log"
+file_format = "%(asctime)s - %(filename)s - %(levelname)s - %(message)s"
+[[discord]]
 enable_discord_logging = true
 discord_webhook = "https://discord.com/api/webhooks/<URL>"
+discord_format = "%(asctime)s - %(filename)s\n%(message)s"
