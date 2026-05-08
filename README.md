@@ -128,7 +128,6 @@ Below is current snapshot of repository. This section is auto-updated by `./lint
 ├── config.toml
 ├── core
 │   ├── config.py
-│   ├── internal_mcp.py
 │   ├── model.py
 │   ├── models_loader.py
 │   └── tools.py
@@ -171,7 +170,7 @@ Below is current snapshot of repository. This section is auto-updated by `./lint
     ├── logger.py
     └── web_search.py
 
-15 directories, 48 files
+15 directories, 47 files
 ```
 <!-- TREE-END -->
 

@@ -198,19 +198,14 @@ def setup_logging(level: int = logging.INFO, config=None):
 
     logging.basicConfig(level=level, handlers=handlers, force=True)
 
-    # Mute noisy library loggers
-    for logger_name in [
-        "discord",
-        "httpcore",
-        "httpx",
-        "openai",
-        "fastmcp",
-        "pydantic",
-    ]:
-        lib_logger = logging.getLogger(logger_name)
-        lib_logger.setLevel(logging.ERROR)
+    # Dynamically silence all loggers except our own
+    for name in list(logging.root.manager.loggerDict.keys()):
+        if name == LOGGER_NAME or name.startswith(f"{LOGGER_NAME}."):
+            continue
+        lib_logger = logging.getLogger(name)
+        lib_logger.setLevel(logging.CRITICAL)
         lib_logger.propagate = False
-        # Ensure they use our handlers if we want them to log warnings to our files/discord
+        # Still attach our handlers to catch CRITICAL errors in files/discord
         for handler in handlers:
             if handler not in lib_logger.handlers:
                 lib_logger.addHandler(handler)

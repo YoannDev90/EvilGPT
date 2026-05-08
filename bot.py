@@ -15,7 +15,6 @@ from utils.handlers.messages import MessageSender
 from utils.logger import get_logger, setup_logging
 from utils.web_search import get_web_context
 
-setup_logging(config=logging_cfg)
 logger = get_logger()
 
 intents = discord.Intents.default()
@@ -176,4 +175,5 @@ def run_bot():
         logger.error("BOT_TOKEN est manquant dans l'environnement !")
         return
     client = EvilBot(intents=intents)
-    client.run(cfg.BOT_TOKEN)
+    # log_handler=None prevents discord.py from overriding our logging config
+    client.run(cfg.BOT_TOKEN, log_handler=None)

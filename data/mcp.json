@@ -1,17 +1,11 @@
 {
   "mcpServers": {
-    "internal": {
-      "command": "python",
-      "args": [
-        "core/internal_mcp.py"
-      ]
+    "search": {
+      "url": "https://search.parallel.ai/mcp"
     },
-    "everything": {
+    "microsandbox": {
       "command": "npx",
-      "args": [
-        "-y",
-        "@modelcontextprotocol/server-everything"
-      ]
+      "args": ["-y", "microsandbox-mcp"]
     }
   }
 }

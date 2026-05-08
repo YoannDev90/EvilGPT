@@ -31,10 +31,20 @@ class MCPManager:
         for name, srv_config in servers.items():
             try:
                 logger.info(f"Initializing MCP server: {name}")
-                # Use FastMCP.client.Client for version 3.x+
-                # We wrap it in a mcpServers dict so the Client correctly identifies it as a config
-                client = Client(
-                    {
+
+                # Check for SSE URL (for search.parallel.ai/mcp)
+                if "url" in srv_config:
+                    client_config = {
+                        "mcpServers": {
+                            name: {
+                                "url": srv_config["url"],
+                                "headers": srv_config.get("headers", {}),
+                            }
+                        }
+                    }
+                else:
+                    # Stdio config
+                    client_config = {
                         "mcpServers": {
                             name: {
                                 "command": srv_config["command"],
@@ -43,7 +53,8 @@ class MCPManager:
                             }
                         }
                     }
-                )
+
+                client = Client(client_config)
                 self.clients[name] = client
 
                 # Connection must be established via context manager to allow list_tools()
