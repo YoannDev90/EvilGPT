@@ -51,6 +51,7 @@ async def generate_answer(messages: list, stream: bool = False):
 
     # Sort models or pick one that isn't known to be down
     chosen = _select_model(models)
+    logger.debug(f"Selected model: {chosen.id} (base: {chosen.api_base})")
 
     # Prépare les fallbacks sans inclure le modèle principal
     fallbacks_configs = []
@@ -83,6 +84,7 @@ async def generate_answer(messages: list, stream: bool = False):
 
         # Si tool_calls est présent, on les exécute
         if hasattr(message, "tool_calls") and message.tool_calls:
+            logger.info(f"LLM wants to use {len(message.tool_calls)} tools: {[tc.function.name for tc in message.tool_calls]}")
             assistant_message = {
                 "role": "assistant",
                 "content": message.content or "",

@@ -82,6 +82,7 @@ class EvilBot(discord.Client):
 
             # Handle history
             history = self.memory.get_history(uid, limit=self.memory.max_history)
+            logger.debug(f"Handling message from {message.author.display_name} (ID: {uid}). History depth: {len(history)}")
 
             messages = [{"role": "system", "content": system_payload}]
             for h in history:
@@ -91,6 +92,7 @@ class EvilBot(discord.Client):
             # Activation de l'indicateur "typing" de Discord
             async with message.channel.typing():
                 # Start streaming
+                logger.debug(f"Sending request to LLM with {len(messages)} messages...")
                 stream = await generate_answer(messages, True)
 
                 full_content = ""

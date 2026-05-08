@@ -95,12 +95,15 @@ class MCPManager:
     ) -> str:
         client = self.clients.get(server_name)
         if not client:
+            logger.error(f"MCP tool call failed: Server '{server_name}' not found")
             return f"Error: MCP server {server_name} not found."
 
+        logger.info(f"Calling MCP tool: {server_name}.{tool_name} with args: {arguments}")
         try:
             # call_tool in fastmcp requires an active connection
             async with client:
                 result = await client.call_tool(tool_name, arguments)
+                logger.info(f"MCP tool {server_name}.{tool_name} returned: {str(result)[:500]}...")
                 return str(result)
         except Exception as e:
             logger.error(f"Error calling MCP tool {tool_name} on {server_name}: {e}")
