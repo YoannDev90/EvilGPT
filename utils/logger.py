@@ -156,21 +156,9 @@ def setup_logging(level: int = logging.INFO, config=None):
 
     If `config` provided and has file/webhook settings, those will be used.
     """
-    console_format = getattr(
-        config,
-        "console_format",
-        "%(asctime)s - %(filename)s - %(message)s",
-    )
-    file_format = getattr(
-        config,
-        "file_format",
-        "%(asctime)s - %(filename)s - %(message)s",
-    )
-    discord_format = getattr(
-        config,
-        "discord_format",
-        "%(asctime)s\n%(message)s",
-    )
+    console_format = getattr(config, "console_format")
+    file_format = getattr(config, "file_format")
+    discord_format = getattr(config, "discord_format")
 
     handlers = []
 
@@ -209,6 +197,23 @@ def setup_logging(level: int = logging.INFO, config=None):
             pass
 
     logging.basicConfig(level=level, handlers=handlers, force=True)
+
+    # Mute noisy library loggers
+    for logger_name in [
+        "discord",
+        "httpcore",
+        "httpx",
+        "openai",
+        "fastmcp",
+        "pydantic",
+    ]:
+        lib_logger = logging.getLogger(logger_name)
+        lib_logger.setLevel(logging.ERROR)
+        lib_logger.propagate = False
+        # Ensure they use our handlers if we want them to log warnings to our files/discord
+        for handler in handlers:
+            if handler not in lib_logger.handlers:
+                lib_logger.addHandler(handler)
 
 
 def get_logger() -> logging.Logger:

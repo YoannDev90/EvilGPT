@@ -6,7 +6,7 @@ import discord
 from discord import app_commands
 
 from cmds import loader as cmds_loader
-from core.config import cfg, read_mood_prompt
+from core.config import cfg, logging_cfg, read_mood_prompt
 from core.model import Answer, generate_answer
 from managers.context import format_context_for_prompt, get_server_context
 from managers.mcp import mcp_manager
@@ -15,7 +15,7 @@ from utils.handlers.messages import MessageSender
 from utils.logger import get_logger, setup_logging
 from utils.web_search import get_web_context
 
-setup_logging()
+setup_logging(config=logging_cfg)
 logger = get_logger()
 
 intents = discord.Intents.default()

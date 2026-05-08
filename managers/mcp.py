@@ -3,7 +3,7 @@ import json
 import os
 from typing import Any, Dict, List
 
-from fastmcp import FastMCP
+from fastmcp.client import Client
 
 from core.config import cfg
 from utils.logger import get_logger
@@ -14,7 +14,7 @@ logger = get_logger()
 class MCPManager:
     def __init__(self, config_path: str):
         self.config_path = config_path
-        self.clients: Dict[str, FastMCP] = {}
+        self.clients: Dict[str, Client] = {}
         self.tools_metadata: List[Dict[str, Any]] = []
 
     def load_config(self):
@@ -31,27 +31,44 @@ class MCPManager:
         for name, srv_config in servers.items():
             try:
                 logger.info(f"Initializing MCP server: {name}")
-                # FastMCP acts as a client when connecting to a server command
-                client = FastMCP(
-                    name, command=srv_config["command"], args=srv_config.get("args", [])
+                # Use FastMCP.client.Client for version 3.x+
+                # We wrap it in a mcpServers dict so the Client correctly identifies it as a config
+                client = Client(
+                    {
+                        "mcpServers": {
+                            name: {
+                                "command": srv_config["command"],
+                                "args": srv_config.get("args", []),
+                                "env": srv_config.get("env", os.environ.copy()),
+                            }
+                        }
+                    }
                 )
                 self.clients[name] = client
 
-                # Fetch tools from the server
-                # In fastmcp, we can iterate over the tools exposed
-                for tool in client.tools:
-                    # Map to OpenAI/LiteLLM function format
-                    self.tools_metadata.append(
-                        {
-                            "type": "function",
-                            "function": {
-                                "name": f"mcp_{name}_{tool.name}",
-                                "description": tool.description,
-                                "parameters": tool.parameters,  # fastmcp tool parameters are already JSON schemas
-                            },
-                        }
-                    )
-                logger.info(f"Loaded {len(client.tools)} tools from {name}")
+                # Connection must be established via context manager to allow list_tools()
+                async with client:
+                    tools = await client.list_tools()
+                    for tool in tools:
+                        # Map to OpenAI/LiteLLM function format
+                        # In fastmcp Client, tool parameters are in inputSchema or input_schema
+                        params = getattr(
+                            tool, "inputSchema", getattr(tool, "parameters", {})
+                        )
+                        if hasattr(params, "model_dump"):
+                            params = params.model_dump()
+
+                        self.tools_metadata.append(
+                            {
+                                "type": "function",
+                                "function": {
+                                    "name": f"mcp_{name}_{tool.name}",
+                                    "description": tool.description,
+                                    "parameters": params,
+                                },
+                            }
+                        )
+                    logger.info(f"Loaded {len(tools)} tools from {name}")
             except Exception as e:
                 logger.error(f"Failed to initialize MCP server {name}: {e}")
 
@@ -63,9 +80,10 @@ class MCPManager:
             return f"Error: MCP server {server_name} not found."
 
         try:
-            # call_tool in fastmcp
-            result = await client.call_tool(tool_name, arguments)
-            return str(result)
+            # call_tool in fastmcp requires an active connection
+            async with client:
+                result = await client.call_tool(tool_name, arguments)
+                return str(result)
         except Exception as e:
             logger.error(f"Error calling MCP tool {tool_name} on {server_name}: {e}")
             return f"Error: {str(e)}"
