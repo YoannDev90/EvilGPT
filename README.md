@@ -177,12 +177,25 @@ Below is current snapshot of repository. This section is auto-updated by `./lint
     │   ├── latex.py
     │   ├── messages.py
     │   └── table.py
-    ├── logger.py
-    └── web_search.py
+    └── logger.py
 
-17 directories, 55 files
+17 directories, 54 files
 ```
 <!-- TREE-END -->
+
+<!-- CODE-STATS-START -->
+## Code Statistics
+
+**Python:** 25 files, 2544 lines
+**JSON:** 7 files, 421 lines
+**Shell:** 1 files, 155 lines
+**TOML:** 1 files, 13 lines
+**Text:** 7 files, 200 lines
+**Markdown:** 1 files, 292 lines
+
+**Total:** 42 files, 3625 lines
+
+<!-- CODE-STATS-END -->
 
 Run `./lint.sh` to format code and regenerate this project tree snapshot. CI runs the same script on every push/PR.
 
