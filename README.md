@@ -119,7 +119,10 @@ Below is current snapshot of repository. This section is auto-updated by `./lint
 │       └── evilgpt.svg
 ├── bot.py
 ├── cmds
+│   ├── edit_mcp.py
 │   ├── __init__.py
+│   ├── list_mcp.py
+│   ├── list_tools.py
 │   ├── loader.py
 │   ├── memory_clear.py
 │   ├── memory_delete.py
@@ -147,7 +150,11 @@ Below is current snapshot of repository. This section is auto-updated by `./lint
 │   │   ├── neutral.txt
 │   │   ├── nihilist.txt
 │   │   └── sarcastic.txt
-│   └── providers.json
+│   ├── providers.json
+│   └── tools
+│       ├── run_bash.json
+│       ├── run_nodejs.json
+│       └── run_python.json
 ├── .github
 │   └── workflows
 │       └── pre-commit.yml
@@ -158,7 +165,12 @@ Below is current snapshot of repository. This section is auto-updated by `./lint
 ├── managers
 │   ├── context.py
 │   ├── mcp.py
-│   └── memory.py
+│   ├── memory.py
+│   └── tools
+│       ├── __init__.py
+│       ├── run_bash.py
+│       ├── run_nodejs.py
+│       └── run_python.py
 ├── README.md
 ├── requirements.txt
 └── utils
@@ -170,7 +182,7 @@ Below is current snapshot of repository. This section is auto-updated by `./lint
     ├── logger.py
     └── web_search.py
 
-15 directories, 47 files
+17 directories, 57 files
 ```
 <!-- TREE-END -->
 
@@ -211,7 +223,6 @@ The bot automatically selects the most appropriate model based on:
 - `cairosvg` - A Simple SVG Converter based on Cairo (latest: 2.9.0)
 - `Pillow` - Python Imaging Library (fork) (latest: 12.2.0)
 - `pilmoji` - Pilmoji is an emoji renderer for Pillow, Python's imaging library. (latest: 2.0.5)
-- `ddgs` - Dux Distributed Global Search. A metasearch library that aggregates results from diverse web search services. (latest: 9.14.2)
 - `microsandbox` - Python SDK for microsandbox — secure, fast microVM-based sandboxing. (latest: 0.4.5)
 - `aiohttp` - Async http client/server framework (asyncio) (latest: 3.13.5)
 - `discord-webhook` - Easily send Discord webhooks with Python (latest: 1.4.1)

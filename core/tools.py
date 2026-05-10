@@ -1,25 +1,29 @@
 import json
-
-import microsandbox
+import os
 
 from managers.mcp import mcp_manager
+from managers.tools import ToolsLoader
 from utils.logger import get_logger
-from utils.web_search import get_web_context
 
 logger = get_logger()
 
-# Tools definition for LiteLLM / OpenAI format
-BASE_TOOLS = []
+# Initialize tools loader
+TOOLS_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data", "tools")
+tools_loader = ToolsLoader(TOOLS_DIR)
 
 
 def get_combined_tools():
-    """Returns the list of base tools plus dynamically loaded MCP tools."""
-    return BASE_TOOLS + mcp_manager.tools_metadata
+    """Returns combined tools from native tools + MCP tools."""
+    return tools_loader.tools_metadata + mcp_manager.tools_metadata
 
 
 async def handle_tool_call(tool_name: str, args: dict) -> str:
-    """Execute the requested tool and return the result as a string."""
+    """Execute requested tool. Routes to native tools or MCP tools."""
     try:
+        # Check if it's a native tool
+        if tool_name in tools_loader.tools_handlers:
+            return await tools_loader.call_tool(tool_name, args)
+
         # Check if it's an MCP tool (format: mcp_SERVERNAME_TOOLNAME)
         if tool_name.startswith("mcp_"):
             parts = tool_name.split("_", 2)

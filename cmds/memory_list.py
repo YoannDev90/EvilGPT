@@ -4,9 +4,9 @@ from discord import app_commands
 
 
 async def setup(tree: app_commands.CommandTree, bot):
-    @tree.command(name="memory_list", description="Liste les derniers tours en mémoire")
+    @tree.command(name="memory_list", description="List the most recent turns in memory")
     @app_commands.describe(
-        limit="Nombre de tours à afficher", user="Utilisateur cible optionnel"
+        limit="Number of turns to display", user="Target user (optional)"
     )
     async def memory_list(interaction, limit: int = 10, user=None):
         target_user = user or interaction.user
@@ -15,7 +15,7 @@ async def setup(tree: app_commands.CommandTree, bot):
             and not interaction.user.guild_permissions.manage_messages
         ):
             await interaction.response.send_message(
-                "Permission requise pour voir la mémoire d'un autre utilisateur.",
+                "You don't have permission to view another user's memory.",
                 ephemeral=True,
             )
             return
@@ -23,7 +23,7 @@ async def setup(tree: app_commands.CommandTree, bot):
         turns = bot.memory.list_turns(target_user.id, limit=max(1, min(limit, 20)))
         if not turns:
             await interaction.response.send_message(
-                "Aucun tour en mémoire pour ce compte.", ephemeral=True
+                "No turns in memory for this account.", ephemeral=True
             )
             return
 
@@ -38,7 +38,7 @@ async def setup(tree: app_commands.CommandTree, bot):
                 f"  user: {user_snippet}",
             ]
             if assistant_snippet:
-                lines.append(f"  bot : {assistant_snippet}")
+                lines.append(f"  bot: {assistant_snippet}")
             return "\n".join(lines)
 
         content = "\n\n".join(_format_turn(turn) for turn in turns)

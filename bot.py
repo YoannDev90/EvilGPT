@@ -13,7 +13,6 @@ from managers.mcp import mcp_manager
 from managers.memory import MemoryManager
 from utils.handlers.messages import MessageSender
 from utils.logger import get_logger, setup_logging
-from utils.web_search import get_web_context
 
 logger = get_logger()
 
@@ -82,7 +81,9 @@ class EvilBot(discord.Client):
 
             # Handle history
             history = self.memory.get_history(uid, limit=self.memory.max_history)
-            logger.debug(f"Handling message from {message.author.display_name} (ID: {uid}). History depth: {len(history)}")
+            logger.debug(
+                f"Handling message from {message.author.display_name} (ID: {uid}). History depth: {len(history)}"
+            )
 
             messages = [{"role": "system", "content": system_payload}]
             for h in history:

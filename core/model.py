@@ -84,7 +84,9 @@ async def generate_answer(messages: list, stream: bool = False):
 
         # Si tool_calls est présent, on les exécute
         if hasattr(message, "tool_calls") and message.tool_calls:
-            logger.info(f"LLM wants to use {len(message.tool_calls)} tools: {[tc.function.name for tc in message.tool_calls]}")
+            logger.info(
+                f"LLM wants to use {len(message.tool_calls)} tools: {[tc.function.name for tc in message.tool_calls]}"
+            )
             assistant_message = {
                 "role": "assistant",
                 "content": message.content or "",

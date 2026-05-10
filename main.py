@@ -8,7 +8,6 @@ from core import model, models_loader, tools
 # Import everything to ensure all loggers are registered before setup_logging
 from core.config import logging_cfg
 from managers import context, mcp, memory
-from utils import web_search
 from utils.handlers import codeblock, latex, messages, table
 from utils.logger import get_logger, setup_logging
 

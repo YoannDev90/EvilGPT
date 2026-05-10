@@ -6,7 +6,6 @@ colorama
 cairosvg
 Pillow
 pilmoji
-ddgs
 microsandbox
 aiohttp
 discord-webhook

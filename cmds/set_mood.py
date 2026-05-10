@@ -2,8 +2,8 @@ from discord import app_commands
 
 
 async def setup(tree: app_commands.CommandTree, bot):
-    @tree.command(name="set_mood", description="Change l'humeur de l'EvilGPT")
-    @app_commands.describe(mood="L'humeur souhaitée")
+    @tree.command(name="set_mood", description="Change the mood/personality of the EvilGPT")
+    @app_commands.describe(mood="Desired mood")
     @app_commands.choices(
         mood=[
             app_commands.Choice(name="Sarcastic", value="sarcastic"),
@@ -23,5 +23,5 @@ async def setup(tree: app_commands.CommandTree, bot):
             "jester": "Chaotic Jester",
         }
         await interaction.response.send_message(
-            f"Humeur changée en : **{mood_names[mood]}**. Prépare-toi à souffrir."
+            f"Mood changed to: **{mood_names[mood]}**. Prepare yourself for the consequences."
         )
