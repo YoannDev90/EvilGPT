@@ -2,7 +2,9 @@ from discord import app_commands
 
 
 async def setup(tree: app_commands.CommandTree, bot):
-    @tree.command(name="set_mood", description="Change the mood/personality of the EvilGPT")
+    @tree.command(
+        name="set_mood", description="Change the mood/personality of the EvilGPT"
+    )
     @app_commands.describe(mood="Desired mood")
     @app_commands.choices(
         mood=[

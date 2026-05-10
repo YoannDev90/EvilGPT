@@ -4,7 +4,9 @@ from discord import app_commands
 
 
 async def setup(tree: app_commands.CommandTree, bot):
-    @tree.command(name="memory_list", description="List the most recent turns in memory")
+    @tree.command(
+        name="memory_list", description="List the most recent turns in memory"
+    )
     @app_commands.describe(
         limit="Number of turns to display", user="Target user (optional)"
     )

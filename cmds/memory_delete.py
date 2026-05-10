@@ -3,14 +3,17 @@ from discord import app_commands
 
 async def setup(tree: app_commands.CommandTree, bot):
     @tree.command(
-        name="memory_delete", description="Delete a specific turn from conversation history"
+        name="memory_delete",
+        description="Delete a specific turn from conversation history",
     )
     @app_commands.describe(turn_id="Turn ID to delete")
     async def memory_delete(interaction, turn_id: str):
         try:
             turn = bot.memory.get_turn(turn_id)
         except KeyError:
-            await interaction.response.send_message("Turn ID not found.", ephemeral=True)
+            await interaction.response.send_message(
+                "Turn ID not found.", ephemeral=True
+            )
             return
 
         if (

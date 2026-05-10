@@ -119,9 +119,7 @@ Below is current snapshot of repository. This section is auto-updated by `./lint
 │       └── evilgpt.svg
 ├── bot.py
 ├── cmds
-│   ├── edit_mcp.py
 │   ├── __init__.py
-│   ├── list_mcp.py
 │   ├── list_tools.py
 │   ├── loader.py
 │   ├── memory_clear.py
@@ -182,7 +180,7 @@ Below is current snapshot of repository. This section is auto-updated by `./lint
     ├── logger.py
     └── web_search.py
 
-17 directories, 57 files
+17 directories, 55 files
 ```
 <!-- TREE-END -->
 
