@@ -1,5 +1,6 @@
 import json
 import os
+import time
 from typing import Any, Dict, List
 
 from utils.logger import get_logger
@@ -16,6 +17,9 @@ class ToolsLoader:
 
     def _load_tools(self):
         """Load all tool definitions from JSON files."""
+        start = time.perf_counter()
+        loaded = []
+        failed = []
         if not os.path.exists(self.tools_dir):
             logger.warning(f"Tools directory not found: {self.tools_dir}")
             return
@@ -39,12 +43,32 @@ class ToolsLoader:
                     )
                     handler = getattr(module, tool_name)
                     self.tools_handlers[tool_name] = handler
-                    logger.info(f"Loaded tool: {tool_name}")
+                    loaded.append(tool_name)
+                    logger.info("Loaded tool: %s", tool_name)
                 except ImportError as e:
-                    logger.error(f"Failed to import handler for {tool_name}: {e}")
+                    failed.append(tool_name)
+                    logger.error(
+                        "Failed to import handler for %s: %s",
+                        tool_name,
+                        e,
+                        exc_info=True,
+                    )
 
             except Exception as e:
-                logger.error(f"Failed to load tool {tool_name}: {e}")
+                failed.append(tool_name)
+                logger.error("Failed to load tool %s: %s", tool_name, e, exc_info=True)
+
+        elapsed = time.perf_counter() - start
+        logger.info(
+            "ToolsLoader: loaded %d tools, failed %d, in %.2fs",
+            len(loaded),
+            len(failed),
+            elapsed,
+        )
+        if loaded:
+            logger.debug("Tools loaded: %s", ", ".join(loaded))
+        if failed:
+            logger.debug("Tools failed: %s", ", ".join(failed))
 
     async def call_tool(self, tool_name: str, args: dict) -> str:
         """Call a tool handler with the given arguments."""

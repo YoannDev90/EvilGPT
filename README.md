@@ -119,13 +119,16 @@ Below is current snapshot of repository. This section is auto-updated by `./lint
 │       └── evilgpt.svg
 ├── bot.py
 ├── cmds
+│   ├── health.py
 │   ├── __init__.py
 │   ├── list_tools.py
 │   ├── loader.py
 │   ├── memory_clear.py
 │   ├── memory_delete.py
 │   ├── memory_list.py
-│   └── set_mood.py
+│   ├── ping.py
+│   ├── set_mood.py
+│   └── _shared.py
 ├── config.toml
 ├── core
 │   ├── config.py
@@ -137,6 +140,7 @@ Below is current snapshot of repository. This section is auto-updated by `./lint
 │   │   └── mdb
 │   │       ├── data.mdb
 │   │       └── lock.mdb
+│   ├── command_sync_state.json
 │   ├── mcp.json
 │   ├── memory.sqlite
 │   ├── memory_state.json
@@ -154,7 +158,22 @@ Below is current snapshot of repository. This section is auto-updated by `./lint
 │       ├── run_bash.json
 │       ├── run_nodejs.json
 │       ├── run_python.json
-│       └── safe_eval_math.json
+│       ├── safe_eval_math.json
+│       ├── sandbox_create.json
+│       ├── sandbox_exec.json
+│       ├── sandbox_fs_list.json
+│       ├── sandbox_fs_mkdir.json
+│       ├── sandbox_fs_read.json
+│       ├── sandbox_fs_remove.json
+│       ├── sandbox_fs_stat.json
+│       ├── sandbox_fs_write.json
+│       ├── sandbox_inspect.json
+│       ├── sandbox_list.json
+│       ├── sandbox_metrics.json
+│       ├── sandbox_remove.json
+│       ├── sandbox_run.json
+│       ├── sandbox_shell.json
+│       └── sandbox_stop.json
 ├── .github
 │   └── workflows
 │       └── pre-commit.yml
@@ -172,7 +191,22 @@ Below is current snapshot of repository. This section is auto-updated by `./lint
 │       ├── run_bash.py
 │       ├── run_nodejs.py
 │       ├── run_python.py
-│       └── safe_eval_math.py
+│       ├── safe_eval_math.py
+│       ├── sandbox_create.py
+│       ├── sandbox_exec.py
+│       ├── sandbox_fs_list.py
+│       ├── sandbox_fs_mkdir.py
+│       ├── sandbox_fs_read.py
+│       ├── sandbox_fs_remove.py
+│       ├── sandbox_fs_stat.py
+│       ├── sandbox_fs_write.py
+│       ├── sandbox_inspect.py
+│       ├── sandbox_list.py
+│       ├── sandbox_metrics.py
+│       ├── sandbox_remove.py
+│       ├── sandbox_run.py
+│       ├── sandbox_shell.py
+│       └── sandbox_stop.py
 ├── README.md
 ├── requirements.txt
 └── utils
@@ -183,7 +217,7 @@ Below is current snapshot of repository. This section is auto-updated by `./lint
     │   └── table.py
     └── logger.py
 
-17 directories, 58 files
+17 directories, 92 files
 ```
 <!-- TREE-END -->
 
@@ -192,11 +226,11 @@ Below is current snapshot of repository. This section is auto-updated by `./lint
 
 **Shell:** 1 files, 167 lines of code
 
-**JSON:** 9 files, 477 lines of code
+**JSON:** 25 files, 694 lines of code
 
-**Markdown:** 1 files, 239 lines of code
+**Markdown:** 1 files, 275 lines of code
 
-**Python:** 27 files, 2204 lines of code
+**Python:** 45 files, 3212 lines of code
 
 **SVG:** 1 files, 17 lines of code
 
@@ -204,7 +238,7 @@ Below is current snapshot of repository. This section is auto-updated by `./lint
 
 **Text:** 7 files, 177 lines of code
 
-**Total:** 47 files, 3294 lines of code, 129 comments, 537 blank lines
+**Total:** 81 files, 4555 lines of code, 136 comments, 742 blank lines
 
 <!-- CODE-STATS-END -->
 

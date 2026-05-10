@@ -1,6 +1,7 @@
 data/cocoindex_memory.db/
 data/memory.sqlite
 data/memory_state.json
+data/command_sync_state.json
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

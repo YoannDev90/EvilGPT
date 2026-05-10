@@ -1,14 +1,7 @@
 import logging
-import os
 import sys
 
-# Trigger imports for all modules that might register loggers
-import bot
-from core import model, models_loader, tools
-# Import everything to ensure all loggers are registered before setup_logging
 from core.config import logging_cfg
-from managers import context, mcp, memory
-from utils.handlers import codeblock, latex, messages, table
 from utils.logger import get_logger, setup_logging
 
 setup_logging(
@@ -19,6 +12,9 @@ logger = get_logger()
 
 if __name__ == "__main__":
     try:
+        # Import bot after logging setup to capture startup logs during module import.
+        import bot
+
         logger.info("Démarrage de l'application EvilGPT...")
         bot.run_bot()
     except KeyboardInterrupt:

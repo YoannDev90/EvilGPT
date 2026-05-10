@@ -2,10 +2,6 @@
   "mcpServers": {
     "search": {
       "url": "https://search.parallel.ai/mcp"
-    },
-    "microsandbox": {
-      "command": "npx",
-      "args": ["-y", "microsandbox-mcp"]
     }
   }
 }

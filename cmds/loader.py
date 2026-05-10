@@ -1,10 +1,16 @@
 import importlib
 import inspect
+import logging
 import pkgutil
+import time
 from pathlib import Path
 from typing import Any
 
 from discord import app_commands
+
+from utils.logger import get_logger
+
+logger = get_logger()
 
 
 def _iter_command_modules(base_path: Path):
@@ -17,11 +23,20 @@ def _iter_command_modules(base_path: Path):
 
 async def load_commands(bot: Any, tree: app_commands.CommandTree, cmds_path: Path):
     """Recursively import modules from `cmds_path` and call `setup(tree, bot)` if present."""
+    start = time.perf_counter()
+    loaded = 0
+    failed = 0
+    loaded_modules = []
+    failed_modules = []
+    module_times = []
+
     # Top-level modules
     for finder, modname, ispkg in pkgutil.walk_packages([str(cmds_path)], prefix=""):
         if modname.split(".")[-1].startswith("__"):
             continue
         rel = modname.replace("/", ".")
+        mod_start = time.perf_counter()
+        logger.debug("Loading command module: %s", modname)
         # Convert filesystem path style to module-like import path
         # We'll import via importlib by path: convert file path to module spec
         try:
@@ -42,15 +57,38 @@ async def load_commands(bot: Any, tree: app_commands.CommandTree, cmds_path: Pat
             try:
                 module = importlib.import_module(f"cmds.{modname}")
             except Exception:
+                failed += 1
+                failed_modules.append(modname)
+                logger.warning(
+                    "Failed to import command module %s", modname, exc_info=True
+                )
                 continue
 
         # If module defines setup function, call it
         setup_fn = getattr(module, "setup", None)
         if callable(setup_fn):
             try:
+                logger.debug("Calling setup() for module %s", modname)
                 maybe_coro = setup_fn(tree, bot)
                 if inspect.isawaitable(maybe_coro):
                     await maybe_coro
+                loaded += 1
+                loaded_modules.append(modname)
+                module_times.append((modname, time.perf_counter() - mod_start))
             except Exception:
                 # ignore failing command modules to avoid crashing startup
+                failed += 1
+                failed_modules.append(modname)
+                logger.exception("setup() failed for module %s", modname)
                 continue
+        else:
+            logger.debug("Module %s has no setup(); skipping", modname)
+
+    total = time.perf_counter() - start
+    logger.info("Loaded %d command modules (%d failed) in %.2fs", loaded, failed, total)
+    if loaded_modules:
+        logger.info("Command modules loaded: %s", ", ".join(loaded_modules))
+    if failed_modules:
+        logger.warning("Command modules failed: %s", ", ".join(failed_modules))
+    for name, t in module_times:
+        logger.debug("Module %s took %.3fs to setup", name, t)

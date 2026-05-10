@@ -11,6 +11,14 @@ logger = get_logger()
 TOOLS_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data", "tools")
 tools_loader = ToolsLoader(TOOLS_DIR)
 
+# Log summary of loaded native tools
+try:
+    native_names = [t.get("name") for t in tools_loader.tools_metadata]
+    logger.info("Native tools: %d found", len(native_names))
+    logger.debug("Native tool names: %s", native_names)
+except Exception:
+    logger.debug("Failed to summarize native tools")
+
 
 def get_combined_tools():
     """Returns combined tools from native tools + MCP tools."""
