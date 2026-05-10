@@ -51,50 +51,93 @@ if [ -f README.md ]; then
 	echo "Code Statistics:"
 	TMP_STATS=$(mktemp)
 	
-	# Define file types to count (extension:label pairs)
-	FILE_TYPES="py:Python json:JSON sh:Shell toml:TOML txt:Text md:Markdown"
-	
-	{
-		echo "## Code Statistics"
-		echo ""
+	# Check if cloc is available
+	if command -v cloc >/dev/null 2>&1; then
+		# Use cloc for code counting
+		CLOC_OUTPUT=$(cloc . --exclude-dir=.venv,.git,__pycache__,.github --json 2>/dev/null || true)
+		CLOC_JSON_FILE=$(mktemp)
+		printf '%s' "$CLOC_OUTPUT" > "$CLOC_JSON_FILE"
 		
-		total_lines=0
-		total_files=0
-		
-		# Dynamically count each file type
-		for filetype in $FILE_TYPES; do
-			ext="${filetype%:*}"
-			label="${filetype#*:}"
+		{
+			echo "## Code Statistics"
+			echo ""
 			
-			files=$(find . -name "*.$ext" -not -path "./.venv/*" -not -path "./__pycache__/*" 2>/dev/null | wc -l)
-			lines=$(find . -name "*.$ext" -not -path "./.venv/*" -not -path "./__pycache__/*" -exec wc -l {} + 2>/dev/null | tail -1 | awk '{print $1}')
-			
-			if [ "$files" -gt 0 ]; then
-				echo "**$label:** $files files, $lines lines"
-				total_lines=$((total_lines + lines))
-				total_files=$((total_files + files))
+			# Parse cloc JSON output
+			if [ -s "$CLOC_JSON_FILE" ]; then
+				python3 - "$CLOC_JSON_FILE" << 'PYSCRIPT'
+import json
+import sys
+
+json_file = sys.argv[1]
+try:
+	with open(json_file, "r", encoding="utf-8") as fh:
+		data = json.load(fh)
+except Exception:
+	print("*(cloc output unavailable)*")
+	sys.exit(0)
+
+total = data.get("SUM", {})
+files_count = total.get("nFiles", 0)
+code_lines = total.get("code", 0)
+comment_lines = total.get("comment", 0)
+blank_lines = total.get("blank", 0)
+
+display_map = {
+	"Bourne Shell": "Shell",
+	"Python": "Python",
+	"Markdown": "Markdown",
+	"JSON": "JSON",
+	"TOML": "TOML",
+	"Text": "Text",
+	"SVG": "SVG",
+}
+
+for lang in sorted(data.keys()):
+	if lang in ["header", "SUM"]:
+		continue
+	lang_data = data.get(lang, {})
+	label = display_map.get(lang, lang)
+	print(f"**{label}:** {lang_data.get('nFiles', 0)} files, {lang_data.get('code', 0)} lines of code")
+	print()
+
+print(f"**Total:** {files_count} files, {code_lines} lines of code, {comment_lines} comments, {blank_lines} blank lines")
+PYSCRIPT
+			else
+				echo "*(cloc output unavailable)*"
 			fi
-		done
+			
+			echo ""
+			echo "<!-- CODE-STATS-END -->"
+		} > "$TMP_STATS"
 		
-		echo ""
-		echo "**Total:** $total_files files, $total_lines lines"
-		echo ""
-		echo "<!-- CODE-STATS-END -->"
-	} > "$TMP_STATS"
-	
-	# Print to console
-	echo "  File types counted:"
-	for filetype in $FILE_TYPES; do
-		ext="${filetype%:*}"
-		label="${filetype#*:}"
-		
-		files=$(find . -name "*.$ext" -not -path "./.venv/*" -not -path "./__pycache__/*" 2>/dev/null | wc -l)
-		lines=$(find . -name "*.$ext" -not -path "./.venv/*" -not -path "./__pycache__/*" -exec wc -l {} + 2>/dev/null | tail -1 | awk '{print $1}')
-		
-		if [ "$files" -gt 0 ]; then
-			echo "    $label: $files files, $lines lines"
+		# Print to console
+		if [ -s "$CLOC_JSON_FILE" ]; then
+			echo "  $(python3 - "$CLOC_JSON_FILE" << 'PYSCRIPT'
+import json
+import sys
+
+json_file = sys.argv[1]
+try:
+	with open(json_file, "r", encoding="utf-8") as fh:
+		d = json.load(fh)
+	print(f"Total: {d.get('SUM', {}).get('nFiles', 0)} files, {d.get('SUM', {}).get('code', 0)} lines of code")
+except Exception:
+	print("Total: unavailable")
+PYSCRIPT
+)"
 		fi
-	done
+		rm -f "$CLOC_JSON_FILE"
+	else
+		echo "  cloc not installed. Install with: brew install cloc (macOS) or apt-get install cloc (Linux)"
+		
+		{
+			echo "## Code Statistics"
+			echo ""
+			echo "*(cloc not available)*"
+			echo ""
+			echo "<!-- CODE-STATS-END -->"
+		} > "$TMP_STATS"
+	fi
 	
 	if grep -q "<!-- CODE-STATS-START -->" "$README"; then
 		sed -n '1,/<!-- CODE-STATS-START -->/p' "$README" > "$README.tmp"

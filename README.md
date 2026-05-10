@@ -186,14 +186,21 @@ Below is current snapshot of repository. This section is auto-updated by `./lint
 <!-- CODE-STATS-START -->
 ## Code Statistics
 
-**Python:** 25 files, 2544 lines
-**JSON:** 7 files, 421 lines
-**Shell:** 1 files, 155 lines
-**TOML:** 1 files, 13 lines
-**Text:** 7 files, 200 lines
-**Markdown:** 1 files, 292 lines
+**Shell:** 1 files, 167 lines of code
 
-**Total:** 42 files, 3625 lines
+**JSON:** 7 files, 423 lines of code
+
+**Markdown:** 1 files, 235 lines of code
+
+**Python:** 25 files, 2042 lines of code
+
+**SVG:** 1 files, 17 lines of code
+
+**TOML:** 1 files, 13 lines of code
+
+**Text:** 7 files, 175 lines of code
+
+**Total:** 43 files, 3072 lines of code, 126 comments, 498 blank lines
 
 <!-- CODE-STATS-END -->
 
