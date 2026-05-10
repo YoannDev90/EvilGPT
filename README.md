@@ -150,9 +150,11 @@ Below is current snapshot of repository. This section is auto-updated by `./lint
 │   │   └── sarcastic.txt
 │   ├── providers.json
 │   └── tools
+│       ├── image_ocr.json
 │       ├── run_bash.json
 │       ├── run_nodejs.json
-│       └── run_python.json
+│       ├── run_python.json
+│       └── safe_eval_math.json
 ├── .github
 │   └── workflows
 │       └── pre-commit.yml
@@ -165,10 +167,12 @@ Below is current snapshot of repository. This section is auto-updated by `./lint
 │   ├── mcp.py
 │   ├── memory.py
 │   └── tools
+│       ├── image_ocr.py
 │       ├── __init__.py
 │       ├── run_bash.py
 │       ├── run_nodejs.py
-│       └── run_python.py
+│       ├── run_python.py
+│       └── safe_eval_math.py
 ├── README.md
 ├── requirements.txt
 └── utils
@@ -179,7 +183,7 @@ Below is current snapshot of repository. This section is auto-updated by `./lint
     │   └── table.py
     └── logger.py
 
-17 directories, 54 files
+17 directories, 58 files
 ```
 <!-- TREE-END -->
 
@@ -188,19 +192,19 @@ Below is current snapshot of repository. This section is auto-updated by `./lint
 
 **Shell:** 1 files, 167 lines of code
 
-**JSON:** 7 files, 423 lines of code
+**JSON:** 9 files, 477 lines of code
 
-**Markdown:** 1 files, 235 lines of code
+**Markdown:** 1 files, 239 lines of code
 
-**Python:** 25 files, 2042 lines of code
+**Python:** 27 files, 2204 lines of code
 
 **SVG:** 1 files, 17 lines of code
 
 **TOML:** 1 files, 13 lines of code
 
-**Text:** 7 files, 175 lines of code
+**Text:** 7 files, 177 lines of code
 
-**Total:** 43 files, 3072 lines of code, 126 comments, 498 blank lines
+**Total:** 47 files, 3294 lines of code, 129 comments, 537 blank lines
 
 <!-- CODE-STATS-END -->
 
@@ -245,6 +249,8 @@ The bot automatically selects the most appropriate model based on:
 - `aiohttp` - Async http client/server framework (asyncio) (latest: 3.13.5)
 - `discord-webhook` - Easily send Discord webhooks with Python (latest: 1.4.1)
 - `cocoindex` - With CocoIndex, users declare the transformation, CocoIndex creates & maintains an index, and keeps the derived index up to date based on source update, with minimal computation and changes. (latest: 1.0.3)
+- `fastmcp` - The fast, Pythonic way to build MCP servers and clients. (latest: 3.2.4)
+- `pytesseract` - Python-tesseract is a python wrapper for Google's Tesseract-OCR (latest: 0.3.13)
 ```
 <!--DEPS-END-->
 

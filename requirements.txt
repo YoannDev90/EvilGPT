@@ -11,3 +11,5 @@ aiohttp
 discord-webhook
 cocoindex
 fastmcp
+pytesseract
+pint
