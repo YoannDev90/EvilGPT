@@ -226,11 +226,11 @@ Below is current snapshot of repository. This section is auto-updated by `./lint
 
 **Shell:** 1 files, 167 lines of code
 
-**JSON:** 25 files, 694 lines of code
+**JSON:** 25 files, 441 lines of code
 
 **Markdown:** 1 files, 275 lines of code
 
-**Python:** 45 files, 3212 lines of code
+**Python:** 45 files, 3415 lines of code
 
 **SVG:** 1 files, 17 lines of code
 
@@ -238,7 +238,7 @@ Below is current snapshot of repository. This section is auto-updated by `./lint
 
 **Text:** 7 files, 177 lines of code
 
-**Total:** 81 files, 4555 lines of code, 136 comments, 742 blank lines
+**Total:** 81 files, 4505 lines of code, 161 comments, 780 blank lines
 
 <!-- CODE-STATS-END -->
 

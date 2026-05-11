@@ -13,7 +13,17 @@ tools_loader = ToolsLoader(TOOLS_DIR)
 
 # Log summary of loaded native tools
 try:
-    native_names = [t.get("name") for t in tools_loader.tools_metadata]
+    native_names = []
+    for t in tools_loader.tools_metadata:
+        if isinstance(t, dict) and t.get("type") == "function":
+            fn = t.get("function", {})
+            native_names.append(fn.get("name") or fn.get("description") or "<unnamed>")
+        else:
+            try:
+                native_names.append(t.get("name") if isinstance(t, dict) else str(t))
+            except Exception:
+                native_names.append(str(t))
+
     logger.info("Native tools: %d found", len(native_names))
     logger.debug("Native tool names: %s", native_names)
 except Exception:

@@ -43,11 +43,17 @@ async def defer_interaction(interaction, *, ephemeral: bool = True) -> bool:
 async def send_interaction(
     interaction, *, content=None, embed=None, embeds=None, ephemeral: bool = True
 ):
-    if interaction.response.is_done():
-        return await interaction.followup.send(
-            content=content, embed=embed, embeds=embeds, ephemeral=ephemeral
-        )
+    # Build kwargs without passing both `embed` and `embeds` (discord forbids mixing)
+    kwargs = {}
+    if content is not None:
+        kwargs["content"] = content
+    if embeds is not None:
+        kwargs["embeds"] = embeds
+    elif embed is not None:
+        kwargs["embed"] = embed
+    kwargs["ephemeral"] = ephemeral
 
-    return await interaction.response.send_message(
-        content=content, embed=embed, embeds=embeds, ephemeral=ephemeral
-    )
+    if interaction.response.is_done():
+        return await interaction.followup.send(**kwargs)
+
+    return await interaction.response.send_message(**kwargs)

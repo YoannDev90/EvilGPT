@@ -30,6 +30,107 @@ from utils.logger import get_logger
 logger = get_logger()
 
 
+def _validate_tools_payload(raw_tools: list) -> list:
+    """Validate and normalize tools payload before sending to LLM provider.
+
+    Returns a filtered list containing only provider-compatible function descriptors.
+    Logs and drops malformed entries to avoid provider validation crashes.
+    """
+    valid = []
+    for t in raw_tools or []:
+        if not isinstance(t, dict):
+            logger.warning("Dropping non-dict tool entry: %s", type(t))
+            continue
+
+        tt = t.get("type")
+        if tt != "function":
+            logger.warning(
+                "Dropping tool with unsupported type '%s' (expected 'function'): %s",
+                tt,
+                t,
+            )
+            continue
+
+        fn = t.get("function")
+        if not isinstance(fn, dict):
+            logger.warning("Dropping tool with missing/invalid 'function' field: %s", t)
+            continue
+
+        name = fn.get("name")
+        if not name or not isinstance(name, str):
+            logger.warning("Dropping tool with invalid name: %s", fn)
+            continue
+
+        # Ensure parameters is present and is a dict (providers expect JSON Schema)
+        params = fn.get("parameters") or {}
+        if not isinstance(params, dict):
+            logger.warning("Normalizing parameters for tool %s", name)
+            params = {}
+            fn["parameters"] = params
+
+        valid.append(
+            {
+                "type": "function",
+                "function": {
+                    "name": name,
+                    "description": fn.get("description", ""),
+                    "parameters": params,
+                },
+            }
+        )
+
+    return valid
+
+
+# Simple message truncation to avoid provider context-length errors.
+DEFAULT_MAX_CONTEXT_CHARS = 90000
+
+
+def _messages_char_size(msgs: list) -> int:
+    try:
+        import json
+
+        return len(json.dumps(msgs, ensure_ascii=False))
+    except Exception:
+        return sum(len(str(m)) for m in msgs)
+
+
+def _truncate_messages(msgs: list, max_chars: int = DEFAULT_MAX_CONTEXT_CHARS) -> list:
+    """Trim oldest non-system messages until the serialized size is under max_chars.
+
+    Keeps system messages and as many recent messages as will fit.
+    """
+    if not isinstance(msgs, list):
+        return msgs
+
+    size = _messages_char_size(msgs)
+    if size <= max_chars:
+        return msgs
+
+    logger.warning(
+        "Messages too large (%d chars), truncating to %d chars", size, max_chars
+    )
+
+    msgs_copy = list(msgs)
+    # Remove oldest non-system messages first
+    i = 0
+    while _messages_char_size(msgs_copy) > max_chars and any(
+        m.get("role") != "system" for m in msgs_copy
+    ):
+        # find first non-system
+        for idx, m in enumerate(msgs_copy):
+            if m.get("role") != "system":
+                del msgs_copy[idx]
+                break
+        i += 1
+
+    final_size = _messages_char_size(msgs_copy)
+    logger.info(
+        "Truncated messages: removed %d messages; final size %d chars", i, final_size
+    )
+    return msgs_copy
+
+
 class Answer:
     def __init__(self, content: str = ""):
         self.content = content
@@ -69,12 +170,15 @@ async def generate_answer(messages: list, stream: bool = False):
         model_name = f"openai/{chosen.id}"
 
         # Premier appel pour voir si l'IA veut appeler un outil
+        # Truncate messages if they're too large for provider context
+        messages = _truncate_messages(messages, DEFAULT_MAX_CONTEXT_CHARS)
+
         resp = await litellm.acompletion(
             model=model_name,
             base_url=chosen.api_base,
             api_key=chosen.api_key,
             messages=messages,
-            tools=get_combined_tools(),
+            tools=_validate_tools_payload(get_combined_tools()),
             tool_choice="auto",
             fallbacks=fallbacks_configs,
             timeout=25,
@@ -125,6 +229,9 @@ async def generate_answer(messages: list, stream: bool = False):
 
             # Deuxième appel après avoir ajouté les résultats des outils
             # Pour la réponse finale au tool calling, on peut streamer si demandé
+            # Truncate messages again before the final LLM call
+            messages = _truncate_messages(messages, DEFAULT_MAX_CONTEXT_CHARS)
+
             resp = await litellm.acompletion(
                 model=model_name,
                 base_url=chosen.api_base,

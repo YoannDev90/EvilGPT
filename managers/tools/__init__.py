@@ -33,7 +33,30 @@ class ToolsLoader:
 
             try:
                 with open(json_path, "r") as f:
-                    metadata = json.load(f)
+                    raw = json.load(f)
+
+                # Normalize metadata to function schema expected by LLM clients
+                try:
+                    name_field = (
+                        raw.get("name", tool_name)
+                        if isinstance(raw, dict)
+                        else tool_name
+                    )
+                    description = (
+                        raw.get("description", "") if isinstance(raw, dict) else ""
+                    )
+                    parameters = raw.get("inputSchema") or raw.get("parameters") or {}
+                    metadata = {
+                        "type": "function",
+                        "function": {
+                            "name": name_field,
+                            "description": description,
+                            "parameters": parameters,
+                        },
+                    }
+                except Exception:
+                    metadata = raw
+
                 self.tools_metadata.append(metadata)
 
                 # Dynamically import handler
