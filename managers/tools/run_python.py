@@ -27,9 +27,8 @@ async def run_python(code: str, timeout: int = 10, image: Optional[str] = None) 
         kwargs["image"] = image or DEFAULT_PYTHON_IMAGE
 
         try:
-            sandbox = await asyncio.to_thread(
-                microsandbox.Sandbox.create, name, **kwargs
-            )
+            # Create in the current event-loop/thread; some SDK builds require a running loop
+            sandbox = microsandbox.Sandbox.create(name, **kwargs)
         except Exception:
             cfg = {
                 "name": name,
@@ -37,12 +36,114 @@ async def run_python(code: str, timeout: int = 10, image: Optional[str] = None) 
                 "cpus": 1,
                 "image": image or DEFAULT_PYTHON_IMAGE,
             }
-            sandbox = await asyncio.to_thread(microsandbox.Sandbox.create, cfg)
+            sandbox = microsandbox.Sandbox.create(cfg)
 
-        result = await asyncio.wait_for(
-            asyncio.to_thread(sandbox.run, code, "python"), timeout=timeout
-        )
-        # Prefer JSON string if result is structured
+        # Some SDK builds return a coroutine/Future from create(); await if so
+        if asyncio.iscoroutine(sandbox) or isinstance(sandbox, asyncio.Future):
+            sandbox = await sandbox
+
+        # Try multiple SDK variants: prefer sandbox.run, then sandbox.exec, then shell fallback
+        def _extract_exec_result(result: Any) -> Dict[str, Any]:
+            # Support multiple SDK result shapes (ExecOutput, simple namespaces)
+            stdout = None
+            stderr = None
+            codev = None
+            success = None
+
+            # Common field names
+            for attr in ("stdout_text", "stdout", "stdout_bytes"):
+                if hasattr(result, attr):
+                    stdout = getattr(result, attr)
+                    break
+            for attr in ("stderr_text", "stderr", "stderr_bytes"):
+                if hasattr(result, attr):
+                    stderr = getattr(result, attr)
+                    break
+            for attr in ("exit_code", "code"):
+                if hasattr(result, attr):
+                    codev = getattr(result, attr)
+                    break
+            if hasattr(result, "success"):
+                success = getattr(result, "success")
+
+            if callable(stdout):
+                stdout = stdout()
+            if callable(stderr):
+                stderr = stderr()
+            if callable(success):
+                success = success()
+
+            # If bytes provided, try to decode
+            if isinstance(stdout, (bytes, bytearray)):
+                try:
+                    stdout = stdout.decode("utf-8", errors="replace")
+                except Exception:
+                    pass
+            if isinstance(stderr, (bytes, bytearray)):
+                try:
+                    stderr = stderr.decode("utf-8", errors="replace")
+                except Exception:
+                    pass
+
+            return {
+                "stdout": stdout,
+                "stderr": stderr,
+                "exitCode": codev,
+                "success": success,
+            }
+
+        result = None
+
+        # Prefer using `exec` which returns either an ExecOutput or an ExecHandle
+        if hasattr(sandbox, "exec"):
+            try:
+                maybe = sandbox.exec("python", ["-c", code])
+
+                # If exec returned a coroutine/awaitable, await it; otherwise run in thread
+                if asyncio.iscoroutine(maybe) or isinstance(maybe, asyncio.Future):
+                    raw = await asyncio.wait_for(maybe, timeout=timeout)
+                else:
+                    raw = await asyncio.wait_for(
+                        asyncio.to_thread(sandbox.exec, "python", ["-c", code]),
+                        timeout=timeout,
+                    )
+
+                # If raw is an ExecHandle (streaming), try to collect its output
+                collect = getattr(raw, "collect", None)
+                if collect is not None:
+                    if asyncio.iscoroutinefunction(collect):
+                        out = await asyncio.wait_for(raw.collect(), timeout=timeout)
+                    else:
+                        out = await asyncio.wait_for(
+                            asyncio.to_thread(raw.collect), timeout=timeout
+                        )
+                    result = _extract_exec_result(out)
+                else:
+                    result = _extract_exec_result(raw)
+            except Exception:
+                raise
+
+        # Fallback: shell invocation (blocking), run in thread and extract
+        elif hasattr(sandbox, "shell"):
+            heredoc = "python - <<'PY'\n" + code + "\nPY"
+            raw = await asyncio.wait_for(
+                asyncio.to_thread(sandbox.shell, heredoc), timeout=timeout
+            )
+            result = _extract_exec_result(raw)
+
+        # Older or alternative SDKs exposing .run
+        elif hasattr(sandbox, "run"):
+            maybe = sandbox.run(code, "python")
+            if asyncio.iscoroutine(maybe) or isinstance(maybe, asyncio.Future):
+                result = await asyncio.wait_for(maybe, timeout=timeout)
+            elif callable(maybe):
+                result = await asyncio.wait_for(
+                    asyncio.to_thread(maybe), timeout=timeout
+                )
+            else:
+                result = maybe
+
+        # Normalize and return
         try:
             return json.dumps(result, ensure_ascii=True)
         except Exception:

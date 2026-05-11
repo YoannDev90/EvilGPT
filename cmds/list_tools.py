@@ -33,9 +33,35 @@ async def setup(tree: app_commands.CommandTree, bot):
                 log_command_end(logger, "list-tools", start_time, status="empty")
                 return
 
+            # Normalize tool descriptors to a common shape {name, description, raw}
+            normalized = []
+            for t in tools:
+                try:
+                    if (
+                        isinstance(t, dict)
+                        and t.get("type") == "function"
+                        and isinstance(t.get("function"), dict)
+                    ):
+                        fn = t["function"]
+                        name = fn.get("name")
+                        desc = fn.get("description", "No description")
+                    else:
+                        name = t.get("name") if isinstance(t, dict) else None
+                        desc = (
+                            t.get("description", "No description")
+                            if isinstance(t, dict)
+                            else str(t)
+                        )
+                    if not name:
+                        # skip malformed entries
+                        continue
+                    normalized.append({"name": name, "description": desc, "raw": t})
+                except Exception:
+                    continue
+
             # Group tools by category
-            native_tools = [t for t in tools if not t["name"].startswith("mcp_")]
-            mcp_tools = [t for t in tools if t["name"].startswith("mcp_")]
+            native_tools = [t for t in normalized if not t["name"].startswith("mcp_")]
+            mcp_tools = [t for t in normalized if t["name"].startswith("mcp_")]
 
             embeds = []
 

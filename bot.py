@@ -2,6 +2,7 @@ import asyncio
 import hashlib
 import json
 import os
+import signal
 import time
 from pathlib import Path
 
@@ -252,6 +253,40 @@ def run_bot():
     if not cfg.BOT_TOKEN:
         logger.error("BOT_TOKEN est manquant dans l'environnement !")
         return
-    client = EvilBot(intents=intents)
-    # log_handler=None prevents discord.py from overriding our logging config
-    client.run(cfg.BOT_TOKEN, log_handler=None)
+
+    async def _main():
+        client = EvilBot(intents=intents)
+
+        loop = asyncio.get_running_loop()
+
+        def _on_signal():
+            logger.info("Shutdown signal received, closing client...")
+            # schedule close on the client; client.start will return after close
+            loop.create_task(client.close())
+
+        for s in (signal.SIGINT, signal.SIGTERM):
+            try:
+                loop.add_signal_handler(s, _on_signal)
+            except NotImplementedError:
+                # Windows or environments where add_signal_handler isn't supported
+                pass
+
+        try:
+            await client.start(cfg.BOT_TOKEN)
+        finally:
+            # Ensure memory is persisted and client closed
+            try:
+                if not client.is_closed():
+                    await client.close()
+            except Exception:
+                logger.exception("Error closing client during shutdown")
+
+            try:
+                await client.memory.sync()
+            except Exception:
+                logger.exception("Error syncing memory during shutdown")
+
+    try:
+        asyncio.run(_main())
+    except Exception:
+        logger.exception("Bot terminated with an exception")
