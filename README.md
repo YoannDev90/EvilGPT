@@ -236,11 +236,11 @@ Below is current snapshot of repository. This section is auto-updated by `./lint
 <!-- CODE-STATS-START -->
 ## Code Statistics
 
-**Shell:** 1 files, 209 lines of code
+**Shell:** 1 files, 150 lines of code
 
 **JSON:** 25 files, 563 lines of code
 
-**Markdown:** 1 files, 272 lines of code
+**Markdown:** 1 files, 285 lines of code
 
 **Python:** 45 files, 3668 lines of code
 
@@ -250,8 +250,7 @@ Below is current snapshot of repository. This section is auto-updated by `./lint
 
 **Text:** 7 files, 177 lines of code
 
-**Total:** 81 files, 4919 lines of code, 193 comments, 820 blank lines
-
+**Total:** 81 files, 4873 lines of code, 196 comments, 829 blank lines
 <!-- CODE-STATS-END -->
 
 Run `./lint.sh` to format code and regenerate this project tree snapshot. CI runs the same script on every push/PR.
@@ -297,6 +296,7 @@ The bot automatically selects the most appropriate model based on:
 - `cocoindex` - With CocoIndex, users declare the transformation, CocoIndex creates & maintains an index, and keeps the derived index up to date based on source update, with minimal computation and changes. (latest: 1.0.5)
 - `fastmcp` - The fast, Pythonic way to build MCP servers and clients. (latest: 3.3.0)
 - `pytesseract` - Python-tesseract is a python wrapper for Google's Tesseract-OCR (latest: 0.3.13)
+- `pint` - Physical quantities module (latest: 0.25.3)
 ```
 <!--DEPS-END-->
 

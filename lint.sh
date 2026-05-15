@@ -1,243 +1,197 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Format code
+# ---------------------------------------------------------------------------
+# 1. Format code
+# ---------------------------------------------------------------------------
 ruff format
 isort .
 
-# Print project tree (filtered)
-if command -v tree >/dev/null 2>&1; then
-	echo "Project tree:"
-	IGNORE_FILE=.gitignore
-	EXCLUDES=".git"
-	if [ -f "$IGNORE_FILE" ]; then
-		# read non-empty, non-comment, non-negation lines
-		GITIGNORE_EXCLUDES=$(grep -vE '^\s*(#|$|!)' "$IGNORE_FILE" | sed 's:^\./::; s:/*$::' | tr '\n' '|' | sed 's:|$::')
-		if [ -n "$GITIGNORE_EXCLUDES" ]; then
-			EXCLUDES="$EXCLUDES|$GITIGNORE_EXCLUDES"
-		fi
-	fi
-	# fallback defaults if resulting pattern empty
-	if [ -z "$EXCLUDES" ]; then
-		EXCLUDES=".git|.venv|__pycache__"
-	fi
+# ---------------------------------------------------------------------------
+# 2. Project tree → stdout + README (between <!-- TREE-START --> / <!-- TREE-END -->)
+# ---------------------------------------------------------------------------
+python3 << 'EOF'
+import subprocess, sys, re
+from pathlib import Path
 
-	tree -a -I "$EXCLUDES" || true
+GITIGNORE = Path(".gitignore")
+README    = Path("README.md")
 
-	# Also update README.md section between <!-- TREE-START --> and <!-- TREE-END -->
-	TMP_TREE=$(mktemp)
-	tree -a -I "$EXCLUDES" > "$TMP_TREE" || true
-	TMP_BLOCK=$(mktemp)
-	{
-		echo '```'
-		cat "$TMP_TREE"
-		echo '```'
-		echo "<!-- TREE-END -->"
-	} > "$TMP_BLOCK"
-	README=README.md
-	if grep -q "<!-- TREE-START -->" "$README"; then
-		sed -n '1,/<!-- TREE-START -->/p' "$README" > "$README.tmp"
-		cat "$TMP_BLOCK" >> "$README.tmp"
-		sed -n '/<!-- TREE-END -->/,$p' "$README" | sed '1d' >> "$README.tmp"
-		mv "$README.tmp" "$README"
-	fi
-	rm -f "$TMP_TREE" "$TMP_BLOCK"
-else
-	echo "'tree' not installed. Install with 'apt-get install tree' or 'brew install tree'."
-fi
-# Count lines of code and update README
-if [ -f README.md ]; then
-	echo "Code Statistics:"
-	TMP_STATS=$(mktemp)
-	
-	# Check if cloc is available
-	if command -v cloc >/dev/null 2>&1; then
-		# Use cloc for code counting
-		CLOC_OUTPUT=$(cloc . --exclude-dir=.venv,.git,__pycache__,.github --json 2>/dev/null || true)
-		CLOC_JSON_FILE=$(mktemp)
-		printf '%s' "$CLOC_OUTPUT" > "$CLOC_JSON_FILE"
-		
-		{
-			echo "## Code Statistics"
-			echo ""
-			
-			# Parse cloc JSON output
-			if [ -s "$CLOC_JSON_FILE" ]; then
-				python3 - "$CLOC_JSON_FILE" << 'PYSCRIPT'
-import json
-import sys
+# Build exclusion pattern for `tree -I`
+excludes = [".git"]
+if GITIGNORE.exists():
+    for line in GITIGNORE.read_text().splitlines():
+        line = line.strip()
+        if line and not line.startswith("#") and not line.startswith("!"):
+            excludes.append(line.removeprefix("./").rstrip("/"))
+pattern = "|".join(excludes) or ".git"
 
-json_file = sys.argv[1]
+if subprocess.run(["which", "tree"], capture_output=True).returncode != 0:
+    print("'tree' not installed. Install with: apt-get install tree / brew install tree")
+    sys.exit(0)
+
+tree_output = subprocess.run(
+    ["tree", "-a", "-I", pattern],
+    capture_output=True, text=True
+).stdout
+
+print("Project tree:")
+print(tree_output)
+
+if not README.exists():
+    sys.exit(0)
+
+content = README.read_text()
+block = f"\n```\n{tree_output}```\n"
+new_content = re.sub(
+    r"(<!-- TREE-START -->).*?(<!-- TREE-END -->)",
+    lambda m: m.group(1) + block + m.group(2),
+    content, flags=re.DOTALL
+)
+if new_content != content:
+    README.write_text(new_content)
+EOF
+
+# ---------------------------------------------------------------------------
+# 3. Code stats (cloc) → stdout + README (between <!-- CODE-STATS-START --> / <!-- CODE-STATS-END -->)
+# ---------------------------------------------------------------------------
+python3 << 'EOF'
+import subprocess, json, re, sys
+from pathlib import Path
+
+README = Path("README.md")
+
+if subprocess.run(["which", "cloc"], capture_output=True).returncode != 0:
+    print("cloc not installed. Install with: brew install cloc / apt-get install cloc")
+    sys.exit(0)
+
+result = subprocess.run(
+    ["cloc", ".", "--exclude-dir=.venv,.git,__pycache__,.github", "--json"],
+    capture_output=True, text=True
+)
 try:
-	with open(json_file, "r", encoding="utf-8") as fh:
-		data = json.load(fh)
-except Exception:
-	print("*(cloc output unavailable)*")
-	sys.exit(0)
+    data = json.loads(result.stdout)
+except json.JSONDecodeError:
+    print("Could not parse cloc output.")
+    sys.exit(0)
+
+DISPLAY = {"Bourne Shell": "Shell", "Python": "Python", "Markdown": "Markdown",
+           "JSON": "JSON", "TOML": "TOML", "Text": "Text", "SVG": "SVG"}
+
+lines = ["## Code Statistics", ""]
+for lang in sorted(data):
+    if lang in ("header", "SUM"):
+        continue
+    label = DISPLAY.get(lang, lang)
+    d = data[lang]
+    lines.append(f"**{label}:** {d['nFiles']} files, {d['code']} lines of code")
+    lines.append("")
 
 total = data.get("SUM", {})
-files_count = total.get("nFiles", 0)
-code_lines = total.get("code", 0)
-comment_lines = total.get("comment", 0)
-blank_lines = total.get("blank", 0)
+summary = (f"**Total:** {total.get('nFiles',0)} files, {total.get('code',0)} lines of code, "
+           f"{total.get('comment',0)} comments, {total.get('blank',0)} blank lines")
+lines.append(summary)
+print("Code Statistics:")
+print(summary)
 
-display_map = {
-	"Bourne Shell": "Shell",
-	"Python": "Python",
-	"Markdown": "Markdown",
-	"JSON": "JSON",
-	"TOML": "TOML",
-	"Text": "Text",
-	"SVG": "SVG",
-}
+if not README.exists():
+    sys.exit(0)
 
-for lang in sorted(data.keys()):
-	if lang in ["header", "SUM"]:
-		continue
-	lang_data = data.get(lang, {})
-	label = display_map.get(lang, lang)
-	print(f"**{label}:** {lang_data.get('nFiles', 0)} files, {lang_data.get('code', 0)} lines of code")
-	print()
+block = "\n" + "\n".join(lines) + "\n"
+content = README.read_text()
+new_content = re.sub(
+    r"(<!-- CODE-STATS-START -->).*?(<!-- CODE-STATS-END -->)",
+    lambda m: m.group(1) + block + m.group(2),
+    content, flags=re.DOTALL
+)
+if new_content != content:
+    README.write_text(new_content)
+EOF
 
-print(f"**Total:** {files_count} files, {code_lines} lines of code, {comment_lines} comments, {blank_lines} blank lines")
-PYSCRIPT
-			else
-				echo "*(cloc output unavailable)*"
-			fi
-			
-			echo ""
-			echo "<!-- CODE-STATS-END -->"
-		} > "$TMP_STATS"
-		
-		# Print to console
-		if [ -s "$CLOC_JSON_FILE" ]; then
-			echo "  $(python3 - "$CLOC_JSON_FILE" << 'PYSCRIPT'
-import json
-import sys
+# ---------------------------------------------------------------------------
+# 4. PyPI dependencies → README (between <!--DEPS-START--> / <!--DEPS-END-->)
+# ---------------------------------------------------------------------------
+python3 << 'EOF'
+import re, json, sys
+from pathlib import Path
+from urllib.request import urlopen
+from urllib.error import URLError
 
-json_file = sys.argv[1]
-try:
-	with open(json_file, "r", encoding="utf-8") as fh:
-		d = json.load(fh)
-	print(f"Total: {d.get('SUM', {}).get('nFiles', 0)} files, {d.get('SUM', {}).get('code', 0)} lines of code")
-except Exception:
-	print("Total: unavailable")
-PYSCRIPT
-)"
-		fi
-		rm -f "$CLOC_JSON_FILE"
-	else
-		echo "  cloc not installed. Install with: brew install cloc (macOS) or apt-get install cloc (Linux)"
-		
-		{
-			echo "## Code Statistics"
-			echo ""
-			echo "*(cloc not available)*"
-			echo ""
-			echo "<!-- CODE-STATS-END -->"
-		} > "$TMP_STATS"
-	fi
-	
-	if grep -q "<!-- CODE-STATS-START -->" "$README"; then
-		sed -n '1,/<!-- CODE-STATS-START -->/p' "$README" > "$README.tmp"
-		cat "$TMP_STATS" >> "$README.tmp"
-		sed -n '/<!-- CODE-STATS-END -->/,$p' "$README" | sed '1d' >> "$README.tmp"
-		mv "$README.tmp" "$README"
-	fi
-	rm -f "$TMP_STATS"
-fi
-if [ -f README.md ] && [ -f requirements.txt ]; then
-	echo "Updating dependencies list (fetching from PyPI)..."
-	TMP_DEPS=$(mktemp)
-	{
-		echo '```markdown'
-		while IFS= read -r requirement; do
-			case "$requirement" in
-				''|\#*)
-					continue
-					;;
-			esac
-			# derive package name (strip extras and version specifiers)
-			pkg=$(printf '%s' "$requirement" | sed -E 's/\[.*\]//; s/[<>=!~].*$//; s/\s.*$//')
-			pkg_lc=$(printf '%s' "$pkg" | tr '[:upper:]' '[:lower:]')
+README       = Path("README.md")
+REQUIREMENTS = Path("requirements.txt")
 
-			# try fetch metadata from PyPI
-			info=$(curl -s --fail "https://pypi.org/pypi/$pkg_lc/json" || true)
-			if [ -n "$info" ]; then
-				summary_version=$(printf '%s' "$info" | python3 -c 'import sys,json
-d=json.load(sys.stdin)
-info=d.get("info",{})
-s=info.get("summary") or ""
-v=info.get("version") or ""
-s=s.replace("\\n"," ").strip()
-print(s+"||"+v)') || true
-				summary=${summary_version%%||*}
-				version=${summary_version#*||}
-				if [ -n "$summary" ]; then
-					echo "- \`$requirement\` - $summary (latest: $version)"
-				else
-					echo "- \`$requirement\` - latest: $version"
-				fi
-			else
-				echo "- \`$requirement\`"
-			fi
-		done < requirements.txt
-		echo '```'
-		echo "<!--DEPS-END-->"
-	} > "$TMP_DEPS"
-	if grep -q "<!--DEPS-START-->" README.md; then
-		sed -n '1,/<!--DEPS-START-->/p' README.md > README.md.tmp
-		cat "$TMP_DEPS" >> README.md.tmp
-		sed -n '/<!--DEPS-END-->/,$p' README.md | sed '1d' >> README.md.tmp
-		mv README.md.tmp README.md
-	fi
-	echo "  Dependencies updated ✓"
-	rm -f "$TMP_DEPS"
-fi
+if not README.exists() or not REQUIREMENTS.exists():
+    sys.exit(0)
 
-if [ -f README.md ] && [ -f .env ]; then
-	echo "Copying environment variable names to README..."
-	python3 - << 'PYSCRIPT'
-import os
+def fetch_pypi(pkg):
+    try:
+        with urlopen(f"https://pypi.org/pypi/{pkg.lower()}/json", timeout=5) as r:
+            info = json.loads(r.read())["info"]
+            return info.get("summary", "").replace("\n", " ").strip(), info.get("version", "")
+    except (URLError, KeyError):
+        return "", ""
 
-env_file = '.env'
-if not os.path.isfile(env_file):
-	print(f"{env_file} not found. Skipping environment variable update.")
-else:
-	with open(env_file, 'r', encoding='utf-8') as f:
-		lines = f.readlines()
-	var_names = []
-	for line in lines:
-		line = line.strip()
-		if line and not line.startswith('#') and '=' in line:
-			var_name = line.split('=', 1)[0].strip()
-			var_names.append(var_name)
-	if var_names:
-		readme_file = 'README.md'
-		if os.path.isfile(readme_file):
-			with open(readme_file, 'r', encoding='utf-8') as f:
-				readme_content = f.read()
-			start_marker = '<!--ENV-START-->'
-			end_marker = '<!--ENV-END-->'
-			if start_marker in readme_content and end_marker in readme_content:
-				# preserve markers and replace the inner block with a code fence listing env keys
-				s_idx = readme_content.find(start_marker) + len(start_marker)
-				e_idx = readme_content.find(end_marker)
-				prefix = readme_content[:s_idx]
-				suffix = readme_content[e_idx:]
-				env_block = '\n```env\n'
-				for var in var_names:
-					env_block += f"{var}=\n"
-				env_block += '```\n'
-				new_content = prefix + env_block + suffix
-				with open(readme_file, 'w', encoding='utf-8') as f:
-					f.write(new_content)
-				print("  Environment variables updated ✓")
-			else:
-				print(f"Markers {start_marker} and {end_marker} not found in {readme_file}. Skipping update.")
-		else:
-			print(f"{readme_file} not found. Skipping environment variable update.")
-PYSCRIPT
-fi
+print("Updating dependencies list (fetching from PyPI)...")
+lines = ["```markdown"]
+for raw in REQUIREMENTS.read_text().splitlines():
+    raw = raw.strip()
+    if not raw or raw.startswith("#"):
+        continue
+    pkg = re.split(r"[\[<>=!~\s]", raw)[0]
+    summary, version = fetch_pypi(pkg)
+    if summary:
+        lines.append(f"- `{raw}` - {summary} (latest: {version})")
+    elif version:
+        lines.append(f"- `{raw}` - latest: {version}")
+    else:
+        lines.append(f"- `{raw}`")
+lines.append("```")
+
+block = "\n" + "\n".join(lines) + "\n"
+content = README.read_text()
+new_content = re.sub(
+    r"(<!--DEPS-START-->).*?(<!--DEPS-END-->)",
+    lambda m: m.group(1) + block + m.group(2),
+    content, flags=re.DOTALL
+)
+if new_content != content:
+    README.write_text(new_content)
+    print("  Dependencies updated ✓")
+EOF
+
+# ---------------------------------------------------------------------------
+# 5. Env var names → README (between <!--ENV-START--> / <!--ENV-END-->)
+# ---------------------------------------------------------------------------
+python3 << 'EOF'
+import re, sys
+from pathlib import Path
+
+README   = Path("README.md")
+ENV_FILE = Path(".env")
+
+if not README.exists() or not ENV_FILE.exists():
+    sys.exit(0)
+
+print("Copying environment variable names to README...")
+var_names = []
+for line in ENV_FILE.read_text().splitlines():
+    line = line.strip()
+    if line and not line.startswith("#") and "=" in line:
+        var_names.append(line.split("=", 1)[0].strip())
+
+if not var_names:
+    sys.exit(0)
+
+block = "\n```env\n" + "".join(f"{v}=\n" for v in var_names) + "```\n"
+content = README.read_text()
+new_content = re.sub(
+    r"(<!--ENV-START-->).*?(<!--ENV-END-->)",
+    lambda m: m.group(1) + block + m.group(2),
+    content, flags=re.DOTALL
+)
+if new_content != content:
+    README.write_text(new_content)
+    print("  Environment variables updated ✓")
+EOF
 
 echo "✅ All updates completed!"
