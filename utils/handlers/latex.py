@@ -1,4 +1,4 @@
-"""_summary_."""
+"""Helpers for detecting and rendering LaTeX content."""
 
 import io
 import logging
@@ -63,17 +63,17 @@ LATEX_PATTERN = re.compile(
 
 
 def latex_to_svg(formula: str) -> bytes:
-    """_summary_.
+    """Render a LaTeX formula to SVG bytes.
 
     Parameters
     ----------
     formula : str
-        _description_
+        LaTeX formula to render.
 
     Returns
     -------
     bytes
-        _description_
+        SVG payload bytes.
     """
     encoded = urllib.parse.quote(formula, safe="")
     url = f"https://math.vercel.app?color=white&from={encoded}.svg"
@@ -83,17 +83,17 @@ def latex_to_svg(formula: str) -> bytes:
 
 
 def convert_latex_to_png(latex: str) -> tuple[io.BytesIO | str, bool]:
-    """_summary_.
+    """Convert LaTeX to a PNG buffer when possible.
 
     Parameters
     ----------
     latex : str
-        _description_
+        LaTeX content to convert.
 
     Returns
     -------
     tuple[io.BytesIO | str, bool]
-        _description_
+        PNG buffer or fallback text, plus success flag.
     """
     if not cairosvg:
         return f"```\n{latex}\n``` (cairosvg missing)", True
@@ -107,16 +107,16 @@ def convert_latex_to_png(latex: str) -> tuple[io.BytesIO | str, bool]:
 
 
 def detect_latex(text: str) -> list[str]:
-    """_summary_.
+    """Find LaTeX fragments in text.
 
     Parameters
     ----------
     text : str
-        _description_
+        Text to inspect.
 
     Returns
     -------
     list[str]
-        _description_
+        List of matched LaTeX fragments.
     """
     return LATEX_PATTERN.findall(text)

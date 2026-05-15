@@ -57,6 +57,18 @@ def _safe_eval(node: ast.AST) -> float:
     ------
     ValueError
         If the AST contains unsupported syntax or symbols.
+    ValueError
+        If an unsupported binary operator is used.
+    ValueError
+        If an unsupported unary operator is used.
+    ValueError
+        If a call target is not a simple name.
+    ValueError
+        If the function name is not allowed.
+    ValueError
+        If an unknown symbol is referenced.
+    ValueError
+        If unsupported syntax remains after validation.
     """
     if isinstance(node, ast.Expression):
         return _safe_eval(node.body)

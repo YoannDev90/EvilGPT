@@ -1,4 +1,4 @@
-"""_summary_."""
+"""Core answer-generation helpers and LiteLLM orchestration."""
 
 import logging
 import time
@@ -41,12 +41,12 @@ def _validate_tools_payload(raw_tools: list) -> list:
     Parameters
     ----------
     raw_tools : list
-        _description_
+        Raw tool descriptors returned by the tool registry.
 
     Returns
     -------
     list
-        _description_
+        Provider-compatible function tool descriptors.
     """
     valid = []
     for t in raw_tools or []:
@@ -99,17 +99,17 @@ DEFAULT_MAX_CONTEXT_CHARS = 90000
 
 
 def _messages_char_size(msgs: list) -> int:
-    """_summary_.
+    """Return the serialized character size of a messages list.
 
     Parameters
     ----------
     msgs : list
-        _description_
+        Chat messages to measure.
 
     Returns
     -------
     int
-        _description_
+        Serialized character count.
     """
     try:
         import json
@@ -127,14 +127,14 @@ def _truncate_messages(msgs: list, max_chars: int = DEFAULT_MAX_CONTEXT_CHARS) -
     Parameters
     ----------
     msgs : list
-        _description_
+        Chat messages to trim.
     max_chars : int
-        _description_ (Default value = DEFAULT_MAX_CONTEXT_CHARS)
+        Maximum character budget. Default is DEFAULT_MAX_CONTEXT_CHARS.
 
     Returns
     -------
     list
-        _description_
+        Trimmed list of messages.
     """
     if not isinstance(msgs, list):
         return msgs
@@ -168,25 +168,25 @@ def _truncate_messages(msgs: list, max_chars: int = DEFAULT_MAX_CONTEXT_CHARS) -
 
 
 class Answer:
-    """_summary_.
+    """Container for a generated model answer.
 
     Attributes
     ----------
     content : str
-        _description_
-    model : _type_
-        _description_
-    response_time : _type_
-        _description_
+        Generated answer text.
+    model : Optional[str]
+        Selected model identifier.
+    response_time : Optional[float]
+        Wall-clock response time in seconds.
     """
 
     def __init__(self, content: str = ""):
-        """_summary_.
+        """Create an answer container.
 
         Parameters
         ----------
         content : str
-            _description_ (Default value = '')
+            Initial answer content. Default is ''.
         """
         self.content = content
         self.model = None
@@ -194,17 +194,17 @@ class Answer:
 
 
 def _select_model(models: List[Model]) -> Optional[Model]:
-    """_summary_.
+    """Select the primary model from the available list.
 
     Parameters
     ----------
     models : List[Model]
-        _description_
+        Available model configurations.
 
     Returns
     -------
     Optional[Model]
-        _description_
+        Selected model or None when the list is empty.
     """
     if not models:
         return None
@@ -213,19 +213,19 @@ def _select_model(models: List[Model]) -> Optional[Model]:
 
 
 async def generate_answer(messages: list, stream: bool = False):
-    """_summary_.
+    """Generate an answer from chat messages, optionally streaming.
 
     Parameters
     ----------
     messages : list
-        _description_
+        Chat history to send to the model.
     stream : bool
-        _description_ (Default value = False)
+        Whether to return a streaming response. Default is False.
 
     Returns
     -------
-    _type_
-        _description_
+    Answer | Any
+        Answer object or streaming response from LiteLLM.
     """
     models = get_models()
     if not models:

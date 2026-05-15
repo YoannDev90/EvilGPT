@@ -1,4 +1,4 @@
-"""_summary_."""
+"""Helpers for sending Discord code blocks."""
 
 import discord
 
@@ -6,23 +6,23 @@ import discord
 async def send_code_block_with_return(
     channel, code_block: str, max_length: int = 2000, bot=None
 ):
-    """_summary_.
+    """Send a code block, splitting it when it exceeds Discord limits.
 
     Parameters
     ----------
-    channel : _type_
-        _description_
+    channel : Any
+        Discord channel-like target.
     code_block : str
-        _description_
+        Code block text to send.
     max_length : int
-        _description_ (Default value = 2000)
-    bot : _type_
-        _description_ (Default value = None)
+        Maximum message length. Default is 2000.
+    bot : Any
+        Optional bot instance used for channel resolution. Default is None.
 
     Returns
     -------
-    _type_
-        _description_
+    discord.Message | None
+        Last message sent, or None.
     """
     first_line_end = code_block.find("\n")
     if first_line_end == -1:
@@ -57,17 +57,22 @@ async def send_code_block_with_return(
 
 
 async def send_code_block(channel, code_block: str, max_length: int = 2000, bot=None):
-    """_summary_.
+    """Send a code block without returning the resulting message.
 
     Parameters
     ----------
-    channel : _type_
-        _description_
+    channel : Any
+        Discord channel-like target.
     code_block : str
-        _description_
+        Code block text to send.
     max_length : int
-        _description_ (Default value = 2000)
-    bot : _type_
-        _description_ (Default value = None)
+        Maximum message length. Default is 2000.
+    bot : Any
+        Optional bot instance used for channel resolution. Default is None.
+
+    Returns
+    -------
+    None
+        No value returned.
     """
     await send_code_block_with_return(channel, code_block, max_length, bot)

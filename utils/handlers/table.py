@@ -47,7 +47,18 @@ def _extract_links_and_sanitize(
     """
 
     def replacer(match: re.Match[str]) -> str | None:
-        """Convert a matched URL into a numbered reference."""
+        """Convert a matched URL into a numbered reference.
+
+        Parameters
+        ----------
+        match : re.Match[str]
+            Regex match object.
+
+        Returns
+        -------
+        str | None
+            Numbered reference string.
+        """
         label, url_md, url_plain = match.groups()
         url = url_md or url_plain
         if url in current_links:
@@ -306,8 +317,19 @@ def detect_and_convert_tables(text: str) -> Tuple[str, List[io.BytesIO], List[di
         r"```(?:markdown|md)?\n((?:\|.*\|(?:\n|$))+)```", re.MULTILINE
     )
 
-    def replace_table(match):
-        """Render one matched table block into an image placeholder."""
+    def replace_table(match: re.Match[str]) -> str:
+        """Render one matched table block into an image placeholder.
+
+        Parameters
+        ----------
+        match : re.Match[str]
+            Regex match for a markdown table block.
+
+        Returns
+        -------
+        str
+            Image placeholder or original block on failure.
+        """
         lines = [l for l in match.group(1).strip().split("\n") if l.strip()]
         if len(lines) < 2:
             return match.group(0)

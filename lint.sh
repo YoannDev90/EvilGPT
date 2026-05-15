@@ -6,33 +6,22 @@ set -euo pipefail
 # ---------------------------------------------------------------------------
 echo "Running formatters if available..."
 if command -v ruff >/dev/null 2>&1; then
+    echo "  Running ruff format..."
     ruff format . || true
 else
     echo "  Skipping ruff (not installed)"
 fi
 if command -v isort >/dev/null 2>&1; then
+    echo "  Running isort..."
     isort . || true
 else
     echo "  Skipping isort (not installed)"
 fi
 if command -v removestar >/dev/null 2>&1; then
+    echo "  Running removestar..."
     removestar . || true
 else
     echo "  Skipping removestar (not installed)"
-fi
-if command -v pycln >/dev/null 2>&1; then
-    # Run pycln only on Python files
-    find . -type f -name "*.py" -print0 | xargs -0 pycln -a || true
-elif python3 -c "import pycln" >/dev/null 2>&1; then
-    find . -type f -name "*.py" -print0 | xargs -0 python3 -m pycln -a || true
-else
-    echo "  Skipping pycln (not installed)"
-fi
-if command -v pymend >/dev/null 2>&1; then
-    # Run pymend only on Python files (avoid passing directory '.' which causes a CLI error)
-    find . -type f -name "*.py" -print0 | xargs -0 pymend --write || true
-else
-    echo "  Skipping pymend (not installed)"
 fi
 
 # ---------------------------------------------------------------------------

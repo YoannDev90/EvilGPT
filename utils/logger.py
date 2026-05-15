@@ -271,7 +271,7 @@ def setup_logging(level: int = logging.INFO, config=None):
     level : int
         Root logging level (default: logging.INFO).
     config : Any
-        Optional configuration object with logging settings.
+        Optional configuration object with logging settings. Default is None.
     """
     console_format = getattr(config, "console_format")
     file_format = getattr(config, "file_format")

@@ -1,4 +1,4 @@
-"""_summary_."""
+"""Load model and provider definitions for LiteLLM integration."""
 
 import json
 import os
@@ -12,31 +12,31 @@ logger = get_logger()
 
 
 class Provider:
-    """_summary_.
+    """Provider configuration resolved from environment variables.
 
     Attributes
     ----------
     provider : str
-        _description_
+        Provider name.
     env_key : str
-        _description_
+        Environment variable that stores the API key.
     api_base : str
-        _description_
-    api_key : _type_
-        _description_
+        Base URL for the provider API.
+    api_key : Optional[str]
+        Loaded API key value or None.
     """
 
     def __init__(self, provider: str, env_key: str, api_base: str):
-        """_summary_.
+        """Create a provider configuration wrapper.
 
         Parameters
         ----------
         provider : str
-            _description_
+            Provider name.
         env_key : str
-            _description_
+            Environment variable containing the API key.
         api_base : str
-            _description_
+            Provider base URL.
         """
         self.provider = provider
         self.env_key = env_key
@@ -50,31 +50,31 @@ class Provider:
 
 
 class Model:
-    """_summary_.
+    """A model entry mapped to a provider configuration.
 
     Attributes
     ----------
     id : str
-        _description_
-    litellm_id : _type_
-        _description_
+        Model identifier.
+    litellm_id : str
+        LiteLLM-compatible model name.
     provider : Provider
-        _description_
-    api_base : _type_
-        _description_
-    api_key : _type_
-        _description_
+        Provider backing this model.
+    api_base : str
+        Provider base URL.
+    api_key : Optional[str]
+        Loaded API key value or None.
     """
 
     def __init__(self, model_id: str, provider: Provider):
-        """_summary_.
+        """Create a model entry for a provider.
 
         Parameters
         ----------
         model_id : str
-            _description_
+            Model identifier.
         provider : Provider
-            _description_
+            Provider configuration for the model.
         """
         self.id = model_id
         self.litellm_id = f"openai/{model_id}"
@@ -84,12 +84,12 @@ class Model:
 
 
 def get_model_catalog() -> List[Dict[str, str]]:
-    """_summary_.
+    """Return the model catalog with provider metadata.
 
     Returns
     -------
     List[Dict[str, str]]
-        _description_
+        Catalog entries for configured models.
     """
     providers = _load_providers()
     if not os.path.exists(cfg.MODELS_PATH):
@@ -123,12 +123,12 @@ def get_model_catalog() -> List[Dict[str, str]]:
 
 
 def _load_providers() -> Dict[str, Provider]:
-    """_summary_.
+    """Load provider configurations from the providers JSON file.
 
     Returns
     -------
     Dict[str, Provider]
-        _description_
+        Providers indexed by lower-case provider name.
     """
     if not os.path.exists(cfg.PROVIDERS_PATH):
         logger.error("Providers file not found: %s", cfg.PROVIDERS_PATH)
@@ -148,12 +148,12 @@ def _load_providers() -> Dict[str, Provider]:
 
 
 def get_models() -> List[Model]:
-    """_summary_.
+    """Return the list of models with available API keys.
 
     Returns
     -------
     List[Model]
-        _description_
+        Models that can be used for generation.
     """
     providers = _load_providers()
     if not os.path.exists(cfg.MODELS_PATH):

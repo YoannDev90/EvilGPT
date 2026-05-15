@@ -1,4 +1,4 @@
-"""_summary_."""
+"""Configuration loading and prompt helpers for EvilGPT."""
 
 import os
 from dataclasses import dataclass
@@ -27,17 +27,17 @@ DEFAULT_CONFIG_PATH = os.path.join(BASE_DIR, "config.toml")
 
 
 def _load_toml(path: str = DEFAULT_CONFIG_PATH) -> Dict[str, Any]:
-    """_summary_.
+    """Load and parse a TOML configuration file.
 
     Parameters
     ----------
     path : str
-        _description_ (Default value = DEFAULT_CONFIG_PATH)
+        Path to the TOML file. Default is DEFAULT_CONFIG_PATH.
 
     Returns
     -------
     Dict[str, Any]
-        _description_
+        Parsed TOML content or an empty dict.
     """
     if _toml is None:
         return {}
@@ -68,19 +68,19 @@ def _load_toml(path: str = DEFAULT_CONFIG_PATH) -> Dict[str, Any]:
 def read_from_toml_config(
     param: str, config: Optional[Dict[str, Any]] = None
 ) -> Dict[str, Any]:
-    """_summary_.
+    """Read a nested config table from TOML data.
 
     Parameters
     ----------
     param : str
-        _description_
+        Section name to read.
     config : Optional[Dict[str, Any]]
-        _description_ (Default value = None)
+        Preloaded config mapping. Default is None.
 
     Returns
     -------
     Dict[str, Any]
-        _description_
+        Section contents or an empty dict.
     """
     cfg = config or _load_toml()
     return cfg.get(param, {}) if isinstance(cfg.get(param, {}), dict) else {}
@@ -88,16 +88,16 @@ def read_from_toml_config(
 
 @dataclass
 class ConsoleLoggingConfig:
-    """_summary_.
+    """Console logging configuration.
 
     Attributes
     ----------
     enable : bool
-        _description_
+        Whether console logging is enabled.
     level : str
-        _description_
+        Console logging level.
     console_format : str
-        _description_
+        Format string used for console logs.
     """
 
     enable: bool = True
@@ -107,16 +107,16 @@ class ConsoleLoggingConfig:
 
 @dataclass
 class FileLoggingConfig:
-    """_summary_.
+    """File logging configuration.
 
     Attributes
     ----------
     enable_file_logging : bool
-        _description_
+        Whether file logging is enabled.
     log_file : str
-        _description_
+        Path to the log file.
     file_format : str
-        _description_
+        Format string used for file logs.
     """
 
     enable_file_logging: bool = True
@@ -128,16 +128,16 @@ class FileLoggingConfig:
 
 @dataclass
 class DiscordLoggingConfig:
-    """_summary_.
+    """Discord webhook logging configuration.
 
     Attributes
     ----------
     enable_discord_logging : bool
-        _description_
+        Whether Discord logging is enabled.
     discord_webhook : Optional[str]
-        _description_
+        Discord webhook URL.
     discord_format : str
-        _description_
+        Format string used for Discord logs.
     """
 
     enable_discord_logging: bool = False
@@ -147,32 +147,32 @@ class DiscordLoggingConfig:
 
 @dataclass
 class LoggingConfig:
-    """_summary_.
+    """Aggregated logging configuration.
 
     Attributes
     ----------
     console : ConsoleLoggingConfig
-        _description_
+        Console logging settings.
     file : FileLoggingConfig
-        _description_
+        File logging settings.
     discord : DiscordLoggingConfig
-        _description_
+        Discord logging settings.
     level : str
-        _description_
+        Console logging level.
     enable_file_logging : bool
-        _description_
+        Whether file logging is enabled.
     log_file : str
-        _description_
+        Log file path.
     enable_discord_logging : bool
-        _description_
+        Whether Discord logging is enabled.
     discord_webhook : Optional[str]
-        _description_
+        Discord webhook URL.
     console_format : str
-        _description_
+        Console log format string.
     file_format : str
-        _description_
+        File log format string.
     discord_format : str
-        _description_
+        Discord log format string.
     """
 
     console: ConsoleLoggingConfig
@@ -181,117 +181,117 @@ class LoggingConfig:
 
     @property
     def level(self) -> str:
-        """_summary_.
+        """Return the configured console log level.
 
         Returns
         -------
         str
-            _description_
+            Console log level string.
         """
         return self.console.level
 
     @property
     def enable_file_logging(self) -> bool:
-        """_summary_.
+        """Return whether file logging is enabled.
 
         Returns
         -------
         bool
-            _description_
+            True when file logging is enabled.
         """
         return self.file.enable_file_logging
 
     @property
     def log_file(self) -> str:
-        """_summary_.
+        """Return the file logging path.
 
         Returns
         -------
         str
-            _description_
+            File logging path.
         """
         return self.file.log_file
 
     @property
     def enable_discord_logging(self) -> bool:
-        """_summary_.
+        """Return whether Discord logging is enabled.
 
         Returns
         -------
         bool
-            _description_
+            True when Discord logging is enabled.
         """
         return self.discord.enable_discord_logging
 
     @property
     def discord_webhook(self) -> Optional[str]:
-        """_summary_.
+        """Return the configured Discord webhook URL.
 
         Returns
         -------
         Optional[str]
-            _description_
+            Discord webhook URL or None.
         """
         return self.discord.discord_webhook
 
     @property
     def console_format(self) -> str:
-        """_summary_.
+        """Return the console log format string.
 
         Returns
         -------
         str
-            _description_
+            Console log format string.
         """
         return self.console.console_format
 
     @property
     def file_format(self) -> str:
-        """_summary_.
+        """Return the file log format string.
 
         Returns
         -------
         str
-            _description_
+            File log format string.
         """
         return self.file.file_format
 
     @property
     def discord_format(self) -> str:
-        """_summary_.
+        """Return the Discord log format string.
 
         Returns
         -------
         str
-            _description_
+            Discord log format string.
         """
         return self.discord.discord_format
 
 
 @dataclass
 class Config:
-    """_summary_.
+    """Runtime config values resolved from environment and files.
 
     Attributes
     ----------
     BOT_TOKEN : Optional[str]
-        _description_
+        Discord bot token.
     WEBHOOK_POSTURL : Optional[str]
-        _description_
+        Webhook path or id component.
     WEBHOOK_URL : Optional[str]
-        _description_
+        Resolved webhook URL.
     BASE_DIR : str
-        _description_
+        Repository base directory.
     SYSTEM_PROMPT_PATH : str
-        _description_
+        Path to the system prompt file.
     PROVIDERS_PATH : str
-        _description_
+        Path to the provider definitions.
     MODELS_PATH : str
-        _description_
+        Path to the model definitions.
     MOODS_DIR : str
-        _description_
+        Path to the mood prompt directory.
     CONFIG_PATH : str
-        _description_
+        Path to the active config file.
     """
 
     BOT_TOKEN: Optional[str] = None
@@ -308,17 +308,17 @@ class Config:
 
 
 def _first_table(items: Any) -> Dict[str, Any]:
-    """_summary_.
+    """Return the first dict from a TOML table-or-list value.
 
     Parameters
     ----------
     items : Any
-        _description_
+        Value extracted from TOML.
 
     Returns
     -------
     Dict[str, Any]
-        _description_
+        First mapping if available, otherwise an empty dict.
     """
     if isinstance(items, list) and items:
         return items[0] if isinstance(items[0], dict) else {}
@@ -328,17 +328,17 @@ def _first_table(items: Any) -> Dict[str, Any]:
 
 
 def _normalize_webhook_url(url: Optional[str]) -> Optional[str]:
-    """_summary_.
+    """Normalize a Discord webhook URL or webhook id/path.
 
     Parameters
     ----------
     url : Optional[str]
-        _description_
+        Input URL or webhook reference.
 
     Returns
     -------
     Optional[str]
-        _description_
+        Normalized webhook URL or None.
     """
     if not url:
         return None
@@ -354,17 +354,17 @@ def _normalize_webhook_url(url: Optional[str]) -> Optional[str]:
 
 
 def load_config(config_path: Optional[str] = None) -> Tuple[Config, LoggingConfig]:
-    """_summary_.
+    """Load application and logging configuration.
 
     Parameters
     ----------
     config_path : Optional[str]
-        _description_ (Default value = None)
+        Optional path to a TOML config file. Default is None.
 
     Returns
     -------
     Tuple[Config, LoggingConfig]
-        _description_
+        Resolved app config and logging config.
     """
     toml_path = config_path or DEFAULT_CONFIG_PATH
     raw = _load_toml(toml_path)
@@ -458,12 +458,12 @@ cfg, logging_cfg = load_config()
 
 
 def read_system_prompt() -> Optional[str]:
-    """_summary_.
+    """Read the global system prompt from disk.
 
     Returns
     -------
     Optional[str]
-        _description_
+        Prompt text or None when the file is missing.
     """
     if os.path.exists(cfg.SYSTEM_PROMPT_PATH):
         with open(cfg.SYSTEM_PROMPT_PATH, "r", encoding="utf-8") as f:
@@ -479,12 +479,12 @@ def read_mood_prompt(mood: str | None) -> Optional[str]:
     Parameters
     ----------
     mood : str | None
-        _description_
+        Mood name to read.
 
     Returns
     -------
     Optional[str]
-        _description_
+        Mood prompt text or None when unavailable.
     """
     moods_dir = os.path.join(BASE_DIR, "data", "moods")
     if mood:

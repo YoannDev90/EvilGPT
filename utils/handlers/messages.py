@@ -44,7 +44,7 @@ class MessageSender:
         channel : discord.abc.Messageable
             Channel-like object to send messages to.
         bot : Optional[discord.Client]
-            Optional bot instance used to resolve the current channel.
+            Optional bot instance used to resolve the current channel. Default is None.
         max_length : int
             Maximum message chunk size (default: 2000).
         """

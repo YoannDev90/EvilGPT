@@ -36,29 +36,31 @@ async def setup(tree: app_commands.CommandTree, bot):
             The interaction that triggered the command.
         """
 
-    start_time = time.perf_counter()
-    log_command_start(logger, "ping", interaction)
+        start_time = time.perf_counter()
+        log_command_start(logger, "ping", interaction)
 
-    try:
-        gateway_ms = round(bot.latency * 1000, 2)
+        try:
+            gateway_ms = round(bot.latency * 1000, 2)
 
-        embed = discord.Embed(
-            title="Pong!",
-            color=discord.Color.blurple(),
-            description="Bot is responsive.",
-        )
-        embed.add_field(name="Gateway Latency", value=f"{gateway_ms} ms", inline=True)
-
-        await interaction.response.send_message(embed=embed, ephemeral=True)
-
-        log_command_end(logger, "ping", start_time)
-    except Exception as exc:
-        log_command_error(logger, "ping", exc)
-        if not interaction.response.is_done():
-            await interaction.response.send_message(
-                "Error while checking latency.", ephemeral=True
+            embed = discord.Embed(
+                title="Pong!",
+                color=discord.Color.blurple(),
+                description="Bot is responsive.",
             )
-        else:
-            await interaction.followup.send(
-                "Error while checking latency.", ephemeral=True
+            embed.add_field(
+                name="Gateway Latency", value=f"{gateway_ms} ms", inline=True
             )
+
+            await interaction.response.send_message(embed=embed, ephemeral=True)
+
+            log_command_end(logger, "ping", start_time)
+        except Exception as exc:
+            log_command_error(logger, "ping", exc)
+            if not interaction.response.is_done():
+                await interaction.response.send_message(
+                    "Error while checking latency.", ephemeral=True
+                )
+            else:
+                await interaction.followup.send(
+                    "Error while checking latency.", ephemeral=True
+                )

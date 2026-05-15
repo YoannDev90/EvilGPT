@@ -1,4 +1,4 @@
-"""_summary_."""
+"""Tool registry helpers for combining native and MCP tools."""
 
 import json
 import os
@@ -37,8 +37,8 @@ def get_combined_tools():
 
     Returns
     -------
-    _type_
-        _description_
+    list
+        Combined list of tool descriptors.
     """
     return tools_loader.tools_metadata + mcp_manager.tools_metadata
 
@@ -49,14 +49,14 @@ async def handle_tool_call(tool_name: str, args: dict) -> str:
     Parameters
     ----------
     tool_name : str
-        _description_
+        Tool name to execute.
     args : dict
-        _description_
+        Arguments forwarded to the tool.
 
     Returns
     -------
     str
-        _description_
+        Tool result string or error message.
     """
     try:
         # Check if it's a native tool
