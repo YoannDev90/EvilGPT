@@ -76,11 +76,23 @@ A powerful Discord bot integrating AI models to respond intelligently to user me
 ### Configuration
 
 1. **Create a `.env` file** in the root directory:
-   ```env
-   BOT_TOKEN=your_discord_bot_token_here
-   GRATISFY_API_BASE=https://api.gratisfy.xyz/v1
-   GRATISFY_API_KEY=your_api_key_here
-   ```
+<!--ENV-START-->
+```env
+BOT_TOKEN=
+WEBHOOK_URL=
+ELECTRONHUB_API_KEY=
+MEGANOVA_API_KEY=
+MISTRAL_API_KEY=
+MNN_API_KEY=
+NAVY_API_KEY=
+PAXSENIX_API_KEY=
+ZANITY_API_KEY=
+EVOLVEX_API_KEY=
+AQUA_API_KEY=
+NVIDIA_NIM_API_KEY=
+```
+<!--ENV-END-->
+
 
 2. **Configure providers** (optional)
    - Edit `providers.json` to add or modify API providers
@@ -224,11 +236,11 @@ Below is current snapshot of repository. This section is auto-updated by `./lint
 <!-- CODE-STATS-START -->
 ## Code Statistics
 
-**Shell:** 1 files, 167 lines of code
+**Shell:** 1 files, 209 lines of code
 
-**JSON:** 25 files, 441 lines of code
+**JSON:** 25 files, 563 lines of code
 
-**Markdown:** 1 files, 275 lines of code
+**Markdown:** 1 files, 272 lines of code
 
 **Python:** 45 files, 3668 lines of code
 
@@ -238,7 +250,7 @@ Below is current snapshot of repository. This section is auto-updated by `./lint
 
 **Text:** 7 files, 177 lines of code
 
-**Total:** 81 files, 4758 lines of code, 190 comments, 818 blank lines
+**Total:** 81 files, 4919 lines of code, 193 comments, 820 blank lines
 
 <!-- CODE-STATS-END -->
 
@@ -273,17 +285,17 @@ The bot automatically selects the most appropriate model based on:
 ```markdown
 - `discord.py` - A Python wrapper for the Discord API (latest: 2.7.1)
 - `python-dotenv` - Read key-value pairs from a .env file and set them as environment variables (latest: 1.2.2)
-- `litellm` - Library to easily interface with LLM API providers (latest: 1.83.14)
-- `requests` - Python HTTP for Humans. (latest: 2.33.1)
+- `litellm` - Library to easily interface with LLM API providers (latest: 1.84.0)
+- `requests` - Python HTTP for Humans. (latest: 2.34.2)
 - `colorama` - Cross-platform colored terminal text. (latest: 0.4.6)
 - `cairosvg` - A Simple SVG Converter based on Cairo (latest: 2.9.0)
 - `Pillow` - Python Imaging Library (fork) (latest: 12.2.0)
 - `pilmoji` - Pilmoji is an emoji renderer for Pillow, Python's imaging library. (latest: 2.0.5)
-- `microsandbox` - Python SDK for microsandbox — secure, fast microVM-based sandboxing. (latest: 0.4.5)
+- `microsandbox` - Python SDK for microsandbox — secure, fast microVM-based sandboxing. (latest: 0.4.6)
 - `aiohttp` - Async http client/server framework (asyncio) (latest: 3.13.5)
 - `discord-webhook` - Easily send Discord webhooks with Python (latest: 1.4.1)
-- `cocoindex` - With CocoIndex, users declare the transformation, CocoIndex creates & maintains an index, and keeps the derived index up to date based on source update, with minimal computation and changes. (latest: 1.0.3)
-- `fastmcp` - The fast, Pythonic way to build MCP servers and clients. (latest: 3.2.4)
+- `cocoindex` - With CocoIndex, users declare the transformation, CocoIndex creates & maintains an index, and keeps the derived index up to date based on source update, with minimal computation and changes. (latest: 1.0.5)
+- `fastmcp` - The fast, Pythonic way to build MCP servers and clients. (latest: 3.3.0)
 - `pytesseract` - Python-tesseract is a python wrapper for Google's Tesseract-OCR (latest: 0.3.13)
 ```
 <!--DEPS-END-->

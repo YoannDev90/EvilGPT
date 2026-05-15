@@ -45,7 +45,6 @@ if command -v tree >/dev/null 2>&1; then
 else
 	echo "'tree' not installed. Install with 'apt-get install tree' or 'brew install tree'."
 fi
-
 # Count lines of code and update README
 if [ -f README.md ]; then
 	echo "Code Statistics:"
@@ -194,6 +193,51 @@ print(s+"||"+v)') || true
 	fi
 	echo "  Dependencies updated ✓"
 	rm -f "$TMP_DEPS"
+fi
+
+if [ -f README.md ] && [ -f .env ]; then
+	echo "Copying environment variable names to README..."
+	python3 - << 'PYSCRIPT'
+import os
+
+env_file = '.env'
+if not os.path.isfile(env_file):
+	print(f"{env_file} not found. Skipping environment variable update.")
+else:
+	with open(env_file, 'r', encoding='utf-8') as f:
+		lines = f.readlines()
+	var_names = []
+	for line in lines:
+		line = line.strip()
+		if line and not line.startswith('#') and '=' in line:
+			var_name = line.split('=', 1)[0].strip()
+			var_names.append(var_name)
+	if var_names:
+		readme_file = 'README.md'
+		if os.path.isfile(readme_file):
+			with open(readme_file, 'r', encoding='utf-8') as f:
+				readme_content = f.read()
+			start_marker = '<!--ENV-START-->'
+			end_marker = '<!--ENV-END-->'
+			if start_marker in readme_content and end_marker in readme_content:
+				# preserve markers and replace the inner block with a code fence listing env keys
+				s_idx = readme_content.find(start_marker) + len(start_marker)
+				e_idx = readme_content.find(end_marker)
+				prefix = readme_content[:s_idx]
+				suffix = readme_content[e_idx:]
+				env_block = '\n```env\n'
+				for var in var_names:
+					env_block += f"{var}=\n"
+				env_block += '```\n'
+				new_content = prefix + env_block + suffix
+				with open(readme_file, 'w', encoding='utf-8') as f:
+					f.write(new_content)
+				print("  Environment variables updated ✓")
+			else:
+				print(f"Markers {start_marker} and {end_marker} not found in {readme_file}. Skipping update.")
+		else:
+			print(f"{readme_file} not found. Skipping environment variable update.")
+PYSCRIPT
 fi
 
 echo "✅ All updates completed!"
