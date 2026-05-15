@@ -1,4 +1,5 @@
 """_summary_."""
+
 import io
 import logging
 import re
@@ -44,6 +45,7 @@ def _extract_links_and_sanitize(
     Tuple[str, List[str]]
         _description_
     """
+
     def replacer(match):
         """_summary_.
 

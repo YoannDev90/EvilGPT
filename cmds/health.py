@@ -1,4 +1,9 @@
-"""_summary_."""
+"""Health command handlers.
+
+Provides a `setup` function to register the `/health` command which
+performs runtime checks for subsystems and reports status.
+"""
+
 import time
 
 import discord
@@ -14,39 +19,40 @@ logger = get_logger()
 
 
 def _status_label(ok: bool) -> str:
-    """_summary_.
+    """Return a human-readable status label.
 
     Parameters
     ----------
     ok : bool
-        _description_
+        True if the subsystem is healthy, False otherwise.
 
     Returns
     -------
     str
-        _description_
+        "Healthy" when ok is True, otherwise "Degraded".
     """
     return "Healthy" if ok else "Degraded"
 
 
 async def setup(tree: app_commands.CommandTree, bot):
-    """_summary_.
+    """Register the `health` command on the provided command tree.
 
     Parameters
     ----------
     tree : app_commands.CommandTree
-        _description_
-    bot : _type_
-        _description_
+        Command tree to register the command on.
+    bot : Any
+        Bot instance used to perform runtime checks.
     """
+
     @tree.command(name="health", description="Show runtime health for bot subsystems")
-    async def health(interaction):
-        """_summary_.
+    async def health(interaction: discord.Interaction):
+        """Perform runtime health checks and reply with a summary embed.
 
         Parameters
         ----------
-        interaction : _type_
-            _description_
+        interaction : discord.Interaction
+            The interaction that triggered the command.
         """
         start_time = time.perf_counter()
         log_command_start(logger, "health", interaction)

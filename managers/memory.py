@@ -1,4 +1,9 @@
-"""_summary_."""
+"""Memory management utilities.
+
+Provides an in-memory manager for user conversation turns and simple
+metadata, plus integration hooks for persisting into CocoIndex / SQLite.
+"""
+
 from __future__ import annotations
 
 import asyncio
@@ -27,29 +32,30 @@ _ACTIVE_MEMORY_MANAGER: "MemoryManager | None" = None
 
 @dataclass(slots=True)
 class MemoryTurn:
-    """_summary_.
+    """A single conversation turn between a user and the assistant.
 
     Attributes
     ----------
     turn_id : str
-        _description_
+        Unique identifier for the turn.
     user_id : int
-        _description_
+        Discord user id who sent the message.
     user_name : str
-        _description_
+        Display name of the user.
     guild_id : int | None
-        _description_
+        Guild id where the turn happened, or None for DMs.
     channel_id : int | None
-        _description_
+        Channel id where the turn happened, or None for DMs.
     user_content : str
-        _description_
+        The user message content.
     assistant_content : str | None
-        _description_
+        The assistant's response content, may be None.
     created_at : float
-        _description_
+        Timestamp when the turn was created.
     updated_at : float
-        _description_
+        Timestamp when the turn was last updated.
     """
+
     turn_id: str
     user_id: int
     user_name: str
@@ -63,51 +69,50 @@ class MemoryTurn:
 
 @dataclass(slots=True)
 class UserMetadataRecord:
-    """_summary_.
+    """Simple per-user metadata stored alongside turns.
 
     Attributes
     ----------
     user_id : int
-        _description_
+        Discord user id this record belongs to.
     mood : str
-        _description_
+        User mood preset used by the bot when replying.
     updated_at : float
-        _description_
+        Timestamp of last update.
     """
+
     user_id: int
     mood: str = "sarcastic"
     updated_at: float = field(default_factory=time.time)
 
 
 def _ensure_parent_dir(path: Path) -> None:
-    """_summary_.
+    """Ensure the parent directory of `path` exists.
 
     Parameters
     ----------
     path : Path
-        _description_
+        File path whose parent directory should be created.
     """
     path.parent.mkdir(parents=True, exist_ok=True)
 
 
 @coco.lifespan
 async def memory_lifespan(builder: coco.EnvironmentBuilder) -> AsyncIterator[None]:
-    """_summary_.
+    """CocoIndex lifespan hook to provide memory-related services.
+
+    The active MemoryManager and a managed SQLite connection are provided
+    into the CocoIndex environment during the application's lifespan.
 
     Parameters
     ----------
     builder : coco.EnvironmentBuilder
-        _description_
-
-    Yields
-    ------
-    _type_
-        _description_
+        CocoIndex environment builder used to register providers.
 
     Raises
     ------
     RuntimeError
-        _description_
+        If the MemoryManager singleton has not been initialized.
     """
     manager = _ACTIVE_MEMORY_MANAGER
     if manager is None:
@@ -123,7 +128,11 @@ async def memory_lifespan(builder: coco.EnvironmentBuilder) -> AsyncIterator[Non
 
 @coco.fn
 async def memory_app_main() -> None:
-    """_summary_."""
+    """CocoIndex function to declare DB tables from in-memory records.
+
+    This function is used by the CocoIndex app to prepare table schemas and
+    declare rows based on the in-memory store.
+    """
     store = coco.use_context(MEMORY_STORE_KEY)
 
     turn_schema = await coco_sqlite.TableSchema.from_class(
@@ -152,54 +161,13 @@ async def memory_app_main() -> None:
 
 
 class MemoryManager:
-    """_summary_.
+    """In-memory conversation history manager with persistence hooks.
 
-    Attributes
-    ----------
-    max_history : int
-        _description_
-    state_path : _type_
-        _description_
-    sqlite_path : _type_
-        _description_
-    cocoindex_db_path : _type_
-        _description_
-
-    Methods
-    -------
-    iter_turns()
-        _description_
-    iter_metadata_records()
-        _description_
-    get_metadata(user_id: int, key: str | None=None)
-        _description_
-    set_metadata(user_id: int, key: str, value: Any)
-        _description_
-    get_turn(turn_id: str)
-        _description_
-    list_turns(user_id: int | None=None, limit: int=10)
-        _description_
-    get_history(user_id: int, limit: int | None=None)
-        _description_
-    record_exchange(*, user_id: int, user_name: str, user_content: str, assistant_content: str, guild_id: int | None, channel_id: int | None, turn_id: str | None=None)
-        _description_
-    delete_turn(turn_id: str)
-        _description_
-    clear_history(user_id: int | None=None)
-        _description_
-    sync()
-        _description_
-    bootstrap()
-        _description_
-    record_and_sync(*, user_id: int, user_name: str, user_content: str, assistant_content: str, guild_id: int | None, channel_id: int | None)
-        _description_
-    set_metadata_and_sync(user_id: int, key: str, value: Any)
-        _description_
-    delete_turn_and_sync(turn_id: str)
-        _description_
-    clear_history_and_sync(user_id: int | None=None)
-        _description_
+    The manager stores recent `MemoryTurn` objects and simple per-user
+    metadata, supports recording/deleting turns and syncing to disk /
+    CocoIndex-backed storage.
     """
+
     def __init__(
         self,
         max_history: int = 15,

@@ -1,4 +1,5 @@
 """_summary_."""
+
 import base64
 import io
 from typing import Optional

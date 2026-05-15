@@ -1,4 +1,8 @@
-"""_summary_."""
+"""Entrypoint for EvilGPT application.
+
+Sets up logging and starts the bot when executed as a script.
+"""
+
 import logging
 import sys
 

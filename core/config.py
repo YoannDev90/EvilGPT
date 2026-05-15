@@ -1,4 +1,5 @@
 """_summary_."""
+
 import os
 from dataclasses import dataclass
 from typing import Any, Dict, Optional, Tuple
@@ -98,6 +99,7 @@ class ConsoleLoggingConfig:
     console_format : str
         _description_
     """
+
     enable: bool = True
     level: str = "INFO"
     console_format: str = "%(asctime)s - %(message)s"
@@ -116,6 +118,7 @@ class FileLoggingConfig:
     file_format : str
         _description_
     """
+
     enable_file_logging: bool = True
     log_file: str = "logs/evilgpt.log"
 
@@ -136,6 +139,7 @@ class DiscordLoggingConfig:
     discord_format : str
         _description_
     """
+
     enable_discord_logging: bool = False
     discord_webhook: Optional[str] = None
     discord_format: str = "%(asctime)s - %(filename)s\n%(message)s"
@@ -170,6 +174,7 @@ class LoggingConfig:
     discord_format : str
         _description_
     """
+
     console: ConsoleLoggingConfig
     file: FileLoggingConfig
     discord: DiscordLoggingConfig
@@ -288,6 +293,7 @@ class Config:
     CONFIG_PATH : str
         _description_
     """
+
     BOT_TOKEN: Optional[str] = None
     WEBHOOK_POSTURL: Optional[str] = None
     WEBHOOK_URL: Optional[str] = None

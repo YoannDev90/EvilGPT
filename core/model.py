@@ -1,4 +1,5 @@
 """_summary_."""
+
 import logging
 import time
 from typing import List, Optional
@@ -178,6 +179,7 @@ class Answer:
     response_time : _type_
         _description_
     """
+
     def __init__(self, content: str = ""):
         """_summary_.
 

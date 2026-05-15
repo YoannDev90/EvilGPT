@@ -242,7 +242,7 @@ Below is current snapshot of repository. This section is auto-updated by `./lint
 
 **Markdown:** 1 files, 285 lines of code
 
-**Python:** 45 files, 3668 lines of code
+**Python:** 45 files, 3676 lines of code
 
 **SVG:** 1 files, 17 lines of code
 
@@ -250,7 +250,7 @@ Below is current snapshot of repository. This section is auto-updated by `./lint
 
 **Text:** 7 files, 177 lines of code
 
-**Total:** 81 files, 4738 lines of code, 1979 comments, 1092 blank lines
+**Total:** 81 files, 4746 lines of code, 2002 comments, 1156 blank lines
 <!-- CODE-STATS-END -->
 
 Run `./lint.sh` to format code and regenerate this project tree snapshot. CI runs the same script on every push/PR.
@@ -294,7 +294,7 @@ The bot automatically selects the most appropriate model based on:
 - `aiohttp==3.13.5` - Async http client/server framework (asyncio) (latest: 3.13.5)
 - `discord-webhook==1.4.1` - Easily send Discord webhooks with Python (latest: 1.4.1)
 - `cocoindex==1.0.5` - With CocoIndex, users declare the transformation, CocoIndex creates & maintains an index, and keeps the derived index up to date based on source update, with minimal computation and changes. (latest: 1.0.5)
-- `fastmcp==3.3.0` - The fast, Pythonic way to build MCP servers and clients. (latest: 3.3.0)
+- `fastmcp==3.3.0` - The fast, Pythonic way to build MCP servers and clients. (latest: 3.3.1)
 - `pytesseract==0.3.13` - Python-tesseract is a python wrapper for Google's Tesseract-OCR (latest: 0.3.13)
 - `pint==0.25.3` - Physical quantities module (latest: 0.25.3)
 ```

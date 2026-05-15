@@ -1,4 +1,5 @@
 """_summary_."""
+
 import json
 import os
 import time
@@ -24,6 +25,7 @@ class Provider:
     api_key : _type_
         _description_
     """
+
     def __init__(self, provider: str, env_key: str, api_base: str):
         """_summary_.
 
@@ -63,6 +65,7 @@ class Model:
     api_key : _type_
         _description_
     """
+
     def __init__(self, model_id: str, provider: Provider):
         """_summary_.
 

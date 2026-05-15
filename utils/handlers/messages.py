@@ -1,4 +1,5 @@
 """_summary_."""
+
 import logging
 import re
 from typing import Any, List, Optional, Tuple
@@ -40,6 +41,7 @@ class MessageSender:
     process_and_send(response: str)
         _description_
     """
+
     def __init__(
         self,
         channel: discord.abc.Messageable,

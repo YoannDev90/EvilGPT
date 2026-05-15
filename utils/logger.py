@@ -1,4 +1,5 @@
 """_summary_."""
+
 import logging
 import time
 from logging import Handler
@@ -20,6 +21,7 @@ class EvilGPTFilter(logging.Filter):
     filter(record: logging.LogRecord)
         _description_
     """
+
     def filter(self, record: logging.LogRecord) -> bool:
         """_summary_.
 
@@ -44,6 +46,7 @@ class ColoredFormatter(logging.Formatter):
     format(record: logging.LogRecord)
         _description_
     """
+
     COLORS = {
         logging.DEBUG: Fore.CYAN,
         logging.INFO: Fore.GREEN,
@@ -78,6 +81,7 @@ class DiscordAnsiFormatter(logging.Formatter):
     format(record: logging.LogRecord)
         _description_
     """
+
     LEVEL_COLORS = {
         logging.DEBUG: "\x1b[36m",
         logging.INFO: "\x1b[32m",
@@ -119,6 +123,7 @@ class DiscordWebhookHandler(Handler):
     emit(record: logging.LogRecord)
         _description_
     """
+
     def __init__(self, webhook_url: str, level: int = logging.INFO):
         """_summary_.
 

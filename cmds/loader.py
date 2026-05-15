@@ -1,4 +1,10 @@
-"""_summary_."""
+"""Command loader utilities.
+
+This module discovers command modules under the `cmds` package and calls
+their `setup(tree, bot)` function if present to register application
+commands.
+"""
+
 import importlib
 import inspect
 import logging
@@ -15,17 +21,17 @@ logger = get_logger()
 
 
 def _iter_command_modules(base_path: Path):
-    """_summary_.
+    """Yield top-level module names found in `base_path`.
 
     Parameters
     ----------
     base_path : Path
-        _description_
+        Filesystem path to the `cmds` directory to scan.
 
     Yields
     ------
-    _type_
-        _description_
+    str
+        Module name (without package prefix) for each discovered module.
     """
     pkg_path = str(base_path)
     for finder, name, ispkg in pkgutil.iter_modules([pkg_path]):
@@ -35,16 +41,20 @@ def _iter_command_modules(base_path: Path):
 
 
 async def load_commands(bot: Any, tree: app_commands.CommandTree, cmds_path: Path):
-    """Recursively import modules from `cmds_path` and call `setup(tree, bot)` if present.
+    """Import and initialize command modules found under `cmds_path`.
+
+    This function walks the package tree under `cmds_path`, imports each
+    module, and calls its `setup(tree, bot)` function if present. Failing
+    modules are logged and skipped to avoid crashing startup.
 
     Parameters
     ----------
     bot : Any
-        _description_
+        Bot instance passed to command modules' `setup` functions.
     tree : app_commands.CommandTree
-        _description_
+        Command tree used to register application commands.
     cmds_path : Path
-        _description_
+        Filesystem path to the `cmds` package directory.
     """
     start = time.perf_counter()
     loaded = 0

@@ -1,4 +1,5 @@
 """_summary_."""
+
 import json
 import os
 import time
@@ -26,6 +27,7 @@ class ToolsLoader:
     call_tool(tool_name: str, args: dict)
         _description_
     """
+
     def __init__(self, tools_dir: str):
         """_summary_.
 

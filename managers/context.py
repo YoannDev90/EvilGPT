@@ -1,4 +1,9 @@
-"""_summary_."""
+"""Helpers to gather and format Discord server context.
+
+Provides utilities to collect basic server metadata and format it for
+inclusion in system prompts or logs.
+"""
+
 import discord
 
 from utils.logger import get_logger
@@ -7,17 +12,18 @@ logger = get_logger()
 
 
 async def get_server_context(guild: discord.Guild):
-    """Gather context about the current server.
+    """Gather context about the given Discord guild.
 
     Parameters
     ----------
     guild : discord.Guild
-        _description_
+        Guild object to inspect.
 
     Returns
     -------
-    _type_
-        _description_
+    dict
+        A dictionary containing summarized server metadata suitable for
+        inclusion in prompts (name, member list, emojis, roles, etc.).
     """
     # Essayer de récupérer les membres si le cache est vide
     if not guild.chunked and guild.member_count < 1000:
@@ -41,17 +47,17 @@ async def get_server_context(guild: discord.Guild):
 
 
 def format_context_for_prompt(context: dict):
-    """Format the gathered context into a string for the system prompt.
+    """Convert the server context dict into a human-readable string.
 
     Parameters
     ----------
     context : dict
-        _description_
+        Context dictionary returned by `get_server_context`.
 
     Returns
     -------
-    _type_
-        _description_
+    str
+        Multi-line string summarizing the server for model prompts.
     """
     lines = [
         f"Information about the current Discord server '{context['server_name']}':"

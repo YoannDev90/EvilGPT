@@ -1,4 +1,8 @@
-"""_summary_."""
+"""Ping command handlers.
+
+Provides a `setup` function to register the `/ping` command which
+returns the bot's gateway latency.
+"""
 import time
 
 import discord
@@ -11,24 +15,24 @@ logger = get_logger()
 
 
 async def setup(tree: app_commands.CommandTree, bot):
-    """_summary_.
+    """Register the `ping` command on the given command tree.
 
     Parameters
     ----------
     tree : app_commands.CommandTree
-        _description_
-    bot : _type_
-        _description_
+        Command tree to register the command on.
+    bot : Any
+        Bot instance used to read gateway latency.
     """
     @tree.command(name="ping", description="Check bot latency and responsiveness")
-    async def ping(interaction):
-        """_summary_.
+        async def ping(interaction: discord.Interaction):
+            """Respond with gateway latency.
 
-        Parameters
-        ----------
-        interaction : _type_
-            _description_
-        """
+            Parameters
+            ----------
+            interaction : discord.Interaction
+                The interaction that triggered the command.
+            """
         start_time = time.perf_counter()
         log_command_start(logger, "ping", interaction)
 
