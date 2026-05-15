@@ -11,11 +11,9 @@ from utils.logger import get_logger
 
 logger = get_logger()
 
-from utils.handlers.codeblock import (send_code_block,
-                                      send_code_block_with_return)
+from utils.handlers.codeblock import send_code_block, send_code_block_with_return
 from utils.handlers.latex import LATEX_TO_EMOJI, detect_latex
-from utils.handlers.table import (TABLE_IMAGE_PLACEHOLDER,
-                                  detect_and_convert_tables)
+from utils.handlers.table import TABLE_IMAGE_PLACEHOLDER, detect_and_convert_tables
 
 
 class MessageSender:

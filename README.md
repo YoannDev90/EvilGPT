@@ -240,9 +240,9 @@ Below is current snapshot of repository. This section is auto-updated by `./lint
 
 **JSON:** 25 files, 402 lines of code
 
-**Markdown:** 1 files, 285 lines of code
+**Markdown:** 1 files, 279 lines of code
 
-**Python:** 45 files, 3676 lines of code
+**Python:** 45 files, 3674 lines of code
 
 **SVG:** 1 files, 17 lines of code
 
@@ -250,7 +250,7 @@ Below is current snapshot of repository. This section is auto-updated by `./lint
 
 **Text:** 7 files, 177 lines of code
 
-**Total:** 81 files, 4737 lines of code, 1938 comments, 1157 blank lines
+**Total:** 81 files, 4729 lines of code, 1938 comments, 1155 blank lines
 <!-- CODE-STATS-END -->
 
 Run `./lint.sh` to format code and regenerate this project tree snapshot. CI runs the same script on every push/PR.
@@ -304,22 +304,14 @@ The bot automatically selects the most appropriate model based on:
 
 ### Linting & CI
 
-- Project provides `lint.sh` at repo root. It runs `ruff format` and `isort .` to format and sort imports.
+- Project provides `lint.sh` at repo root. 
 - Run locally before commit:
 
 ```bash
 ./lint.sh
 ```
 
-- CI: GitHub Actions workflow runs `lint.sh` on `push` and `pull_request` to `main` and feature branches. Fix issues locally and push again.
-
-If you prefer to install linters manually:
-
-```bash
-pip install ruff isort
-ruff format
-isort .
-```
+- CI: GitHub Actions workflow runs `lint.sh` on `push` and `pull_request` to `master` and feature branches. Fix issues locally and push again.
 
 ### Adding New Providers
 1. Add provider configuration to `providers.json`

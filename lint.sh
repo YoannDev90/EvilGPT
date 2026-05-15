@@ -13,7 +13,7 @@ else
 fi
 if command -v isort >/dev/null 2>&1; then
     echo "  Running isort..."
-    isort . || true
+    isort **/*.py || true
 else
     echo "  Skipping isort (not installed)"
 fi
