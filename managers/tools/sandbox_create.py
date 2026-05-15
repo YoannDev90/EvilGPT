@@ -1,3 +1,4 @@
+"""_summary_."""
 import asyncio
 import json
 from typing import Any, Dict, List, Optional
@@ -23,6 +24,40 @@ async def sandbox_create(
     maxDuration: Optional[int] = None,
     idleTimeout: Optional[int] = None,
 ) -> str:
+    """_summary_.
+
+    Parameters
+    ----------
+    name : str
+        _description_
+    image : str
+        _description_
+    cpus : int
+        _description_ (Default value = 1)
+    memoryMib : int
+        _description_ (Default value = 512)
+    workdir : Optional[str]
+        _description_ (Default value = None)
+    env : Optional[Dict[str, str]]
+        _description_ (Default value = None)
+    volumes : Optional[List[Dict[str, Any]]]
+        _description_ (Default value = None)
+    patches : Optional[List[Dict[str, Any]]]
+        _description_ (Default value = None)
+    entrypoint : Optional[List[str]]
+        _description_ (Default value = None)
+    hostname : Optional[str]
+        _description_ (Default value = None)
+    maxDuration : Optional[int]
+        _description_ (Default value = None)
+    idleTimeout : Optional[int]
+        _description_ (Default value = None)
+
+    Returns
+    -------
+    str
+        _description_
+    """
     try:
         kwargs: Dict[str, Any] = {
             "image": image,

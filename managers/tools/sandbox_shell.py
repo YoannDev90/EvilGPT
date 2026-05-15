@@ -1,3 +1,4 @@
+"""_summary_."""
 import asyncio
 import json
 from typing import Any, Dict, Optional
@@ -10,6 +11,18 @@ logger = get_logger()
 
 
 def _extract_exec_result(result: Any) -> Dict[str, Any]:
+    """_summary_.
+
+    Parameters
+    ----------
+    result : Any
+        _description_
+
+    Returns
+    -------
+    Dict[str, Any]
+        _description_
+    """
     stdout = getattr(result, "stdout", None)
     stderr = getattr(result, "stderr", None)
     code = getattr(result, "code", None)
@@ -33,6 +46,22 @@ def _extract_exec_result(result: Any) -> Dict[str, Any]:
 async def sandbox_shell(
     name: str, command: str, timeout: Optional[float] = None
 ) -> str:
+    """_summary_.
+
+    Parameters
+    ----------
+    name : str
+        _description_
+    command : str
+        _description_
+    timeout : Optional[float]
+        _description_ (Default value = None)
+
+    Returns
+    -------
+    str
+        _description_
+    """
     try:
         sandbox = await asyncio.to_thread(microsandbox.Sandbox.get, name)
         if timeout is not None:

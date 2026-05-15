@@ -1,3 +1,4 @@
+"""_summary_."""
 import json
 import os
 import time
@@ -9,7 +10,30 @@ logger = get_logger()
 
 
 class ToolsLoader:
+    """_summary_.
+
+    Attributes
+    ----------
+    tools_dir : str
+        _description_
+    tools_metadata : List[Dict[str, Any]]
+        _description_
+    tools_handlers : Dict[str, Any]
+        _description_
+
+    Methods
+    -------
+    call_tool(tool_name: str, args: dict)
+        _description_
+    """
     def __init__(self, tools_dir: str):
+        """_summary_.
+
+        Parameters
+        ----------
+        tools_dir : str
+            _description_
+        """
         self.tools_dir = tools_dir
         self.tools_metadata: List[Dict[str, Any]] = []
         self.tools_handlers: Dict[str, Any] = {}
@@ -94,7 +118,20 @@ class ToolsLoader:
             logger.debug("Tools failed: %s", ", ".join(failed))
 
     async def call_tool(self, tool_name: str, args: dict) -> str:
-        """Call a tool handler with the given arguments."""
+        """Call a tool handler with the given arguments.
+
+        Parameters
+        ----------
+        tool_name : str
+            _description_
+        args : dict
+            _description_
+
+        Returns
+        -------
+        str
+            _description_
+        """
         if tool_name not in self.tools_handlers:
             return f"Unknown tool: {tool_name}"
 

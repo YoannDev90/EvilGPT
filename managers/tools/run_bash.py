@@ -1,3 +1,4 @@
+"""_summary_."""
 import asyncio
 import json
 import time
@@ -14,7 +15,27 @@ DEFAULT_SHELL_IMAGE = "ubuntu:22.04"
 
 
 async def run_bash(code: str, timeout: int = 10, image: Optional[str] = None) -> str:
-    """Execute bash commands in sandboxed environment using ephemeral sandbox."""
+    """Execute bash commands in sandboxed environment using ephemeral sandbox.
+
+    Parameters
+    ----------
+    code : str
+        _description_
+    timeout : int
+        _description_ (Default value = 10)
+    image : Optional[str]
+        _description_ (Default value = None)
+
+    Returns
+    -------
+    str
+        _description_
+
+    Raises
+    ------
+    __UnknownError__
+        _description_
+    """
     name = f"run-bash-{int(time.time() * 1000)}"
     sandbox = None
     try:
@@ -42,6 +63,18 @@ async def run_bash(code: str, timeout: int = 10, image: Optional[str] = None) ->
 
         def _extract_exec_result(result: Any) -> Dict[str, Any]:
             # Support multiple SDK result shapes (ExecOutput, simple namespaces)
+            """_summary_.
+
+            Parameters
+            ----------
+            result : Any
+                _description_
+
+            Returns
+            -------
+            Dict[str, Any]
+                _description_
+            """
             stdout = None
             stderr = None
             codev = None

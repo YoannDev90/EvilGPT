@@ -1,3 +1,4 @@
+"""_summary_."""
 import asyncio
 import json
 import time
@@ -17,6 +18,25 @@ async def run_nodejs(code: str, timeout: int = 10, image: Optional[str] = None) 
     """Execute Node.js code in sandboxed environment using ephemeral sandbox.
 
     Mirrors the approach used by `run_python` to avoid direct Sandbox constructor calls.
+
+    Parameters
+    ----------
+    code : str
+        _description_
+    timeout : int
+        _description_ (Default value = 10)
+    image : Optional[str]
+        _description_ (Default value = None)
+
+    Returns
+    -------
+    str
+        _description_
+
+    Raises
+    ------
+    __UnknownError__
+        _description_
     """
     name = f"run-nodejs-{int(time.time() * 1000)}"
     sandbox = None
@@ -45,6 +65,18 @@ async def run_nodejs(code: str, timeout: int = 10, image: Optional[str] = None) 
 
         def _extract_exec_result(result: Any) -> Dict[str, Any]:
             # Support multiple SDK result shapes (ExecOutput, simple namespaces)
+            """_summary_.
+
+            Parameters
+            ----------
+            result : Any
+                _description_
+
+            Returns
+            -------
+            Dict[str, Any]
+                _description_
+            """
             stdout = None
             stderr = None
             codev = None

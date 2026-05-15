@@ -1,3 +1,4 @@
+"""_summary_."""
 import os
 from dataclasses import dataclass
 from typing import Any, Dict, Optional, Tuple
@@ -25,6 +26,18 @@ DEFAULT_CONFIG_PATH = os.path.join(BASE_DIR, "config.toml")
 
 
 def _load_toml(path: str = DEFAULT_CONFIG_PATH) -> Dict[str, Any]:
+    """_summary_.
+
+    Parameters
+    ----------
+    path : str
+        _description_ (Default value = DEFAULT_CONFIG_PATH)
+
+    Returns
+    -------
+    Dict[str, Any]
+        _description_
+    """
     if _toml is None:
         return {}
     if os.path.exists(path):
@@ -54,12 +67,37 @@ def _load_toml(path: str = DEFAULT_CONFIG_PATH) -> Dict[str, Any]:
 def read_from_toml_config(
     param: str, config: Optional[Dict[str, Any]] = None
 ) -> Dict[str, Any]:
+    """_summary_.
+
+    Parameters
+    ----------
+    param : str
+        _description_
+    config : Optional[Dict[str, Any]]
+        _description_ (Default value = None)
+
+    Returns
+    -------
+    Dict[str, Any]
+        _description_
+    """
     cfg = config or _load_toml()
     return cfg.get(param, {}) if isinstance(cfg.get(param, {}), dict) else {}
 
 
 @dataclass
 class ConsoleLoggingConfig:
+    """_summary_.
+
+    Attributes
+    ----------
+    enable : bool
+        _description_
+    level : str
+        _description_
+    console_format : str
+        _description_
+    """
     enable: bool = True
     level: str = "INFO"
     console_format: str = "%(asctime)s - %(message)s"
@@ -67,6 +105,17 @@ class ConsoleLoggingConfig:
 
 @dataclass
 class FileLoggingConfig:
+    """_summary_.
+
+    Attributes
+    ----------
+    enable_file_logging : bool
+        _description_
+    log_file : str
+        _description_
+    file_format : str
+        _description_
+    """
     enable_file_logging: bool = True
     log_file: str = "logs/evilgpt.log"
 
@@ -76,6 +125,17 @@ class FileLoggingConfig:
 
 @dataclass
 class DiscordLoggingConfig:
+    """_summary_.
+
+    Attributes
+    ----------
+    enable_discord_logging : bool
+        _description_
+    discord_webhook : Optional[str]
+        _description_
+    discord_format : str
+        _description_
+    """
     enable_discord_logging: bool = False
     discord_webhook: Optional[str] = None
     discord_format: str = "%(asctime)s - %(filename)s\n%(message)s"
@@ -83,45 +143,151 @@ class DiscordLoggingConfig:
 
 @dataclass
 class LoggingConfig:
+    """_summary_.
+
+    Attributes
+    ----------
+    console : ConsoleLoggingConfig
+        _description_
+    file : FileLoggingConfig
+        _description_
+    discord : DiscordLoggingConfig
+        _description_
+    level : str
+        _description_
+    enable_file_logging : bool
+        _description_
+    log_file : str
+        _description_
+    enable_discord_logging : bool
+        _description_
+    discord_webhook : Optional[str]
+        _description_
+    console_format : str
+        _description_
+    file_format : str
+        _description_
+    discord_format : str
+        _description_
+    """
     console: ConsoleLoggingConfig
     file: FileLoggingConfig
     discord: DiscordLoggingConfig
 
     @property
     def level(self) -> str:
+        """_summary_.
+
+        Returns
+        -------
+        str
+            _description_
+        """
         return self.console.level
 
     @property
     def enable_file_logging(self) -> bool:
+        """_summary_.
+
+        Returns
+        -------
+        bool
+            _description_
+        """
         return self.file.enable_file_logging
 
     @property
     def log_file(self) -> str:
+        """_summary_.
+
+        Returns
+        -------
+        str
+            _description_
+        """
         return self.file.log_file
 
     @property
     def enable_discord_logging(self) -> bool:
+        """_summary_.
+
+        Returns
+        -------
+        bool
+            _description_
+        """
         return self.discord.enable_discord_logging
 
     @property
     def discord_webhook(self) -> Optional[str]:
+        """_summary_.
+
+        Returns
+        -------
+        Optional[str]
+            _description_
+        """
         return self.discord.discord_webhook
 
     @property
     def console_format(self) -> str:
+        """_summary_.
+
+        Returns
+        -------
+        str
+            _description_
+        """
         return self.console.console_format
 
     @property
     def file_format(self) -> str:
+        """_summary_.
+
+        Returns
+        -------
+        str
+            _description_
+        """
         return self.file.file_format
 
     @property
     def discord_format(self) -> str:
+        """_summary_.
+
+        Returns
+        -------
+        str
+            _description_
+        """
         return self.discord.discord_format
 
 
 @dataclass
 class Config:
+    """_summary_.
+
+    Attributes
+    ----------
+    BOT_TOKEN : Optional[str]
+        _description_
+    WEBHOOK_POSTURL : Optional[str]
+        _description_
+    WEBHOOK_URL : Optional[str]
+        _description_
+    BASE_DIR : str
+        _description_
+    SYSTEM_PROMPT_PATH : str
+        _description_
+    PROVIDERS_PATH : str
+        _description_
+    MODELS_PATH : str
+        _description_
+    MOODS_DIR : str
+        _description_
+    CONFIG_PATH : str
+        _description_
+    """
     BOT_TOKEN: Optional[str] = None
     WEBHOOK_POSTURL: Optional[str] = None
     WEBHOOK_URL: Optional[str] = None
@@ -136,6 +302,18 @@ class Config:
 
 
 def _first_table(items: Any) -> Dict[str, Any]:
+    """_summary_.
+
+    Parameters
+    ----------
+    items : Any
+        _description_
+
+    Returns
+    -------
+    Dict[str, Any]
+        _description_
+    """
     if isinstance(items, list) and items:
         return items[0] if isinstance(items[0], dict) else {}
     if isinstance(items, dict):
@@ -144,6 +322,18 @@ def _first_table(items: Any) -> Dict[str, Any]:
 
 
 def _normalize_webhook_url(url: Optional[str]) -> Optional[str]:
+    """_summary_.
+
+    Parameters
+    ----------
+    url : Optional[str]
+        _description_
+
+    Returns
+    -------
+    Optional[str]
+        _description_
+    """
     if not url:
         return None
     # If the configured url contains a placeholder, substitute with env var WEBHOOK_URL
@@ -158,6 +348,18 @@ def _normalize_webhook_url(url: Optional[str]) -> Optional[str]:
 
 
 def load_config(config_path: Optional[str] = None) -> Tuple[Config, LoggingConfig]:
+    """_summary_.
+
+    Parameters
+    ----------
+    config_path : Optional[str]
+        _description_ (Default value = None)
+
+    Returns
+    -------
+    Tuple[Config, LoggingConfig]
+        _description_
+    """
     toml_path = config_path or DEFAULT_CONFIG_PATH
     raw = _load_toml(toml_path)
 
@@ -250,6 +452,13 @@ cfg, logging_cfg = load_config()
 
 
 def read_system_prompt() -> Optional[str]:
+    """_summary_.
+
+    Returns
+    -------
+    Optional[str]
+        _description_
+    """
     if os.path.exists(cfg.SYSTEM_PROMPT_PATH):
         with open(cfg.SYSTEM_PROMPT_PATH, "r", encoding="utf-8") as f:
             return f.read().strip()
@@ -260,6 +469,16 @@ def read_mood_prompt(mood: str | None) -> Optional[str]:
     """Read a mood-specific system prompt from `data/moods/<mood>.txt`.
 
     If `mood` is None or the file does not exist, fallback to `neutral.txt`.
+
+    Parameters
+    ----------
+    mood : str | None
+        _description_
+
+    Returns
+    -------
+    Optional[str]
+        _description_
     """
     moods_dir = os.path.join(BASE_DIR, "data", "moods")
     if mood:

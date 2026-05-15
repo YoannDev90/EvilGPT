@@ -1,3 +1,4 @@
+"""_summary_."""
 import logging
 import time
 from typing import List, Optional
@@ -35,6 +36,16 @@ def _validate_tools_payload(raw_tools: list) -> list:
 
     Returns a filtered list containing only provider-compatible function descriptors.
     Logs and drops malformed entries to avoid provider validation crashes.
+
+    Parameters
+    ----------
+    raw_tools : list
+        _description_
+
+    Returns
+    -------
+    list
+        _description_
     """
     valid = []
     for t in raw_tools or []:
@@ -87,6 +98,18 @@ DEFAULT_MAX_CONTEXT_CHARS = 90000
 
 
 def _messages_char_size(msgs: list) -> int:
+    """_summary_.
+
+    Parameters
+    ----------
+    msgs : list
+        _description_
+
+    Returns
+    -------
+    int
+        _description_
+    """
     try:
         import json
 
@@ -99,6 +122,18 @@ def _truncate_messages(msgs: list, max_chars: int = DEFAULT_MAX_CONTEXT_CHARS) -
     """Trim oldest non-system messages until the serialized size is under max_chars.
 
     Keeps system messages and as many recent messages as will fit.
+
+    Parameters
+    ----------
+    msgs : list
+        _description_
+    max_chars : int
+        _description_ (Default value = DEFAULT_MAX_CONTEXT_CHARS)
+
+    Returns
+    -------
+    list
+        _description_
     """
     if not isinstance(msgs, list):
         return msgs
@@ -132,13 +167,43 @@ def _truncate_messages(msgs: list, max_chars: int = DEFAULT_MAX_CONTEXT_CHARS) -
 
 
 class Answer:
+    """_summary_.
+
+    Attributes
+    ----------
+    content : str
+        _description_
+    model : _type_
+        _description_
+    response_time : _type_
+        _description_
+    """
     def __init__(self, content: str = ""):
+        """_summary_.
+
+        Parameters
+        ----------
+        content : str
+            _description_ (Default value = '')
+        """
         self.content = content
         self.model = None
         self.response_time = None
 
 
 def _select_model(models: List[Model]) -> Optional[Model]:
+    """_summary_.
+
+    Parameters
+    ----------
+    models : List[Model]
+        _description_
+
+    Returns
+    -------
+    Optional[Model]
+        _description_
+    """
     if not models:
         return None
     # Favor generic selection for now, or use first available
@@ -146,6 +211,20 @@ def _select_model(models: List[Model]) -> Optional[Model]:
 
 
 async def generate_answer(messages: list, stream: bool = False):
+    """_summary_.
+
+    Parameters
+    ----------
+    messages : list
+        _description_
+    stream : bool
+        _description_ (Default value = False)
+
+    Returns
+    -------
+    _type_
+        _description_
+    """
     models = get_models()
     if not models:
         return Answer("Désolé, aucune configuration d'IA disponible.")

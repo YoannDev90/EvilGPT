@@ -1,3 +1,4 @@
+"""_summary_."""
 import json
 import os
 import time
@@ -10,7 +11,31 @@ logger = get_logger()
 
 
 class Provider:
+    """_summary_.
+
+    Attributes
+    ----------
+    provider : str
+        _description_
+    env_key : str
+        _description_
+    api_base : str
+        _description_
+    api_key : _type_
+        _description_
+    """
     def __init__(self, provider: str, env_key: str, api_base: str):
+        """_summary_.
+
+        Parameters
+        ----------
+        provider : str
+            _description_
+        env_key : str
+            _description_
+        api_base : str
+            _description_
+        """
         self.provider = provider
         self.env_key = env_key
         self.api_base = api_base
@@ -23,7 +48,31 @@ class Provider:
 
 
 class Model:
+    """_summary_.
+
+    Attributes
+    ----------
+    id : str
+        _description_
+    litellm_id : _type_
+        _description_
+    provider : Provider
+        _description_
+    api_base : _type_
+        _description_
+    api_key : _type_
+        _description_
+    """
     def __init__(self, model_id: str, provider: Provider):
+        """_summary_.
+
+        Parameters
+        ----------
+        model_id : str
+            _description_
+        provider : Provider
+            _description_
+        """
         self.id = model_id
         self.litellm_id = f"openai/{model_id}"
         self.provider = provider
@@ -32,6 +81,13 @@ class Model:
 
 
 def get_model_catalog() -> List[Dict[str, str]]:
+    """_summary_.
+
+    Returns
+    -------
+    List[Dict[str, str]]
+        _description_
+    """
     providers = _load_providers()
     if not os.path.exists(cfg.MODELS_PATH):
         logger.error("Models file not found: %s", cfg.MODELS_PATH)
@@ -64,6 +120,13 @@ def get_model_catalog() -> List[Dict[str, str]]:
 
 
 def _load_providers() -> Dict[str, Provider]:
+    """_summary_.
+
+    Returns
+    -------
+    Dict[str, Provider]
+        _description_
+    """
     if not os.path.exists(cfg.PROVIDERS_PATH):
         logger.error("Providers file not found: %s", cfg.PROVIDERS_PATH)
         return {}
@@ -82,6 +145,13 @@ def _load_providers() -> Dict[str, Provider]:
 
 
 def get_models() -> List[Model]:
+    """_summary_.
+
+    Returns
+    -------
+    List[Model]
+        _description_
+    """
     providers = _load_providers()
     if not os.path.exists(cfg.MODELS_PATH):
         logger.error("Models file not found: %s", cfg.MODELS_PATH)

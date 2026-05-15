@@ -1,3 +1,4 @@
+"""_summary_."""
 import asyncio
 import json
 import shlex
@@ -11,6 +12,18 @@ logger = get_logger()
 
 
 def _extract_exec_result(result: Any) -> Dict[str, Any]:
+    """_summary_.
+
+    Parameters
+    ----------
+    result : Any
+        _description_
+
+    Returns
+    -------
+    Dict[str, Any]
+        _description_
+    """
     stdout = getattr(result, "stdout", None)
     stderr = getattr(result, "stderr", None)
     code = getattr(result, "code", None)
@@ -32,6 +45,20 @@ def _extract_exec_result(result: Any) -> Dict[str, Any]:
 
 
 async def sandbox_fs_read(name: str, path: str) -> str:
+    """_summary_.
+
+    Parameters
+    ----------
+    name : str
+        _description_
+    path : str
+        _description_
+
+    Returns
+    -------
+    str
+        _description_
+    """
     try:
         sandbox = await asyncio.to_thread(microsandbox.Sandbox.get, name)
         cmd = f"cat {shlex.quote(path)}"

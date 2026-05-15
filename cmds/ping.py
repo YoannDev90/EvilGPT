@@ -1,3 +1,4 @@
+"""_summary_."""
 import time
 
 import discord
@@ -10,8 +11,24 @@ logger = get_logger()
 
 
 async def setup(tree: app_commands.CommandTree, bot):
+    """_summary_.
+
+    Parameters
+    ----------
+    tree : app_commands.CommandTree
+        _description_
+    bot : _type_
+        _description_
+    """
     @tree.command(name="ping", description="Check bot latency and responsiveness")
     async def ping(interaction):
+        """_summary_.
+
+        Parameters
+        ----------
+        interaction : _type_
+            _description_
+        """
         start_time = time.perf_counter()
         log_command_start(logger, "ping", interaction)
 

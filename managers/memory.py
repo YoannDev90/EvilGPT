@@ -1,3 +1,4 @@
+"""_summary_."""
 from __future__ import annotations
 
 import asyncio
@@ -26,6 +27,29 @@ _ACTIVE_MEMORY_MANAGER: "MemoryManager | None" = None
 
 @dataclass(slots=True)
 class MemoryTurn:
+    """_summary_.
+
+    Attributes
+    ----------
+    turn_id : str
+        _description_
+    user_id : int
+        _description_
+    user_name : str
+        _description_
+    guild_id : int | None
+        _description_
+    channel_id : int | None
+        _description_
+    user_content : str
+        _description_
+    assistant_content : str | None
+        _description_
+    created_at : float
+        _description_
+    updated_at : float
+        _description_
+    """
     turn_id: str
     user_id: int
     user_name: str
@@ -39,17 +63,52 @@ class MemoryTurn:
 
 @dataclass(slots=True)
 class UserMetadataRecord:
+    """_summary_.
+
+    Attributes
+    ----------
+    user_id : int
+        _description_
+    mood : str
+        _description_
+    updated_at : float
+        _description_
+    """
     user_id: int
     mood: str = "sarcastic"
     updated_at: float = field(default_factory=time.time)
 
 
 def _ensure_parent_dir(path: Path) -> None:
+    """_summary_.
+
+    Parameters
+    ----------
+    path : Path
+        _description_
+    """
     path.parent.mkdir(parents=True, exist_ok=True)
 
 
 @coco.lifespan
 async def memory_lifespan(builder: coco.EnvironmentBuilder) -> AsyncIterator[None]:
+    """_summary_.
+
+    Parameters
+    ----------
+    builder : coco.EnvironmentBuilder
+        _description_
+
+    Yields
+    ------
+    _type_
+        _description_
+
+    Raises
+    ------
+    RuntimeError
+        _description_
+    """
     manager = _ACTIVE_MEMORY_MANAGER
     if manager is None:
         raise RuntimeError("MemoryManager is not initialized.")
@@ -64,6 +123,7 @@ async def memory_lifespan(builder: coco.EnvironmentBuilder) -> AsyncIterator[Non
 
 @coco.fn
 async def memory_app_main() -> None:
+    """_summary_."""
     store = coco.use_context(MEMORY_STORE_KEY)
 
     turn_schema = await coco_sqlite.TableSchema.from_class(
@@ -92,6 +152,54 @@ async def memory_app_main() -> None:
 
 
 class MemoryManager:
+    """_summary_.
+
+    Attributes
+    ----------
+    max_history : int
+        _description_
+    state_path : _type_
+        _description_
+    sqlite_path : _type_
+        _description_
+    cocoindex_db_path : _type_
+        _description_
+
+    Methods
+    -------
+    iter_turns()
+        _description_
+    iter_metadata_records()
+        _description_
+    get_metadata(user_id: int, key: str | None=None)
+        _description_
+    set_metadata(user_id: int, key: str, value: Any)
+        _description_
+    get_turn(turn_id: str)
+        _description_
+    list_turns(user_id: int | None=None, limit: int=10)
+        _description_
+    get_history(user_id: int, limit: int | None=None)
+        _description_
+    record_exchange(*, user_id: int, user_name: str, user_content: str, assistant_content: str, guild_id: int | None, channel_id: int | None, turn_id: str | None=None)
+        _description_
+    delete_turn(turn_id: str)
+        _description_
+    clear_history(user_id: int | None=None)
+        _description_
+    sync()
+        _description_
+    bootstrap()
+        _description_
+    record_and_sync(*, user_id: int, user_name: str, user_content: str, assistant_content: str, guild_id: int | None, channel_id: int | None)
+        _description_
+    set_metadata_and_sync(user_id: int, key: str, value: Any)
+        _description_
+    delete_turn_and_sync(turn_id: str)
+        _description_
+    clear_history_and_sync(user_id: int | None=None)
+        _description_
+    """
     def __init__(
         self,
         max_history: int = 15,
@@ -100,6 +208,19 @@ class MemoryManager:
         sqlite_path: Path | str = SQLITE_PATH,
         cocoindex_db_path: Path | str = COCOINDEX_DB_PATH,
     ) -> None:
+        """_summary_.
+
+        Parameters
+        ----------
+        max_history : int
+            _description_ (Default value = 15)
+        state_path : Path | str
+            _description_ (Default value = STATE_PATH)
+        sqlite_path : Path | str
+            _description_ (Default value = SQLITE_PATH)
+        cocoindex_db_path : Path | str
+            _description_ (Default value = COCOINDEX_DB_PATH)
+        """
         global _ACTIVE_MEMORY_MANAGER
 
         _ACTIVE_MEMORY_MANAGER = self
@@ -118,6 +239,7 @@ class MemoryManager:
         self._load_state()
 
     def _load_state(self) -> None:
+        """_summary_."""
         if not self.state_path.exists():
             return
 
@@ -145,6 +267,7 @@ class MemoryManager:
             self._metadata[record.user_id] = record
 
     def _save_state(self) -> None:
+        """_summary_."""
         payload = {
             "turns": [asdict(turn) for turn in self.iter_turns()],
             "metadata": [asdict(record) for record in self.iter_metadata_records()],
@@ -155,17 +278,57 @@ class MemoryManager:
         tmp_path.replace(self.state_path)
 
     def _sorted_turns(self) -> list[MemoryTurn]:
+        """_summary_.
+
+        Returns
+        -------
+        list[MemoryTurn]
+            _description_
+        """
         return sorted(
             self._turns.values(), key=lambda turn: (turn.created_at, turn.turn_id)
         )
 
     def iter_turns(self) -> Iterable[MemoryTurn]:
+        """_summary_.
+
+        Returns
+        -------
+        Iterable[MemoryTurn]
+            _description_
+        """
         return self._sorted_turns()
 
     def iter_metadata_records(self) -> Iterable[UserMetadataRecord]:
+        """_summary_.
+
+        Returns
+        -------
+        Iterable[UserMetadataRecord]
+            _description_
+        """
         return sorted(self._metadata.values(), key=lambda record: record.user_id)
 
     def _resolve_turn_id(self, turn_id: str) -> str:
+        """_summary_.
+
+        Parameters
+        ----------
+        turn_id : str
+            _description_
+
+        Returns
+        -------
+        str
+            _description_
+
+        Raises
+        ------
+        KeyError
+            _description_
+        ValueError
+            _description_
+        """
         if turn_id in self._turns:
             return turn_id
 
@@ -181,6 +344,20 @@ class MemoryManager:
         return matches[0]
 
     def get_metadata(self, user_id: int, key: str | None = None) -> Any:
+        """_summary_.
+
+        Parameters
+        ----------
+        user_id : int
+            _description_
+        key : str | None
+            _description_ (Default value = None)
+
+        Returns
+        -------
+        Any
+            _description_
+        """
         record = self._metadata.get(user_id)
         if key is None:
             return {"mood": record.mood if record else "sarcastic"}
@@ -191,6 +368,22 @@ class MemoryManager:
         return getattr(record, key, None)
 
     def set_metadata(self, user_id: int, key: str, value: Any) -> None:
+        """_summary_.
+
+        Parameters
+        ----------
+        user_id : int
+            _description_
+        key : str
+            _description_
+        value : Any
+            _description_
+
+        Raises
+        ------
+        ValueError
+            _description_
+        """
         if key != "mood":
             raise ValueError(f"Unsupported metadata key: {key}")
         record = self._metadata.get(user_id)
@@ -201,11 +394,37 @@ class MemoryManager:
         record.updated_at = time.time()
 
     def get_turn(self, turn_id: str) -> MemoryTurn:
+        """_summary_.
+
+        Parameters
+        ----------
+        turn_id : str
+            _description_
+
+        Returns
+        -------
+        MemoryTurn
+            _description_
+        """
         return self._turns[self._resolve_turn_id(turn_id)]
 
     def list_turns(
         self, user_id: int | None = None, limit: int = 10
     ) -> list[MemoryTurn]:
+        """_summary_.
+
+        Parameters
+        ----------
+        user_id : int | None
+            _description_ (Default value = None)
+        limit : int
+            _description_ (Default value = 10)
+
+        Returns
+        -------
+        list[MemoryTurn]
+            _description_
+        """
         turns = list(self.iter_turns())
         if user_id is not None:
             turns = [turn for turn in turns if turn.user_id == user_id]
@@ -214,6 +433,20 @@ class MemoryManager:
     def get_history(
         self, user_id: int, limit: int | None = None
     ) -> list[dict[str, str]]:
+        """_summary_.
+
+        Parameters
+        ----------
+        user_id : int
+            _description_
+        limit : int | None
+            _description_ (Default value = None)
+
+        Returns
+        -------
+        list[dict[str, str]]
+            _description_
+        """
         turns = [turn for turn in self.iter_turns() if turn.user_id == user_id]
         if limit is not None:
             turns = turns[-max(0, limit) :]
@@ -238,6 +471,30 @@ class MemoryManager:
         channel_id: int | None,
         turn_id: str | None = None,
     ) -> str:
+        """_summary_.
+
+        Parameters
+        ----------
+        user_id : int
+            _description_
+        user_name : str
+            _description_
+        user_content : str
+            _description_
+        assistant_content : str
+            _description_
+        guild_id : int | None
+            _description_
+        channel_id : int | None
+            _description_
+        turn_id : str | None
+            _description_ (Default value = None)
+
+        Returns
+        -------
+        str
+            _description_
+        """
         turn = MemoryTurn(
             turn_id=turn_id or uuid.uuid4().hex,
             user_id=user_id,
@@ -251,10 +508,34 @@ class MemoryManager:
         return turn.turn_id
 
     def delete_turn(self, turn_id: str) -> MemoryTurn:
+        """_summary_.
+
+        Parameters
+        ----------
+        turn_id : str
+            _description_
+
+        Returns
+        -------
+        MemoryTurn
+            _description_
+        """
         resolved = self._resolve_turn_id(turn_id)
         return self._turns.pop(resolved)
 
     def clear_history(self, user_id: int | None = None) -> int:
+        """_summary_.
+
+        Parameters
+        ----------
+        user_id : int | None
+            _description_ (Default value = None)
+
+        Returns
+        -------
+        int
+            _description_
+        """
         if user_id is None:
             removed = len(self._turns)
             self._turns.clear()
@@ -268,11 +549,13 @@ class MemoryManager:
         return len(removed_turn_ids)
 
     async def sync(self) -> None:
+        """_summary_."""
         async with self._sync_lock:
             self._save_state()
             await self._app.update()
 
     async def bootstrap(self) -> None:
+        """_summary_."""
         await self.sync()
 
     async def record_and_sync(
@@ -285,6 +568,28 @@ class MemoryManager:
         guild_id: int | None,
         channel_id: int | None,
     ) -> str:
+        """_summary_.
+
+        Parameters
+        ----------
+        user_id : int
+            _description_
+        user_name : str
+            _description_
+        user_content : str
+            _description_
+        assistant_content : str
+            _description_
+        guild_id : int | None
+            _description_
+        channel_id : int | None
+            _description_
+
+        Returns
+        -------
+        str
+            _description_
+        """
         async with self._sync_lock:
             turn_id = self.record_exchange(
                 user_id=user_id,
@@ -299,12 +604,35 @@ class MemoryManager:
             return turn_id
 
     async def set_metadata_and_sync(self, user_id: int, key: str, value: Any) -> None:
+        """_summary_.
+
+        Parameters
+        ----------
+        user_id : int
+            _description_
+        key : str
+            _description_
+        value : Any
+            _description_
+        """
         async with self._sync_lock:
             self.set_metadata(user_id, key, value)
             self._save_state()
             await self._app.update()
 
     async def delete_turn_and_sync(self, turn_id: str) -> MemoryTurn:
+        """_summary_.
+
+        Parameters
+        ----------
+        turn_id : str
+            _description_
+
+        Returns
+        -------
+        MemoryTurn
+            _description_
+        """
         async with self._sync_lock:
             turn = self.delete_turn(turn_id)
             self._save_state()
@@ -312,6 +640,18 @@ class MemoryManager:
             return turn
 
     async def clear_history_and_sync(self, user_id: int | None = None) -> int:
+        """_summary_.
+
+        Parameters
+        ----------
+        user_id : int | None
+            _description_ (Default value = None)
+
+        Returns
+        -------
+        int
+            _description_
+        """
         async with self._sync_lock:
             removed = self.clear_history(user_id)
             self._save_state()

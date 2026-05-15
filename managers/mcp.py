@@ -1,3 +1,4 @@
+"""_summary_."""
 import asyncio
 import json
 import os
@@ -6,7 +7,7 @@ import subprocess
 import traceback
 from typing import Any, Dict, List
 
-from fastmcp.client import Client
+from fastmcp import Client
 
 from core.config import cfg
 from utils.logger import get_logger
@@ -15,7 +16,38 @@ logger = get_logger()
 
 
 class MCPManager:
+    """_summary_.
+
+    Attributes
+    ----------
+    config_path : str
+        _description_
+    clients : Dict[str, Client]
+        _description_
+    client_configs : Dict[str, Dict[str, Any]]
+        _description_
+    server_raw_configs : Dict[str, Dict[str, Any]]
+        _description_
+    tools_metadata : List[Dict[str, Any]]
+        _description_
+
+    Methods
+    -------
+    load_config()
+        _description_
+    initialize()
+        _description_
+    call_tool(server_name: str, tool_name: str, arguments: Dict[str, Any])
+        _description_
+    """
     def __init__(self, config_path: str):
+        """_summary_.
+
+        Parameters
+        ----------
+        config_path : str
+            _description_
+        """
         self.config_path = config_path
         self.clients: Dict[str, Client] = {}
         self.client_configs: Dict[str, Dict[str, Any]] = {}
@@ -28,6 +60,20 @@ class MCPManager:
         """Run command locally to capture stdout/stderr/exit for debugging only.
 
         Returns dict with keys: returncode, stdout, stderr, cmdline.
+
+        Parameters
+        ----------
+        command : str
+            _description_
+        args : List[str]
+            _description_
+        env : Dict[str, str]
+            _description_
+
+        Returns
+        -------
+        Dict[str, str]
+            _description_
         """
         cmd = [command] + (args or [])
         try:
@@ -54,6 +100,18 @@ class MCPManager:
             }
 
     def _prepare_runtime_env(self, base_env: Dict[str, str]) -> Dict[str, str]:
+        """_summary_.
+
+        Parameters
+        ----------
+        base_env : Dict[str, str]
+            _description_
+
+        Returns
+        -------
+        Dict[str, str]
+            _description_
+        """
         env = base_env.copy()
         msb_path = os.path.expanduser("~/.microsandbox/bin")
         msb_binary = os.path.join(msb_path, "msb")
@@ -67,6 +125,13 @@ class MCPManager:
         return env
 
     def load_config(self):
+        """_summary_.
+
+        Returns
+        -------
+        _type_
+            _description_
+        """
         if not os.path.exists(self.config_path):
             logger.warning(f"MCP config not found at {self.config_path}")
             return {}
@@ -74,6 +139,7 @@ class MCPManager:
             return json.load(f)
 
     async def initialize(self):
+        """_summary_."""
         config = self.load_config()
         servers = config.get("mcpServers", {})
 
@@ -85,6 +151,15 @@ class MCPManager:
             await asyncio.gather(*tasks)
 
     async def _initialize_server(self, name: str, srv_config: Dict[str, Any]):
+        """_summary_.
+
+        Parameters
+        ----------
+        name : str
+            _description_
+        srv_config : Dict[str, Any]
+            _description_
+        """
         try:
             logger.info(f"Initializing MCP server: {name}")
 
@@ -183,6 +258,22 @@ class MCPManager:
     async def call_tool(
         self, server_name: str, tool_name: str, arguments: Dict[str, Any]
     ) -> str:
+        """_summary_.
+
+        Parameters
+        ----------
+        server_name : str
+            _description_
+        tool_name : str
+            _description_
+        arguments : Dict[str, Any]
+            _description_
+
+        Returns
+        -------
+        str
+            _description_
+        """
         client = self.clients.get(server_name)
         if not client:
             logger.error(f"MCP tool call failed: Server '{server_name}' not found")

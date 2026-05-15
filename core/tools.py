@@ -1,3 +1,4 @@
+"""_summary_."""
 import json
 import os
 
@@ -31,12 +32,31 @@ except Exception:
 
 
 def get_combined_tools():
-    """Returns combined tools from native tools + MCP tools."""
+    """Returns combined tools from native tools + MCP tools.
+
+    Returns
+    -------
+    _type_
+        _description_
+    """
     return tools_loader.tools_metadata + mcp_manager.tools_metadata
 
 
 async def handle_tool_call(tool_name: str, args: dict) -> str:
-    """Execute requested tool. Routes to native tools or MCP tools."""
+    """Execute requested tool. Routes to native tools or MCP tools.
+
+    Parameters
+    ----------
+    tool_name : str
+        _description_
+    args : dict
+        _description_
+
+    Returns
+    -------
+    str
+        _description_
+    """
     try:
         # Check if it's a native tool
         if tool_name in tools_loader.tools_handlers:

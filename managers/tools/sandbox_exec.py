@@ -1,3 +1,4 @@
+"""_summary_."""
 import asyncio
 import json
 from typing import Any, Dict, List, Optional
@@ -10,6 +11,18 @@ logger = get_logger()
 
 
 def _extract_exec_result(result: Any) -> Dict[str, Any]:
+    """_summary_.
+
+    Parameters
+    ----------
+    result : Any
+        _description_
+
+    Returns
+    -------
+    Dict[str, Any]
+        _description_
+    """
     stdout = getattr(result, "stdout", None)
     stderr = getattr(result, "stderr", None)
     code = getattr(result, "code", None)
@@ -38,6 +51,28 @@ async def sandbox_exec(
     env: Optional[Dict[str, str]] = None,
     timeout: Optional[float] = None,
 ) -> str:
+    """_summary_.
+
+    Parameters
+    ----------
+    name : str
+        _description_
+    command : str
+        _description_
+    args : Optional[List[str]]
+        _description_ (Default value = None)
+    cwd : Optional[str]
+        _description_ (Default value = None)
+    env : Optional[Dict[str, str]]
+        _description_ (Default value = None)
+    timeout : Optional[float]
+        _description_ (Default value = None)
+
+    Returns
+    -------
+    str
+        _description_
+    """
     try:
         sandbox = await asyncio.to_thread(microsandbox.Sandbox.get, name)
 

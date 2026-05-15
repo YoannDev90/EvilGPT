@@ -1,3 +1,4 @@
+"""_summary_."""
 import io
 import logging
 import re
@@ -29,7 +30,33 @@ COLUMN_MAX_WIDTH = 1200
 def _extract_links_and_sanitize(
     text: str, current_links: List[str]
 ) -> Tuple[str, List[str]]:
+    """_summary_.
+
+    Parameters
+    ----------
+    text : str
+        _description_
+    current_links : List[str]
+        _description_
+
+    Returns
+    -------
+    Tuple[str, List[str]]
+        _description_
+    """
     def replacer(match):
+        """_summary_.
+
+        Parameters
+        ----------
+        match : _type_
+            _description_
+
+        Returns
+        -------
+        _type_
+            _description_
+        """
         label, url_md, url_plain = match.groups()
         url = url_md or url_plain
         if url in current_links:
@@ -48,6 +75,22 @@ def _extract_links_and_sanitize(
 
 
 def _get_font(size: int, bold: bool = False, italic: bool = False):
+    """_summary_.
+
+    Parameters
+    ----------
+    size : int
+        _description_
+    bold : bool
+        _description_ (Default value = False)
+    italic : bool
+        _description_ (Default value = False)
+
+    Returns
+    -------
+    _type_
+        _description_
+    """
     try:
         if bold and italic:
             path = "assets/fonts/NotoSans-BoldItalic.ttf"
@@ -68,6 +111,24 @@ def _calc_col_widths(
     font: ImageFont.FreeTypeFont,
     padding: int,
 ) -> List[int]:
+    """_summary_.
+
+    Parameters
+    ----------
+    headers : List[str]
+        _description_
+    rows : List[List[str]]
+        _description_
+    font : ImageFont.FreeTypeFont
+        _description_
+    padding : int
+        _description_
+
+    Returns
+    -------
+    List[int]
+        _description_
+    """
     img = Image.new("RGB", (1, 1))
     widths = []
     with Pilmoji(img) as pilmoji:
@@ -86,6 +147,22 @@ def _calc_col_widths(
 
 
 def _wrap_text(text: str, max_width: int, font: ImageFont.FreeTypeFont) -> List[str]:
+    """_summary_.
+
+    Parameters
+    ----------
+    text : str
+        _description_
+    max_width : int
+        _description_
+    font : ImageFont.FreeTypeFont
+        _description_
+
+    Returns
+    -------
+    List[str]
+        _description_
+    """
     draw = ImageDraw.Draw(Image.new("RGB", (1, 1)))
     words = text.split()
     lines = []
@@ -107,6 +184,22 @@ def _wrap_text(text: str, max_width: int, font: ImageFont.FreeTypeFont) -> List[
 def _render_table_image(
     headers: List[str], rows: List[List[str]], alignments: List[str]
 ) -> Tuple[io.BytesIO, List[str]]:
+    """_summary_.
+
+    Parameters
+    ----------
+    headers : List[str]
+        _description_
+    rows : List[List[str]]
+        _description_
+    alignments : List[str]
+        _description_
+
+    Returns
+    -------
+    Tuple[io.BytesIO, List[str]]
+        _description_
+    """
     all_links = []
     sanitized_headers = []
     for h in headers:
@@ -203,6 +296,18 @@ def _render_table_image(
 
 
 def detect_and_convert_tables(text: str) -> Tuple[str, List[io.BytesIO], List[dict]]:
+    """_summary_.
+
+    Parameters
+    ----------
+    text : str
+        _description_
+
+    Returns
+    -------
+    Tuple[str, List[io.BytesIO], List[dict]]
+        _description_
+    """
     table_images = []
     table_data_list = []
 
@@ -211,6 +316,18 @@ def detect_and_convert_tables(text: str) -> Tuple[str, List[io.BytesIO], List[di
     )
 
     def replace_table(match):
+        """_summary_.
+
+        Parameters
+        ----------
+        match : _type_
+            _description_
+
+        Returns
+        -------
+        _type_
+            _description_
+        """
         lines = [l for l in match.group(1).strip().split("\n") if l.strip()]
         if len(lines) < 2:
             return match.group(0)

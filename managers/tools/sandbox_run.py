@@ -1,3 +1,4 @@
+"""_summary_."""
 import asyncio
 import json
 import time
@@ -11,6 +12,18 @@ logger = get_logger()
 
 
 def _extract_exec_result(result: Any) -> Dict[str, Any]:
+    """_summary_.
+
+    Parameters
+    ----------
+    result : Any
+        _description_
+
+    Returns
+    -------
+    Dict[str, Any]
+        _description_
+    """
     stdout = getattr(result, "stdout", None)
     stderr = getattr(result, "stderr", None)
     code = getattr(result, "code", None)
@@ -38,6 +51,26 @@ async def sandbox_run(
     cpus: int = 1,
     env: Optional[Dict[str, str]] = None,
 ) -> str:
+    """_summary_.
+
+    Parameters
+    ----------
+    image : str
+        _description_
+    command : str
+        _description_
+    memoryMib : int
+        _description_ (Default value = 512)
+    cpus : int
+        _description_ (Default value = 1)
+    env : Optional[Dict[str, str]]
+        _description_ (Default value = None)
+
+    Returns
+    -------
+    str
+        _description_
+    """
     name = f"native-run-{int(time.time() * 1000)}"
     sandbox = None
     try:

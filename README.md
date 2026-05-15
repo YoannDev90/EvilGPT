@@ -236,9 +236,9 @@ Below is current snapshot of repository. This section is auto-updated by `./lint
 <!-- CODE-STATS-START -->
 ## Code Statistics
 
-**Shell:** 1 files, 150 lines of code
+**Shell:** 1 files, 176 lines of code
 
-**JSON:** 25 files, 563 lines of code
+**JSON:** 25 files, 402 lines of code
 
 **Markdown:** 1 files, 285 lines of code
 
@@ -250,7 +250,7 @@ Below is current snapshot of repository. This section is auto-updated by `./lint
 
 **Text:** 7 files, 177 lines of code
 
-**Total:** 81 files, 4873 lines of code, 196 comments, 829 blank lines
+**Total:** 81 files, 4738 lines of code, 1979 comments, 1092 blank lines
 <!-- CODE-STATS-END -->
 
 Run `./lint.sh` to format code and regenerate this project tree snapshot. CI runs the same script on every push/PR.
@@ -282,21 +282,21 @@ The bot automatically selects the most appropriate model based on:
 
 <!--DEPS-START-->
 ```markdown
-- `discord.py` - A Python wrapper for the Discord API (latest: 2.7.1)
-- `python-dotenv` - Read key-value pairs from a .env file and set them as environment variables (latest: 1.2.2)
-- `litellm` - Library to easily interface with LLM API providers (latest: 1.84.0)
-- `requests` - Python HTTP for Humans. (latest: 2.34.2)
-- `colorama` - Cross-platform colored terminal text. (latest: 0.4.6)
-- `cairosvg` - A Simple SVG Converter based on Cairo (latest: 2.9.0)
-- `Pillow` - Python Imaging Library (fork) (latest: 12.2.0)
-- `pilmoji` - Pilmoji is an emoji renderer for Pillow, Python's imaging library. (latest: 2.0.5)
-- `microsandbox` - Python SDK for microsandbox — secure, fast microVM-based sandboxing. (latest: 0.4.6)
-- `aiohttp` - Async http client/server framework (asyncio) (latest: 3.13.5)
-- `discord-webhook` - Easily send Discord webhooks with Python (latest: 1.4.1)
-- `cocoindex` - With CocoIndex, users declare the transformation, CocoIndex creates & maintains an index, and keeps the derived index up to date based on source update, with minimal computation and changes. (latest: 1.0.5)
-- `fastmcp` - The fast, Pythonic way to build MCP servers and clients. (latest: 3.3.0)
-- `pytesseract` - Python-tesseract is a python wrapper for Google's Tesseract-OCR (latest: 0.3.13)
-- `pint` - Physical quantities module (latest: 0.25.3)
+- `discord.py==2.7.1` - A Python wrapper for the Discord API (latest: 2.7.1)
+- `python-dotenv==1.2.2` - Read key-value pairs from a .env file and set them as environment variables (latest: 1.2.2)
+- `litellm==1.84.0` - Library to easily interface with LLM API providers (latest: 1.84.0)
+- `requests==2.34.2` - Python HTTP for Humans. (latest: 2.34.2)
+- `colorama==0.4.6` - Cross-platform colored terminal text. (latest: 0.4.6)
+- `cairosvg==2.9.0` - A Simple SVG Converter based on Cairo (latest: 2.9.0)
+- `Pillow==12.2.0` - Python Imaging Library (fork) (latest: 12.2.0)
+- `pilmoji==2.0.5` - Pilmoji is an emoji renderer for Pillow, Python's imaging library. (latest: 2.0.5)
+- `microsandbox==0.4.6` - Python SDK for microsandbox — secure, fast microVM-based sandboxing. (latest: 0.4.6)
+- `aiohttp==3.13.5` - Async http client/server framework (asyncio) (latest: 3.13.5)
+- `discord-webhook==1.4.1` - Easily send Discord webhooks with Python (latest: 1.4.1)
+- `cocoindex==1.0.5` - With CocoIndex, users declare the transformation, CocoIndex creates & maintains an index, and keeps the derived index up to date based on source update, with minimal computation and changes. (latest: 1.0.5)
+- `fastmcp==3.3.0` - The fast, Pythonic way to build MCP servers and clients. (latest: 3.3.0)
+- `pytesseract==0.3.13` - Python-tesseract is a python wrapper for Google's Tesseract-OCR (latest: 0.3.13)
+- `pint==0.25.3` - Physical quantities module (latest: 0.25.3)
 ```
 <!--DEPS-END-->
 

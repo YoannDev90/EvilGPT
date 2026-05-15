@@ -1,3 +1,4 @@
+"""_summary_."""
 import ast
 import math
 from typing import Any, Dict
@@ -39,6 +40,35 @@ ALLOWED_UNARYOPS = (ast.UAdd, ast.USub)
 
 
 def _safe_eval(node: ast.AST) -> float:
+    """_summary_.
+
+    Parameters
+    ----------
+    node : ast.AST
+        _description_
+
+    Returns
+    -------
+    float
+        _description_
+
+    Raises
+    ------
+    ValueError
+        _description_
+    ValueError
+        _description_
+    ValueError
+        _description_
+    ValueError
+        _description_
+    ValueError
+        _description_
+    ValueError
+        _description_
+    ValueError
+        _description_
+    """
     if isinstance(node, ast.Expression):
         return _safe_eval(node.body)
 
@@ -93,6 +123,23 @@ def _safe_eval(node: ast.AST) -> float:
 
 
 def _try_eval_units(expression: str) -> str:
+    """_summary_.
+
+    Parameters
+    ----------
+    expression : str
+        _description_
+
+    Returns
+    -------
+    str
+        _description_
+
+    Raises
+    ------
+    ValueError
+        _description_
+    """
     expr = expression.strip()
 
     for sep in (" to ", " in "):
@@ -110,7 +157,20 @@ def _try_eval_units(expression: str) -> str:
 
 
 async def safe_eval_math(expression: str, precision: int = 10) -> str:
-    """Safely evaluate math expression, with optional unit conversion support."""
+    """Safely evaluate math expression, with optional unit conversion support.
+
+    Parameters
+    ----------
+    expression : str
+        _description_
+    precision : int
+        _description_ (Default value = 10)
+
+    Returns
+    -------
+    str
+        _description_
+    """
     try:
         precision = max(1, min(int(precision), 16))
         expr = expression.strip()

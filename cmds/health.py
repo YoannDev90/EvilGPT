@@ -1,3 +1,4 @@
+"""_summary_."""
 import time
 
 import discord
@@ -13,12 +14,40 @@ logger = get_logger()
 
 
 def _status_label(ok: bool) -> str:
+    """_summary_.
+
+    Parameters
+    ----------
+    ok : bool
+        _description_
+
+    Returns
+    -------
+    str
+        _description_
+    """
     return "Healthy" if ok else "Degraded"
 
 
 async def setup(tree: app_commands.CommandTree, bot):
+    """_summary_.
+
+    Parameters
+    ----------
+    tree : app_commands.CommandTree
+        _description_
+    bot : _type_
+        _description_
+    """
     @tree.command(name="health", description="Show runtime health for bot subsystems")
     async def health(interaction):
+        """_summary_.
+
+        Parameters
+        ----------
+        interaction : _type_
+            _description_
+        """
         start_time = time.perf_counter()
         log_command_start(logger, "health", interaction)
 

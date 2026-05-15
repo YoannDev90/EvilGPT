@@ -1,3 +1,4 @@
+"""_summary_."""
 import base64
 import io
 from typing import Optional
@@ -12,6 +13,20 @@ logger = get_logger()
 
 
 def _build_tesseract_config(psm: Optional[int], oem: Optional[int]) -> str:
+    """_summary_.
+
+    Parameters
+    ----------
+    psm : Optional[int]
+        _description_
+    oem : Optional[int]
+        _description_
+
+    Returns
+    -------
+    str
+        _description_
+    """
     parts = []
     if psm is not None:
         parts.append(f"--psm {psm}")
@@ -23,6 +38,27 @@ def _build_tesseract_config(psm: Optional[int], oem: Optional[int]) -> str:
 def _load_image_bytes(
     image_path: Optional[str], image_url: Optional[str], image_base64: Optional[str]
 ) -> bytes:
+    """_summary_.
+
+    Parameters
+    ----------
+    image_path : Optional[str]
+        _description_
+    image_url : Optional[str]
+        _description_
+    image_base64 : Optional[str]
+        _description_
+
+    Returns
+    -------
+    bytes
+        _description_
+
+    Raises
+    ------
+    ValueError
+        _description_
+    """
     if image_path:
         with open(image_path, "rb") as f:
             return f.read()
@@ -46,7 +82,28 @@ async def image_ocr(
     psm: Optional[int] = None,
     oem: Optional[int] = None,
 ) -> str:
-    """Extract text from image with Tesseract OCR."""
+    """Extract text from image with Tesseract OCR.
+
+    Parameters
+    ----------
+    image_path : str
+        _description_ (Default value = '')
+    image_url : str
+        _description_ (Default value = '')
+    image_base64 : str
+        _description_ (Default value = '')
+    lang : str
+        _description_ (Default value = 'eng')
+    psm : Optional[int]
+        _description_ (Default value = None)
+    oem : Optional[int]
+        _description_ (Default value = None)
+
+    Returns
+    -------
+    str
+        _description_
+    """
     try:
         raw = _load_image_bytes(image_path, image_url, image_base64)
         image = Image.open(io.BytesIO(raw))

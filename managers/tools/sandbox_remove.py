@@ -1,3 +1,4 @@
+"""_summary_."""
 import asyncio
 import json
 
@@ -9,6 +10,20 @@ logger = get_logger()
 
 
 async def sandbox_remove(name: str, force: bool = False) -> str:
+    """_summary_.
+
+    Parameters
+    ----------
+    name : str
+        _description_
+    force : bool
+        _description_ (Default value = False)
+
+    Returns
+    -------
+    str
+        _description_
+    """
     try:
         if force:
             try:

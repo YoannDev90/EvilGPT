@@ -1,3 +1,4 @@
+"""_summary_."""
 import asyncio
 import json
 import time
@@ -18,6 +19,25 @@ async def run_python(code: str, timeout: int = 10, image: Optional[str] = None) 
 
     Uses an ephemeral sandbox created for this run to avoid requiring a direct
     `Sandbox()` constructor.
+
+    Parameters
+    ----------
+    code : str
+        _description_
+    timeout : int
+        _description_ (Default value = 10)
+    image : Optional[str]
+        _description_ (Default value = None)
+
+    Returns
+    -------
+    str
+        _description_
+
+    Raises
+    ------
+    __UnknownError__
+        _description_
     """
     name = f"run-python-{int(time.time() * 1000)}"
     sandbox = None
@@ -45,6 +65,18 @@ async def run_python(code: str, timeout: int = 10, image: Optional[str] = None) 
         # Try multiple SDK variants: prefer sandbox.run, then sandbox.exec, then shell fallback
         def _extract_exec_result(result: Any) -> Dict[str, Any]:
             # Support multiple SDK result shapes (ExecOutput, simple namespaces)
+            """_summary_.
+
+            Parameters
+            ----------
+            result : Any
+                _description_
+
+            Returns
+            -------
+            Dict[str, Any]
+                _description_
+            """
             stdout = None
             stderr = None
             codev = None

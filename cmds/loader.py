@@ -1,3 +1,4 @@
+"""_summary_."""
 import importlib
 import inspect
 import logging
@@ -14,6 +15,18 @@ logger = get_logger()
 
 
 def _iter_command_modules(base_path: Path):
+    """_summary_.
+
+    Parameters
+    ----------
+    base_path : Path
+        _description_
+
+    Yields
+    ------
+    _type_
+        _description_
+    """
     pkg_path = str(base_path)
     for finder, name, ispkg in pkgutil.iter_modules([pkg_path]):
         if name.startswith("__"):
@@ -22,7 +35,17 @@ def _iter_command_modules(base_path: Path):
 
 
 async def load_commands(bot: Any, tree: app_commands.CommandTree, cmds_path: Path):
-    """Recursively import modules from `cmds_path` and call `setup(tree, bot)` if present."""
+    """Recursively import modules from `cmds_path` and call `setup(tree, bot)` if present.
+
+    Parameters
+    ----------
+    bot : Any
+        _description_
+    tree : app_commands.CommandTree
+        _description_
+    cmds_path : Path
+        _description_
+    """
     start = time.perf_counter()
     loaded = 0
     failed = 0

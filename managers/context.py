@@ -1,3 +1,4 @@
+"""_summary_."""
 import discord
 
 from utils.logger import get_logger
@@ -6,7 +7,18 @@ logger = get_logger()
 
 
 async def get_server_context(guild: discord.Guild):
-    """Gather context about the current server."""
+    """Gather context about the current server.
+
+    Parameters
+    ----------
+    guild : discord.Guild
+        _description_
+
+    Returns
+    -------
+    _type_
+        _description_
+    """
     # Essayer de récupérer les membres si le cache est vide
     if not guild.chunked and guild.member_count < 1000:
         try:
@@ -29,7 +41,18 @@ async def get_server_context(guild: discord.Guild):
 
 
 def format_context_for_prompt(context: dict):
-    """Format the gathered context into a string for the system prompt."""
+    """Format the gathered context into a string for the system prompt.
+
+    Parameters
+    ----------
+    context : dict
+        _description_
+
+    Returns
+    -------
+    _type_
+        _description_
+    """
     lines = [
         f"Information about the current Discord server '{context['server_name']}':"
     ]

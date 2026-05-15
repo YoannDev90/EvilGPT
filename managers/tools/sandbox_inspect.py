@@ -1,3 +1,4 @@
+"""_summary_."""
 import asyncio
 import json
 
@@ -9,6 +10,18 @@ logger = get_logger()
 
 
 async def sandbox_inspect(name: str) -> str:
+    """_summary_.
+
+    Parameters
+    ----------
+    name : str
+        _description_
+
+    Returns
+    -------
+    str
+        _description_
+    """
     try:
         handle = await asyncio.to_thread(microsandbox.Sandbox.get, name)
         data = {

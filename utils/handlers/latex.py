@@ -1,3 +1,4 @@
+"""_summary_."""
 import io
 import logging
 import re
@@ -61,6 +62,18 @@ LATEX_PATTERN = re.compile(
 
 
 def latex_to_svg(formula: str) -> bytes:
+    """_summary_.
+
+    Parameters
+    ----------
+    formula : str
+        _description_
+
+    Returns
+    -------
+    bytes
+        _description_
+    """
     encoded = urllib.parse.quote(formula, safe="")
     url = f"https://math.vercel.app?color=white&from={encoded}.svg"
     response = requests.get(url, timeout=10)
@@ -69,6 +82,18 @@ def latex_to_svg(formula: str) -> bytes:
 
 
 def convert_latex_to_png(latex: str) -> tuple[io.BytesIO | str, bool]:
+    """_summary_.
+
+    Parameters
+    ----------
+    latex : str
+        _description_
+
+    Returns
+    -------
+    tuple[io.BytesIO | str, bool]
+        _description_
+    """
     if not cairosvg:
         return f"```\n{latex}\n``` (cairosvg missing)", True
     try:
@@ -81,4 +106,16 @@ def convert_latex_to_png(latex: str) -> tuple[io.BytesIO | str, bool]:
 
 
 def detect_latex(text: str) -> list[str]:
+    """_summary_.
+
+    Parameters
+    ----------
+    text : str
+        _description_
+
+    Returns
+    -------
+    list[str]
+        _description_
+    """
     return LATEX_PATTERN.findall(text)

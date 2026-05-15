@@ -1,9 +1,28 @@
+"""_summary_."""
 import discord
 
 
 async def send_code_block_with_return(
     channel, code_block: str, max_length: int = 2000, bot=None
 ):
+    """_summary_.
+
+    Parameters
+    ----------
+    channel : _type_
+        _description_
+    code_block : str
+        _description_
+    max_length : int
+        _description_ (Default value = 2000)
+    bot : _type_
+        _description_ (Default value = None)
+
+    Returns
+    -------
+    _type_
+        _description_
+    """
     first_line_end = code_block.find("\n")
     if first_line_end == -1:
         language = ""
@@ -37,4 +56,17 @@ async def send_code_block_with_return(
 
 
 async def send_code_block(channel, code_block: str, max_length: int = 2000, bot=None):
+    """_summary_.
+
+    Parameters
+    ----------
+    channel : _type_
+        _description_
+    code_block : str
+        _description_
+    max_length : int
+        _description_ (Default value = 2000)
+    bot : _type_
+        _description_ (Default value = None)
+    """
     await send_code_block_with_return(channel, code_block, max_length, bot)

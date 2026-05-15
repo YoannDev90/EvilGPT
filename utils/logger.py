@@ -1,3 +1,4 @@
+"""_summary_."""
 import logging
 import time
 from logging import Handler
@@ -12,11 +13,37 @@ LOGGER_NAME = "EvilGPT"
 
 
 class EvilGPTFilter(logging.Filter):
+    """_summary_.
+
+    Methods
+    -------
+    filter(record: logging.LogRecord)
+        _description_
+    """
     def filter(self, record: logging.LogRecord) -> bool:
+        """_summary_.
+
+        Parameters
+        ----------
+        record : logging.LogRecord
+            _description_
+
+        Returns
+        -------
+        bool
+            _description_
+        """
         return record.name == LOGGER_NAME
 
 
 class ColoredFormatter(logging.Formatter):
+    """_summary_.
+
+    Methods
+    -------
+    format(record: logging.LogRecord)
+        _description_
+    """
     COLORS = {
         logging.DEBUG: Fore.CYAN,
         logging.INFO: Fore.GREEN,
@@ -26,12 +53,31 @@ class ColoredFormatter(logging.Formatter):
     }
 
     def format(self, record: logging.LogRecord) -> str:
+        """_summary_.
+
+        Parameters
+        ----------
+        record : logging.LogRecord
+            _description_
+
+        Returns
+        -------
+        str
+            _description_
+        """
         color = self.COLORS.get(record.levelno, "")
         message = super().format(record)
         return f"{color}{message}{Style.RESET_ALL}"
 
 
 class DiscordAnsiFormatter(logging.Formatter):
+    """_summary_.
+
+    Methods
+    -------
+    format(record: logging.LogRecord)
+        _description_
+    """
     LEVEL_COLORS = {
         logging.DEBUG: "\x1b[36m",
         logging.INFO: "\x1b[32m",
@@ -43,18 +89,63 @@ class DiscordAnsiFormatter(logging.Formatter):
     RESET = "\x1b[0m"
 
     def format(self, record: logging.LogRecord) -> str:
+        """_summary_.
+
+        Parameters
+        ----------
+        record : logging.LogRecord
+            _description_
+
+        Returns
+        -------
+        str
+            _description_
+        """
         message = super().format(record)
         color = self.LEVEL_COLORS.get(record.levelno, "\x1b[37m")
         return f"```ansi\n{color}{message}{self.RESET}\n```"
 
 
 class DiscordWebhookHandler(Handler):
+    """_summary_.
+
+    Attributes
+    ----------
+    webhook_url : str
+        _description_
+
+    Methods
+    -------
+    emit(record: logging.LogRecord)
+        _description_
+    """
     def __init__(self, webhook_url: str, level: int = logging.INFO):
+        """_summary_.
+
+        Parameters
+        ----------
+        webhook_url : str
+            _description_
+        level : int
+            _description_ (Default value = logging.INFO)
+        """
         super().__init__(level)
         self.webhook_url = webhook_url
 
     @staticmethod
     def _level_color(levelno: int) -> int:
+        """_summary_.
+
+        Parameters
+        ----------
+        levelno : int
+            _description_
+
+        Returns
+        -------
+        int
+            _description_
+        """
         palette = {
             logging.DEBUG: 0x3498DB,
             logging.INFO: 0x2ECC71,
@@ -65,6 +156,18 @@ class DiscordWebhookHandler(Handler):
         return palette.get(levelno, 0x95A5A6)
 
     def _build_payload(self, record: logging.LogRecord) -> dict:
+        """_summary_.
+
+        Parameters
+        ----------
+        record : logging.LogRecord
+            _description_
+
+        Returns
+        -------
+        dict
+            _description_
+        """
         message = self.format(record)
         payload = {
             "username": "EvilGPT",
@@ -76,6 +179,20 @@ class DiscordWebhookHandler(Handler):
 
     @staticmethod
     def _split_payload_chunks(message: str, limit: int = 1900) -> list[str]:
+        """_summary_.
+
+        Parameters
+        ----------
+        message : str
+            _description_
+        limit : int
+            _description_ (Default value = 1900)
+
+        Returns
+        -------
+        list[str]
+            _description_
+        """
         if len(message) <= limit:
             return [message]
 
@@ -92,6 +209,13 @@ class DiscordWebhookHandler(Handler):
         return chunks
 
     def emit(self, record: logging.LogRecord) -> None:
+        """_summary_.
+
+        Parameters
+        ----------
+        record : logging.LogRecord
+            _description_
+        """
         try:
             import requests
 
@@ -148,6 +272,18 @@ class DiscordWebhookHandler(Handler):
 
 
 def _is_real_webhook_url(url: Optional[str]) -> bool:
+    """_summary_.
+
+    Parameters
+    ----------
+    url : Optional[str]
+        _description_
+
+    Returns
+    -------
+    bool
+        _description_
+    """
     return bool(url) and "<URL>" not in url
 
 
@@ -155,6 +291,13 @@ def setup_logging(level: int = logging.INFO, config=None):
     """Set up logging.
 
     If `config` provided and has file/webhook settings, those will be used.
+
+    Parameters
+    ----------
+    level : int
+        _description_ (Default value = logging.INFO)
+    config : _type_
+        _description_ (Default value = None)
     """
     console_format = getattr(config, "console_format")
     file_format = getattr(config, "file_format")
@@ -212,4 +355,11 @@ def setup_logging(level: int = logging.INFO, config=None):
 
 
 def get_logger() -> logging.Logger:
+    """_summary_.
+
+    Returns
+    -------
+    logging.Logger
+        _description_
+    """
     return logging.getLogger(LOGGER_NAME)
