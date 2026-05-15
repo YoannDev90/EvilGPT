@@ -1,4 +1,4 @@
-"""_summary_."""
+"""Extract text from images with Tesseract OCR."""
 
 import base64
 import io
@@ -14,19 +14,19 @@ logger = get_logger()
 
 
 def _build_tesseract_config(psm: Optional[int], oem: Optional[int]) -> str:
-    """_summary_.
+    """Build a Tesseract command-line config string.
 
     Parameters
     ----------
     psm : Optional[int]
-        _description_
+        Page segmentation mode value.
     oem : Optional[int]
-        _description_
+        OCR engine mode value.
 
     Returns
     -------
     str
-        _description_
+        Combined Tesseract config string.
     """
     parts = []
     if psm is not None:
@@ -39,26 +39,26 @@ def _build_tesseract_config(psm: Optional[int], oem: Optional[int]) -> str:
 def _load_image_bytes(
     image_path: Optional[str], image_url: Optional[str], image_base64: Optional[str]
 ) -> bytes:
-    """_summary_.
+    """Load raw image bytes from a path, URL or base64 payload.
 
     Parameters
     ----------
     image_path : Optional[str]
-        _description_
+        Local filesystem path.
     image_url : Optional[str]
-        _description_
+        Remote URL to fetch.
     image_base64 : Optional[str]
-        _description_
+        Base64-encoded image payload.
 
     Returns
     -------
     bytes
-        _description_
+        Raw image bytes.
 
     Raises
     ------
     ValueError
-        _description_
+        If none of the image sources are provided.
     """
     if image_path:
         with open(image_path, "rb") as f:
@@ -88,22 +88,22 @@ async def image_ocr(
     Parameters
     ----------
     image_path : str
-        _description_ (Default value = '')
+        Local image path to read (default: '').
     image_url : str
-        _description_ (Default value = '')
+        Image URL to fetch (default: '').
     image_base64 : str
-        _description_ (Default value = '')
+        Base64 image payload (default: '').
     lang : str
-        _description_ (Default value = 'eng')
+        Tesseract language code (default: 'eng').
     psm : Optional[int]
-        _description_ (Default value = None)
+        Page segmentation mode (default: None).
     oem : Optional[int]
-        _description_ (Default value = None)
+        OCR engine mode (default: None).
 
     Returns
     -------
     str
-        _description_
+        Detected text or an error message.
     """
     try:
         raw = _load_image_bytes(image_path, image_url, image_base64)

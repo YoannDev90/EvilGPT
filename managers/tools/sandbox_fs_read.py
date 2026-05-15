@@ -1,4 +1,4 @@
-"""_summary_."""
+"""Sandbox helper for reading files inside a microsandbox."""
 
 import asyncio
 import json
@@ -13,17 +13,17 @@ logger = get_logger()
 
 
 def _extract_exec_result(result: Any) -> Dict[str, Any]:
-    """_summary_.
+    """Normalize a sandbox execution result into a JSON-friendly dict.
 
     Parameters
     ----------
     result : Any
-        _description_
+        Raw execution result returned by microsandbox.
 
     Returns
     -------
     Dict[str, Any]
-        _description_
+        Dictionary with stdout, stderr, exit code and success.
     """
     stdout = getattr(result, "stdout", None)
     stderr = getattr(result, "stderr", None)
@@ -46,19 +46,19 @@ def _extract_exec_result(result: Any) -> Dict[str, Any]:
 
 
 async def sandbox_fs_read(name: str, path: str) -> str:
-    """_summary_.
+    """Read a file from inside a sandbox.
 
     Parameters
     ----------
     name : str
-        _description_
+        Sandbox name.
     path : str
-        _description_
+        File path to read.
 
     Returns
     -------
     str
-        _description_
+        File contents or a JSON error payload.
     """
     try:
         sandbox = await asyncio.to_thread(microsandbox.Sandbox.get, name)

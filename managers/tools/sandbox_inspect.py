@@ -1,4 +1,4 @@
-"""_summary_."""
+"""Inspect microsandbox metadata."""
 
 import asyncio
 import json
@@ -11,17 +11,17 @@ logger = get_logger()
 
 
 async def sandbox_inspect(name: str) -> str:
-    """_summary_.
+    """Return metadata for a sandbox.
 
     Parameters
     ----------
     name : str
-        _description_
+        Sandbox name.
 
     Returns
     -------
     str
-        _description_
+        JSON string describing the sandbox state and configuration.
     """
     try:
         handle = await asyncio.to_thread(microsandbox.Sandbox.get, name)

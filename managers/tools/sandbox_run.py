@@ -1,4 +1,4 @@
-"""_summary_."""
+"""Create a sandbox and run a command in one step."""
 
 import asyncio
 import json
@@ -13,17 +13,17 @@ logger = get_logger()
 
 
 def _extract_exec_result(result: Any) -> Dict[str, Any]:
-    """_summary_.
+    """Normalize a sandbox execution result into a JSON-friendly dict.
 
     Parameters
     ----------
     result : Any
-        _description_
+        Raw execution result returned by microsandbox.
 
     Returns
     -------
     Dict[str, Any]
-        _description_
+        Dictionary with stdout, stderr, exit code and success.
     """
     stdout = getattr(result, "stdout", None)
     stderr = getattr(result, "stderr", None)
@@ -52,25 +52,25 @@ async def sandbox_run(
     cpus: int = 1,
     env: Optional[Dict[str, str]] = None,
 ) -> str:
-    """_summary_.
+    """Create a sandbox, run a command and return the result payload.
 
     Parameters
     ----------
     image : str
-        _description_
+        Container image to use.
     command : str
-        _description_
+        Shell command to run.
     memoryMib : int
-        _description_ (Default value = 512)
+        Memory limit in MiB (default: 512).
     cpus : int
-        _description_ (Default value = 1)
+        Number of CPUs to allocate (default: 1).
     env : Optional[Dict[str, str]]
-        _description_ (Default value = None)
+        Environment overrides (default: None).
 
     Returns
     -------
     str
-        _description_
+        JSON string with the execution result.
     """
     name = f"native-run-{int(time.time() * 1000)}"
     sandbox = None

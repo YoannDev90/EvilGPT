@@ -1,4 +1,4 @@
-"""_summary_."""
+"""Create microsandbox instances from the bot's tool interface."""
 
 import asyncio
 import json
@@ -25,39 +25,39 @@ async def sandbox_create(
     maxDuration: Optional[int] = None,
     idleTimeout: Optional[int] = None,
 ) -> str:
-    """_summary_.
+    """Create a new sandbox and return a status payload.
 
     Parameters
     ----------
     name : str
-        _description_
+        Sandbox name.
     image : str
-        _description_
+        Container image to use.
     cpus : int
-        _description_ (Default value = 1)
+        Number of CPUs to allocate (default: 1).
     memoryMib : int
-        _description_ (Default value = 512)
+        Memory limit in MiB (default: 512).
     workdir : Optional[str]
-        _description_ (Default value = None)
+        Working directory inside the sandbox (default: None).
     env : Optional[Dict[str, str]]
-        _description_ (Default value = None)
+        Environment variables to inject (default: None).
     volumes : Optional[List[Dict[str, Any]]]
-        _description_ (Default value = None)
+        Volume mounts to configure (default: None).
     patches : Optional[List[Dict[str, Any]]]
-        _description_ (Default value = None)
+        Patch entries to apply (default: None).
     entrypoint : Optional[List[str]]
-        _description_ (Default value = None)
+        Custom entrypoint command (default: None).
     hostname : Optional[str]
-        _description_ (Default value = None)
+        Optional hostname to assign (default: None).
     maxDuration : Optional[int]
-        _description_ (Default value = None)
+        Maximum sandbox duration in seconds (default: None).
     idleTimeout : Optional[int]
-        _description_ (Default value = None)
+        Idle timeout in seconds (default: None).
 
     Returns
     -------
     str
-        _description_
+        JSON string describing the created sandbox.
     """
     try:
         kwargs: Dict[str, Any] = {

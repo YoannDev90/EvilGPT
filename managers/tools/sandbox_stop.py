@@ -1,4 +1,4 @@
-"""_summary_."""
+"""Stop or kill a microsandbox instance."""
 
 import asyncio
 import json
@@ -11,19 +11,19 @@ logger = get_logger()
 
 
 async def sandbox_stop(name: str, force: bool = False) -> str:
-    """_summary_.
+    """Stop a sandbox cleanly, or kill it when forced.
 
     Parameters
     ----------
     name : str
-        _description_
+        Sandbox name.
     force : bool
-        _description_ (Default value = False)
+        If True, kill the sandbox instead of stopping it (default: False).
 
     Returns
     -------
     str
-        _description_
+        JSON string describing the stop result.
     """
     try:
         handle = await asyncio.to_thread(microsandbox.Sandbox.get, name)

@@ -1,4 +1,4 @@
-"""_summary_."""
+"""Render markdown tables as images for Discord messages."""
 
 import io
 import logging
@@ -31,34 +31,23 @@ COLUMN_MAX_WIDTH = 1200
 def _extract_links_and_sanitize(
     text: str, current_links: List[str]
 ) -> Tuple[str, List[str]]:
-    """_summary_.
+    """Replace raw links with numbered references and collect URLs.
 
     Parameters
     ----------
     text : str
-        _description_
+        Input text to sanitize.
     current_links : List[str]
-        _description_
+        Previously seen URLs to keep numbering stable.
 
     Returns
     -------
     Tuple[str, List[str]]
-        _description_
+        Sanitized text and the updated list of links.
     """
 
-    def replacer(match):
-        """_summary_.
-
-        Parameters
-        ----------
-        match : _type_
-            _description_
-
-        Returns
-        -------
-        _type_
-            _description_
-        """
+    def replacer(match: re.Match[str]) -> str | None:
+        """Convert a matched URL into a numbered reference."""
         label, url_md, url_plain = match.groups()
         url = url_md or url_plain
         if url in current_links:
@@ -77,21 +66,21 @@ def _extract_links_and_sanitize(
 
 
 def _get_font(size: int, bold: bool = False, italic: bool = False):
-    """_summary_.
+    """Load a table font variant by size and style.
 
     Parameters
     ----------
     size : int
-        _description_
+        Font size in points.
     bold : bool
-        _description_ (Default value = False)
+        Whether to load the bold font variant (default: False).
     italic : bool
-        _description_ (Default value = False)
+        Whether to load the italic font variant (default: False).
 
     Returns
     -------
-    _type_
-        _description_
+    ImageFont.FreeTypeFont | ImageFont.ImageFont
+        Loaded font object, or Pillow default font on failure.
     """
     try:
         if bold and italic:
@@ -113,23 +102,23 @@ def _calc_col_widths(
     font: ImageFont.FreeTypeFont,
     padding: int,
 ) -> List[int]:
-    """_summary_.
+    """Calculate column widths for a rendered table image.
 
     Parameters
     ----------
     headers : List[str]
-        _description_
+        Column headers.
     rows : List[List[str]]
-        _description_
+        Table rows.
     font : ImageFont.FreeTypeFont
-        _description_
+        Font used for measurement.
     padding : int
-        _description_
+        Horizontal padding applied to each cell.
 
     Returns
     -------
     List[int]
-        _description_
+        Calculated column widths in pixels.
     """
     img = Image.new("RGB", (1, 1))
     widths = []
@@ -149,21 +138,21 @@ def _calc_col_widths(
 
 
 def _wrap_text(text: str, max_width: int, font: ImageFont.FreeTypeFont) -> List[str]:
-    """_summary_.
+    """Wrap text to fit within a pixel width.
 
     Parameters
     ----------
     text : str
-        _description_
+        Text to wrap.
     max_width : int
-        _description_
+        Maximum width in pixels.
     font : ImageFont.FreeTypeFont
-        _description_
+        Font used for measurement.
 
     Returns
     -------
     List[str]
-        _description_
+        Wrapped lines.
     """
     draw = ImageDraw.Draw(Image.new("RGB", (1, 1)))
     words = text.split()
@@ -186,21 +175,21 @@ def _wrap_text(text: str, max_width: int, font: ImageFont.FreeTypeFont) -> List[
 def _render_table_image(
     headers: List[str], rows: List[List[str]], alignments: List[str]
 ) -> Tuple[io.BytesIO, List[str]]:
-    """_summary_.
+    """Render a markdown table into an image buffer.
 
     Parameters
     ----------
     headers : List[str]
-        _description_
+        Column headers.
     rows : List[List[str]]
-        _description_
+        Table rows.
     alignments : List[str]
-        _description_
+        Column alignments.
 
     Returns
     -------
     Tuple[io.BytesIO, List[str]]
-        _description_
+        PNG buffer and the table's extracted links.
     """
     all_links = []
     sanitized_headers = []
@@ -298,17 +287,17 @@ def _render_table_image(
 
 
 def detect_and_convert_tables(text: str) -> Tuple[str, List[io.BytesIO], List[dict]]:
-    """_summary_.
+    """Detect markdown tables in text and convert them to image buffers.
 
     Parameters
     ----------
     text : str
-        _description_
+        Message text to inspect.
 
     Returns
     -------
     Tuple[str, List[io.BytesIO], List[dict]]
-        _description_
+        Rewritten text, PNG buffers and table metadata.
     """
     table_images = []
     table_data_list = []
@@ -318,18 +307,7 @@ def detect_and_convert_tables(text: str) -> Tuple[str, List[io.BytesIO], List[di
     )
 
     def replace_table(match):
-        """_summary_.
-
-        Parameters
-        ----------
-        match : _type_
-            _description_
-
-        Returns
-        -------
-        _type_
-            _description_
-        """
+        """Render one matched table block into an image placeholder."""
         lines = [l for l in match.group(1).strip().split("\n") if l.strip()]
         if len(lines) < 2:
             return match.group(0)

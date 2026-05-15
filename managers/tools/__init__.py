@@ -1,4 +1,8 @@
-"""_summary_."""
+"""Tool loading helpers for `managers.tools`.
+
+This package loads tool metadata from JSON files and resolves the matching
+Python handler functions used by the bot and sandbox integration.
+"""
 
 import json
 import os
@@ -11,30 +15,25 @@ logger = get_logger()
 
 
 class ToolsLoader:
-    """_summary_.
+    """Load tool metadata and handler callables from a tools directory.
 
     Attributes
     ----------
     tools_dir : str
-        _description_
+        Directory containing JSON tool definitions.
     tools_metadata : List[Dict[str, Any]]
-        _description_
+        Normalized metadata entries for loaded tools.
     tools_handlers : Dict[str, Any]
-        _description_
-
-    Methods
-    -------
-    call_tool(tool_name: str, args: dict)
-        _description_
+        Mapping of tool names to async handler callables.
     """
 
     def __init__(self, tools_dir: str):
-        """_summary_.
+        """Create a loader for the given tools directory.
 
         Parameters
         ----------
         tools_dir : str
-            _description_
+            Path to the directory containing tool JSON files.
         """
         self.tools_dir = tools_dir
         self.tools_metadata: List[Dict[str, Any]] = []
@@ -120,19 +119,19 @@ class ToolsLoader:
             logger.debug("Tools failed: %s", ", ".join(failed))
 
     async def call_tool(self, tool_name: str, args: dict) -> str:
-        """Call a tool handler with the given arguments.
+        """Call a loaded tool handler and return its result.
 
         Parameters
         ----------
         tool_name : str
-            _description_
+            Name of the loaded tool to invoke.
         args : dict
-            _description_
+            Keyword arguments forwarded to the tool handler.
 
         Returns
         -------
         str
-            _description_
+            Result returned by the tool handler, or an error string.
         """
         if tool_name not in self.tools_handlers:
             return f"Unknown tool: {tool_name}"

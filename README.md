@@ -242,7 +242,7 @@ Below is current snapshot of repository. This section is auto-updated by `./lint
 
 **Markdown:** 1 files, 285 lines of code
 
-**Python:** 45 files, 3676 lines of code
+**Python:** 45 files, 3674 lines of code
 
 **SVG:** 1 files, 17 lines of code
 
@@ -250,7 +250,7 @@ Below is current snapshot of repository. This section is auto-updated by `./lint
 
 **Text:** 7 files, 177 lines of code
 
-**Total:** 81 files, 4746 lines of code, 2002 comments, 1156 blank lines
+**Total:** 81 files, 4744 lines of code, 1959 comments, 1163 blank lines
 <!-- CODE-STATS-END -->
 
 Run `./lint.sh` to format code and regenerate this project tree snapshot. CI runs the same script on every push/PR.

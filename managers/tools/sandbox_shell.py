@@ -1,4 +1,4 @@
-"""_summary_."""
+"""Execute shell commands inside a microsandbox."""
 
 import asyncio
 import json
@@ -12,17 +12,17 @@ logger = get_logger()
 
 
 def _extract_exec_result(result: Any) -> Dict[str, Any]:
-    """_summary_.
+    """Normalize a sandbox execution result into a JSON-friendly dict.
 
     Parameters
     ----------
     result : Any
-        _description_
+        Raw execution result returned by microsandbox.
 
     Returns
     -------
     Dict[str, Any]
-        _description_
+        Dictionary with stdout, stderr, exit code and success.
     """
     stdout = getattr(result, "stdout", None)
     stderr = getattr(result, "stderr", None)
@@ -47,21 +47,21 @@ def _extract_exec_result(result: Any) -> Dict[str, Any]:
 async def sandbox_shell(
     name: str, command: str, timeout: Optional[float] = None
 ) -> str:
-    """_summary_.
+    """Execute a shell command in an existing sandbox.
 
     Parameters
     ----------
     name : str
-        _description_
+        Sandbox name.
     command : str
-        _description_
+        Shell command to execute.
     timeout : Optional[float]
-        _description_ (Default value = None)
+        Optional timeout in seconds (default: None).
 
     Returns
     -------
     str
-        _description_
+        JSON string with the normalized execution result.
     """
     try:
         sandbox = await asyncio.to_thread(microsandbox.Sandbox.get, name)

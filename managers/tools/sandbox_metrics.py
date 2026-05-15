@@ -1,4 +1,4 @@
-"""_summary_."""
+"""Sandbox helper for retrieving resource usage metrics."""
 
 import asyncio
 import json
@@ -11,17 +11,17 @@ logger = get_logger()
 
 
 async def sandbox_metrics(name: str) -> str:
-    """_summary_.
+    """Return resource metrics for a sandbox.
 
     Parameters
     ----------
     name : str
-        _description_
+        Sandbox name.
 
     Returns
     -------
     str
-        _description_
+        JSON object string with CPU, memory, disk and network metrics.
     """
     try:
         sandbox = await asyncio.to_thread(microsandbox.Sandbox.get, name)

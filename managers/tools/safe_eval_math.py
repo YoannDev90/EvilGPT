@@ -1,4 +1,4 @@
-"""_summary_."""
+"""Safely evaluate math expressions and unit conversions."""
 
 import ast
 import math
@@ -41,34 +41,22 @@ ALLOWED_UNARYOPS = (ast.UAdd, ast.USub)
 
 
 def _safe_eval(node: ast.AST) -> float:
-    """_summary_.
+    """Recursively evaluate an AST node with a strict allowlist.
 
     Parameters
     ----------
     node : ast.AST
-        _description_
+        Parsed AST node to evaluate.
 
     Returns
     -------
     float
-        _description_
+        Numeric result of the expression.
 
     Raises
     ------
     ValueError
-        _description_
-    ValueError
-        _description_
-    ValueError
-        _description_
-    ValueError
-        _description_
-    ValueError
-        _description_
-    ValueError
-        _description_
-    ValueError
-        _description_
+        If the AST contains unsupported syntax or symbols.
     """
     if isinstance(node, ast.Expression):
         return _safe_eval(node.body)
@@ -124,22 +112,22 @@ def _safe_eval(node: ast.AST) -> float:
 
 
 def _try_eval_units(expression: str) -> str:
-    """_summary_.
+    """Try to parse a unit conversion or quantity expression.
 
     Parameters
     ----------
     expression : str
-        _description_
+        Expression containing a unit conversion or quantity.
 
     Returns
     -------
     str
-        _description_
+        Formatted unit result string.
 
     Raises
     ------
     ValueError
-        _description_
+        If the input is not a unit expression.
     """
     expr = expression.strip()
 
@@ -163,14 +151,14 @@ async def safe_eval_math(expression: str, precision: int = 10) -> str:
     Parameters
     ----------
     expression : str
-        _description_
+        Math expression or unit conversion to evaluate.
     precision : int
-        _description_ (Default value = 10)
+        Number of significant digits to return (default: 10).
 
     Returns
     -------
     str
-        _description_
+        Result string or an error message.
     """
     try:
         precision = max(1, min(int(precision), 16))

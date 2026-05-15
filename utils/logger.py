@@ -1,4 +1,4 @@
-"""_summary_."""
+"""Logging helpers and Discord webhook handlers for EvilGPT."""
 
 import logging
 import time
@@ -14,38 +14,26 @@ LOGGER_NAME = "EvilGPT"
 
 
 class EvilGPTFilter(logging.Filter):
-    """_summary_.
-
-    Methods
-    -------
-    filter(record: logging.LogRecord)
-        _description_
-    """
+    """Filter log records to only keep EvilGPT logger output."""
 
     def filter(self, record: logging.LogRecord) -> bool:
-        """_summary_.
+        """Return True for log records emitted by the EvilGPT logger.
 
         Parameters
         ----------
         record : logging.LogRecord
-            _description_
+            Log record to inspect.
 
         Returns
         -------
         bool
-            _description_
+            True when the record belongs to the EvilGPT logger.
         """
         return record.name == LOGGER_NAME
 
 
 class ColoredFormatter(logging.Formatter):
-    """_summary_.
-
-    Methods
-    -------
-    format(record: logging.LogRecord)
-        _description_
-    """
+    """Add ANSI color codes to console log messages."""
 
     COLORS = {
         logging.DEBUG: Fore.CYAN,
@@ -56,17 +44,17 @@ class ColoredFormatter(logging.Formatter):
     }
 
     def format(self, record: logging.LogRecord) -> str:
-        """_summary_.
+        """Format a log record with console color codes.
 
         Parameters
         ----------
         record : logging.LogRecord
-            _description_
+            Log record to format.
 
         Returns
         -------
         str
-            _description_
+            Colored formatted string.
         """
         color = self.COLORS.get(record.levelno, "")
         message = super().format(record)
@@ -74,13 +62,7 @@ class ColoredFormatter(logging.Formatter):
 
 
 class DiscordAnsiFormatter(logging.Formatter):
-    """_summary_.
-
-    Methods
-    -------
-    format(record: logging.LogRecord)
-        _description_
-    """
+    """Wrap log output in a Discord-compatible ANSI code block."""
 
     LEVEL_COLORS = {
         logging.DEBUG: "\x1b[36m",
@@ -93,17 +75,17 @@ class DiscordAnsiFormatter(logging.Formatter):
     RESET = "\x1b[0m"
 
     def format(self, record: logging.LogRecord) -> str:
-        """_summary_.
+        """Format a log record for Discord ANSI rendering.
 
         Parameters
         ----------
         record : logging.LogRecord
-            _description_
+            Log record to format.
 
         Returns
         -------
         str
-            _description_
+            ANSI wrapped code block string.
         """
         message = super().format(record)
         color = self.LEVEL_COLORS.get(record.levelno, "\x1b[37m")
@@ -111,45 +93,34 @@ class DiscordAnsiFormatter(logging.Formatter):
 
 
 class DiscordWebhookHandler(Handler):
-    """_summary_.
-
-    Attributes
-    ----------
-    webhook_url : str
-        _description_
-
-    Methods
-    -------
-    emit(record: logging.LogRecord)
-        _description_
-    """
+    """Send log records to a Discord webhook."""
 
     def __init__(self, webhook_url: str, level: int = logging.INFO):
-        """_summary_.
+        """Initialize the Discord webhook handler.
 
         Parameters
         ----------
         webhook_url : str
-            _description_
+            Discord webhook URL.
         level : int
-            _description_ (Default value = logging.INFO)
+            Logging level threshold (default: logging.INFO).
         """
         super().__init__(level)
         self.webhook_url = webhook_url
 
     @staticmethod
     def _level_color(levelno: int) -> int:
-        """_summary_.
+        """Return a Discord embed color for a logging level.
 
         Parameters
         ----------
         levelno : int
-            _description_
+            Logging level number.
 
         Returns
         -------
         int
-            _description_
+            Discord color integer.
         """
         palette = {
             logging.DEBUG: 0x3498DB,
@@ -161,17 +132,17 @@ class DiscordWebhookHandler(Handler):
         return palette.get(levelno, 0x95A5A6)
 
     def _build_payload(self, record: logging.LogRecord) -> dict:
-        """_summary_.
+        """Build the webhook payload for a log record.
 
         Parameters
         ----------
         record : logging.LogRecord
-            _description_
+            Log record to serialize.
 
         Returns
         -------
         dict
-            _description_
+            Discord webhook payload.
         """
         message = self.format(record)
         payload = {
@@ -184,19 +155,19 @@ class DiscordWebhookHandler(Handler):
 
     @staticmethod
     def _split_payload_chunks(message: str, limit: int = 1900) -> list[str]:
-        """_summary_.
+        """Split a long Discord message into safe chunks.
 
         Parameters
         ----------
         message : str
-            _description_
+            Message text to split.
         limit : int
-            _description_ (Default value = 1900)
+            Maximum chunk length (default: 1900).
 
         Returns
         -------
         list[str]
-            _description_
+            List of message chunks.
         """
         if len(message) <= limit:
             return [message]
@@ -214,12 +185,12 @@ class DiscordWebhookHandler(Handler):
         return chunks
 
     def emit(self, record: logging.LogRecord) -> None:
-        """_summary_.
+        """Emit a log record to the configured Discord webhook.
 
         Parameters
         ----------
         record : logging.LogRecord
-            _description_
+            Log record to send.
         """
         try:
             import requests
@@ -277,32 +248,30 @@ class DiscordWebhookHandler(Handler):
 
 
 def _is_real_webhook_url(url: Optional[str]) -> bool:
-    """_summary_.
+    """Return True when the webhook URL looks like a real value.
 
     Parameters
     ----------
     url : Optional[str]
-        _description_
+        Webhook URL to test.
 
     Returns
     -------
     bool
-        _description_
+        True when the URL is non-empty and not a placeholder.
     """
     return bool(url) and "<URL>" not in url
 
 
 def setup_logging(level: int = logging.INFO, config=None):
-    """Set up logging.
-
-    If `config` provided and has file/webhook settings, those will be used.
+    """Configure console, file and Discord webhook logging.
 
     Parameters
     ----------
     level : int
-        _description_ (Default value = logging.INFO)
-    config : _type_
-        _description_ (Default value = None)
+        Root logging level (default: logging.INFO).
+    config : Any
+        Optional configuration object with logging settings.
     """
     console_format = getattr(config, "console_format")
     file_format = getattr(config, "file_format")
@@ -360,11 +329,11 @@ def setup_logging(level: int = logging.INFO, config=None):
 
 
 def get_logger() -> logging.Logger:
-    """_summary_.
+    """Return the EvilGPT logger instance.
 
     Returns
     -------
     logging.Logger
-        _description_
+        Logger configured for EvilGPT output.
     """
     return logging.getLogger(LOGGER_NAME)

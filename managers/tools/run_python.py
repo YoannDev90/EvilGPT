@@ -1,4 +1,4 @@
-"""_summary_."""
+"""Run Python snippets inside an ephemeral microsandbox."""
 
 import asyncio
 import json
@@ -16,29 +16,30 @@ DEFAULT_PYTHON_IMAGE = "python:3.12-slim"
 
 
 async def run_python(code: str, timeout: int = 10, image: Optional[str] = None) -> str:
-    """Execute Python code in sandboxed environment.
-
-    Uses an ephemeral sandbox created for this run to avoid requiring a direct
-    `Sandbox()` constructor.
+    """Execute Python code in an ephemeral sandbox.
 
     Parameters
     ----------
     code : str
-        _description_
+        Python source code to execute.
     timeout : int
-        _description_ (Default value = 10)
+        Maximum execution time in seconds (default: 10).
     image : Optional[str]
-        _description_ (Default value = None)
+        Optional container image to use (default: None uses built-in image).
 
     Returns
     -------
     str
-        _description_
+        JSON string containing stdout, stderr, exit code and success.
 
     Raises
     ------
-    __UnknownError__
-        _description_
+    RuntimeError
+        If the sandbox does not expose a supported execution API.
+    asyncio.TimeoutError
+        If execution exceeds the configured timeout.
+    Exception
+        If sandbox creation, execution or cleanup fails.
     """
     name = f"run-python-{int(time.time() * 1000)}"
     sandbox = None
@@ -65,18 +66,17 @@ async def run_python(code: str, timeout: int = 10, image: Optional[str] = None) 
 
         # Try multiple SDK variants: prefer sandbox.run, then sandbox.exec, then shell fallback
         def _extract_exec_result(result: Any) -> Dict[str, Any]:
-            # Support multiple SDK result shapes (ExecOutput, simple namespaces)
-            """_summary_.
+            """Normalize a sandbox execution result into a JSON-friendly dict.
 
             Parameters
             ----------
             result : Any
-                _description_
+                Raw execution result returned by microsandbox.
 
             Returns
             -------
             Dict[str, Any]
-                _description_
+                Dictionary with stdout, stderr, exit code and success.
             """
             stdout = None
             stderr = None

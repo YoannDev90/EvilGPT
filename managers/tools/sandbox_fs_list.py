@@ -1,4 +1,4 @@
-"""_summary_."""
+"""Sandbox helper for listing files inside a microsandbox."""
 
 import asyncio
 import json
@@ -12,17 +12,17 @@ logger = get_logger()
 
 
 def _extract_exec_result(result: Any) -> Dict[str, Any]:
-    """_summary_.
+    """Extract a normalized result payload from a sandbox execution result.
 
     Parameters
     ----------
     result : Any
-        _description_
+        Raw execution result returned by microsandbox.
 
     Returns
     -------
     Dict[str, Any]
-        _description_
+        Normalized dictionary with stdout, stderr, exit code and success.
     """
     stdout = getattr(result, "stdout", None)
     stderr = getattr(result, "stderr", None)
@@ -45,19 +45,19 @@ def _extract_exec_result(result: Any) -> Dict[str, Any]:
 
 
 async def sandbox_fs_list(name: str, path: str) -> str:
-    """_summary_.
+    """List directory entries inside a sandbox.
 
     Parameters
     ----------
     name : str
-        _description_
+        Sandbox name.
     path : str
-        _description_
+        Directory path to inspect.
 
     Returns
     -------
     str
-        _description_
+        JSON array string with directory entry information.
     """
     try:
         sandbox = await asyncio.to_thread(microsandbox.Sandbox.get, name)

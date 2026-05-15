@@ -1,4 +1,4 @@
-"""_summary_."""
+"""Helpers for sending long or formatted Discord messages."""
 
 import logging
 import re
@@ -19,27 +19,16 @@ from utils.handlers.table import (TABLE_IMAGE_PLACEHOLDER,
 
 
 class MessageSender:
-    """_summary_.
+    """Send text, LaTeX and table-rich responses to Discord channels.
 
     Attributes
     ----------
     channel : discord.abc.Messageable
-        _description_
+        Target channel-like object used for sending messages.
     bot : Optional[discord.Client]
-        _description_
+        Optional bot instance used to resolve the live channel object.
     max_length : int
-        _description_
-
-    Methods
-    -------
-    send_text_chunks(text: str)
-        _description_
-    send_latex_image(latex_match: str)
-        _description_
-    send_text_with_latex(text: str)
-        _description_
-    process_and_send(response: str)
-        _description_
+        Maximum number of characters per message chunk.
     """
 
     def __init__(
@@ -48,45 +37,45 @@ class MessageSender:
         bot: Optional[discord.Client] = None,
         max_length: int = 2000,
     ):
-        """_summary_.
+        """Initialize a message sender.
 
         Parameters
         ----------
         channel : discord.abc.Messageable
-            _description_
+            Channel-like object to send messages to.
         bot : Optional[discord.Client]
-            _description_ (Default value = None)
+            Optional bot instance used to resolve the current channel.
         max_length : int
-            _description_ (Default value = 2000)
+            Maximum message chunk size (default: 2000).
         """
         self.channel = channel
         self.bot = bot
         self.max_length = max_length
 
     def _get_target_channel(self) -> discord.abc.Messageable:
-        """_summary_.
+        """Return the most up-to-date channel object available.
 
         Returns
         -------
         discord.abc.Messageable
-            _description_
+            Resolved channel object.
         """
         if self.bot and hasattr(self.channel, "id"):
             return self.bot.get_channel(self.channel.id) or self.channel
         return self.channel
 
     async def send_text_chunks(self, text: str) -> Optional[discord.Message]:
-        """_summary_.
+        """Send plain text as one or more Discord messages.
 
         Parameters
         ----------
         text : str
-            _description_
+            Text to send.
 
         Returns
         -------
         Optional[discord.Message]
-            _description_
+            Last message sent, or None if text was empty.
         """
         if not text.strip():
             return None
@@ -113,17 +102,17 @@ class MessageSender:
         return last_message
 
     async def send_latex_image(self, latex_match: str) -> Optional[discord.Message]:
-        """_summary_.
+        """Render and send a LaTeX expression as an image when possible.
 
         Parameters
         ----------
         latex_match : str
-            _description_
+            Raw LaTeX text or match content.
 
         Returns
         -------
         Optional[discord.Message]
-            _description_
+            Message created by Discord, or None on failure.
         """
         from utils.handlers.latex import convert_latex_to_png
 
@@ -139,17 +128,17 @@ class MessageSender:
         return await target.send(f"Failed to render LaTeX: {latex_display}")
 
     def _clean_latex(self, latex: str) -> str:
-        """_summary_.
+        """Strip wrappers such as code fences and `$...$` from LaTeX text.
 
         Parameters
         ----------
         latex : str
-            _description_
+            Raw LaTeX string.
 
         Returns
         -------
         str
-            _description_
+            Cleaned LaTeX content.
         """
         latex = latex.strip()
         if latex.startswith("```") and latex.endswith("```"):
@@ -163,17 +152,17 @@ class MessageSender:
         return latex
 
     async def send_text_with_latex(self, text: str) -> Optional[discord.Message]:
-        """_summary_.
+        """Send text while converting LaTeX fragments to emoji or images.
 
         Parameters
         ----------
         text : str
-            _description_
+            Text containing optional LaTeX fragments.
 
         Returns
         -------
         Optional[discord.Message]
-            _description_
+            Last Discord message sent, or None.
         """
         matches = detect_latex(text)
         if not matches:
@@ -203,17 +192,17 @@ class MessageSender:
     async def process_and_send(
         self, response: str
     ) -> Tuple[Optional[discord.Message], List[dict]]:
-        """_summary_.
+        """Process a response and send text, tables and code blocks.
 
         Parameters
         ----------
         response : str
-            _description_
+            Full model response to send.
 
         Returns
         -------
         Tuple[Optional[discord.Message], List[dict]]
-            _description_
+            Last message sent and table metadata extracted from the response.
         """
         response, table_images, table_data = detect_and_convert_tables(response)
         placeholder_escaped = re.escape(TABLE_IMAGE_PLACEHOLDER)

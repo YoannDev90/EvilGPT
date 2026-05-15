@@ -1,4 +1,4 @@
-"""_summary_."""
+"""List active microsandbox instances."""
 
 import asyncio
 import json
@@ -11,12 +11,12 @@ logger = get_logger()
 
 
 async def sandbox_list() -> str:
-    """_summary_.
+    """Return a JSON list of currently active sandboxes.
 
     Returns
     -------
     str
-        _description_
+        JSON array string describing the active sandboxes.
     """
     try:
         handles = await asyncio.to_thread(microsandbox.Sandbox.list)

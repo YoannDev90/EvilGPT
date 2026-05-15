@@ -109,6 +109,11 @@ async def memory_lifespan(builder: coco.EnvironmentBuilder) -> AsyncIterator[Non
     builder : coco.EnvironmentBuilder
         CocoIndex environment builder used to register providers.
 
+    Yields
+    ------
+    None
+        Yields once while the CocoIndex environment is active.
+
     Raises
     ------
     RuntimeError
@@ -176,18 +181,18 @@ class MemoryManager:
         sqlite_path: Path | str = SQLITE_PATH,
         cocoindex_db_path: Path | str = COCOINDEX_DB_PATH,
     ) -> None:
-        """_summary_.
+        """Create a memory manager instance.
 
         Parameters
         ----------
         max_history : int
-            _description_ (Default value = 15)
+            Maximum number of recent turns to keep in memory. Default is 15.
         state_path : Path | str
-            _description_ (Default value = STATE_PATH)
+            Path to the JSON state file. Default is STATE_PATH.
         sqlite_path : Path | str
-            _description_ (Default value = SQLITE_PATH)
+            Path to the SQLite database file. Default is SQLITE_PATH.
         cocoindex_db_path : Path | str
-            _description_ (Default value = COCOINDEX_DB_PATH)
+            Path to the CocoIndex database file. Default is COCOINDEX_DB_PATH.
         """
         global _ACTIVE_MEMORY_MANAGER
 
@@ -207,7 +212,10 @@ class MemoryManager:
         self._load_state()
 
     def _load_state(self) -> None:
-        """_summary_."""
+        """Load persisted memory state from disk into the in-memory store.
+
+        If the state file does not exist or cannot be parsed it is ignored.
+        """
         if not self.state_path.exists():
             return
 
@@ -235,7 +243,7 @@ class MemoryManager:
             self._metadata[record.user_id] = record
 
     def _save_state(self) -> None:
-        """_summary_."""
+        """Persist current in-memory turns and metadata to disk atomically."""
         payload = {
             "turns": [asdict(turn) for turn in self.iter_turns()],
             "metadata": [asdict(record) for record in self.iter_metadata_records()],
@@ -246,56 +254,56 @@ class MemoryManager:
         tmp_path.replace(self.state_path)
 
     def _sorted_turns(self) -> list[MemoryTurn]:
-        """_summary_.
+        """Return turns sorted by creation time and id.
 
         Returns
         -------
         list[MemoryTurn]
-            _description_
+            Sorted list of turns stored in memory.
         """
         return sorted(
             self._turns.values(), key=lambda turn: (turn.created_at, turn.turn_id)
         )
 
     def iter_turns(self) -> Iterable[MemoryTurn]:
-        """_summary_.
+        """Iterate over stored turns in chronological order.
 
         Returns
         -------
         Iterable[MemoryTurn]
-            _description_
+            Iterator over MemoryTurn instances.
         """
         return self._sorted_turns()
 
     def iter_metadata_records(self) -> Iterable[UserMetadataRecord]:
-        """_summary_.
+        """Iterate over user metadata records sorted by user id.
 
         Returns
         -------
         Iterable[UserMetadataRecord]
-            _description_
+            Iterator over UserMetadataRecord instances.
         """
         return sorted(self._metadata.values(), key=lambda record: record.user_id)
 
     def _resolve_turn_id(self, turn_id: str) -> str:
-        """_summary_.
+        """Resolve a full turn id from a possibly abbreviated prefix.
 
         Parameters
         ----------
         turn_id : str
-            _description_
+            Full or prefix of a turn id.
 
         Returns
         -------
         str
-            _description_
+            Resolved full turn id.
 
         Raises
         ------
         KeyError
-            _description_
+            If no matching id exists.
         ValueError
-            _description_
+            If the prefix is ambiguous and matches multiple ids.
         """
         if turn_id in self._turns:
             return turn_id
@@ -312,19 +320,19 @@ class MemoryManager:
         return matches[0]
 
     def get_metadata(self, user_id: int, key: str | None = None) -> Any:
-        """_summary_.
+        """Return metadata for `user_id` or a specific key.
 
         Parameters
         ----------
         user_id : int
-            _description_
+            Discord user id.
         key : str | None
-            _description_ (Default value = None)
+            Specific metadata key to return (default: None returns summary dict).
 
         Returns
         -------
         Any
-            _description_
+            Metadata value, a dict summary, or None if not present.
         """
         record = self._metadata.get(user_id)
         if key is None:
@@ -336,21 +344,23 @@ class MemoryManager:
         return getattr(record, key, None)
 
     def set_metadata(self, user_id: int, key: str, value: Any) -> None:
-        """_summary_.
+        """Set a metadata value for a user.
+
+        Only the `mood` key is currently supported.
 
         Parameters
         ----------
         user_id : int
-            _description_
+            Discord user id.
         key : str
-            _description_
+            Metadata key to set (currently only 'mood').
         value : Any
-            _description_
+            New value for the key.
 
         Raises
         ------
         ValueError
-            _description_
+            If an unsupported key is provided.
         """
         if key != "mood":
             raise ValueError(f"Unsupported metadata key: {key}")
@@ -362,36 +372,36 @@ class MemoryManager:
         record.updated_at = time.time()
 
     def get_turn(self, turn_id: str) -> MemoryTurn:
-        """_summary_.
+        """Return a stored `MemoryTurn` by id or prefix.
 
         Parameters
         ----------
         turn_id : str
-            _description_
+            Full or prefixed turn id.
 
         Returns
         -------
         MemoryTurn
-            _description_
+            The requested turn.
         """
         return self._turns[self._resolve_turn_id(turn_id)]
 
     def list_turns(
         self, user_id: int | None = None, limit: int = 10
     ) -> list[MemoryTurn]:
-        """_summary_.
+        """List recent turns, optionally filtered by user id.
 
         Parameters
         ----------
         user_id : int | None
-            _description_ (Default value = None)
+            If provided, only returns turns for this user (default: None).
         limit : int
-            _description_ (Default value = 10)
+            Maximum number of turns to return (default: 10).
 
         Returns
         -------
         list[MemoryTurn]
-            _description_
+            List of recent MemoryTurn objects.
         """
         turns = list(self.iter_turns())
         if user_id is not None:
@@ -401,19 +411,19 @@ class MemoryManager:
     def get_history(
         self, user_id: int, limit: int | None = None
     ) -> list[dict[str, str]]:
-        """_summary_.
+        """Return a chat-style message history for a user.
 
         Parameters
         ----------
         user_id : int
-            _description_
+            Discord user id to fetch history for.
         limit : int | None
-            _description_ (Default value = None)
+            Maximum number of user turns to include (default: None for all).
 
         Returns
         -------
         list[dict[str, str]]
-            _description_
+            List of message dicts with `role` and `content` keys.
         """
         turns = [turn for turn in self.iter_turns() if turn.user_id == user_id]
         if limit is not None:
@@ -439,29 +449,29 @@ class MemoryManager:
         channel_id: int | None,
         turn_id: str | None = None,
     ) -> str:
-        """_summary_.
+        """Record a user-assistant exchange as a new MemoryTurn.
 
         Parameters
         ----------
         user_id : int
-            _description_
+            Discord user id.
         user_name : str
-            _description_
+            Display name of the user.
         user_content : str
-            _description_
+            Content of the user's message.
         assistant_content : str
-            _description_
+            Content of the assistant's reply.
         guild_id : int | None
-            _description_
+            Guild id where the exchange occurred, or None.
         channel_id : int | None
-            _description_
+            Channel id where the exchange occurred, or None.
         turn_id : str | None
-            _description_ (Default value = None)
+            Optional explicit turn id to use (default: generated).
 
         Returns
         -------
         str
-            _description_
+            The turn id of the recorded exchange.
         """
         turn = MemoryTurn(
             turn_id=turn_id or uuid.uuid4().hex,
@@ -476,33 +486,33 @@ class MemoryManager:
         return turn.turn_id
 
     def delete_turn(self, turn_id: str) -> MemoryTurn:
-        """_summary_.
+        """Delete and return a stored turn by id or prefix.
 
         Parameters
         ----------
         turn_id : str
-            _description_
+            Full or prefixed turn id to delete.
 
         Returns
         -------
         MemoryTurn
-            _description_
+            The deleted MemoryTurn instance.
         """
         resolved = self._resolve_turn_id(turn_id)
         return self._turns.pop(resolved)
 
     def clear_history(self, user_id: int | None = None) -> int:
-        """_summary_.
+        """Clear history for a given user or all users.
 
         Parameters
         ----------
         user_id : int | None
-            _description_ (Default value = None)
+            If provided, only clear history for this user; otherwise clear all. Default is None.
 
         Returns
         -------
         int
-            _description_
+            Number of turns removed.
         """
         if user_id is None:
             removed = len(self._turns)
@@ -517,13 +527,13 @@ class MemoryManager:
         return len(removed_turn_ids)
 
     async def sync(self) -> None:
-        """_summary_."""
+        """Persist state and update the CocoIndex app asynchronously."""
         async with self._sync_lock:
             self._save_state()
             await self._app.update()
 
     async def bootstrap(self) -> None:
-        """_summary_."""
+        """Bootstrap memory subsystem (alias to `sync`)."""
         await self.sync()
 
     async def record_and_sync(
@@ -536,27 +546,27 @@ class MemoryManager:
         guild_id: int | None,
         channel_id: int | None,
     ) -> str:
-        """_summary_.
+        """Record an exchange and immediately persist/sync it.
 
         Parameters
         ----------
         user_id : int
-            _description_
+            Discord user id.
         user_name : str
-            _description_
+            Display name of the user.
         user_content : str
-            _description_
+            Content of the user's message.
         assistant_content : str
-            _description_
+            Content of the assistant's reply.
         guild_id : int | None
-            _description_
+            Guild id where the exchange occurred, or None.
         channel_id : int | None
-            _description_
+            Channel id where the exchange occurred, or None.
 
         Returns
         -------
         str
-            _description_
+            Turn id of the recorded exchange.
         """
         async with self._sync_lock:
             turn_id = self.record_exchange(
@@ -572,16 +582,16 @@ class MemoryManager:
             return turn_id
 
     async def set_metadata_and_sync(self, user_id: int, key: str, value: Any) -> None:
-        """_summary_.
+        """Set metadata for a user and persist the change.
 
         Parameters
         ----------
         user_id : int
-            _description_
+            Discord user id.
         key : str
-            _description_
+            Metadata key to set.
         value : Any
-            _description_
+            New value for the key.
         """
         async with self._sync_lock:
             self.set_metadata(user_id, key, value)
@@ -589,17 +599,17 @@ class MemoryManager:
             await self._app.update()
 
     async def delete_turn_and_sync(self, turn_id: str) -> MemoryTurn:
-        """_summary_.
+        """Delete a turn and persist the state.
 
         Parameters
         ----------
         turn_id : str
-            _description_
+            Full or prefixed turn id to delete.
 
         Returns
         -------
         MemoryTurn
-            _description_
+            The deleted turn.
         """
         async with self._sync_lock:
             turn = self.delete_turn(turn_id)
@@ -608,17 +618,17 @@ class MemoryManager:
             return turn
 
     async def clear_history_and_sync(self, user_id: int | None = None) -> int:
-        """_summary_.
+        """Clear history (for a user or all users) and persist change.
 
         Parameters
         ----------
         user_id : int | None
-            _description_ (Default value = None)
+            If provided, clear history only for this user. Default is None.
 
         Returns
         -------
         int
-            _description_
+            Number of turns removed.
         """
         async with self._sync_lock:
             removed = self.clear_history(user_id)

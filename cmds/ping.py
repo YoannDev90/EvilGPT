@@ -3,6 +3,7 @@
 Provides a `setup` function to register the `/ping` command which
 returns the bot's gateway latency.
 """
+
 import time
 
 import discord
@@ -24,40 +25,40 @@ async def setup(tree: app_commands.CommandTree, bot):
     bot : Any
         Bot instance used to read gateway latency.
     """
+
     @tree.command(name="ping", description="Check bot latency and responsiveness")
-        async def ping(interaction: discord.Interaction):
-            """Respond with gateway latency.
+    async def ping(interaction: discord.Interaction):
+        """Respond with gateway latency.
 
-            Parameters
-            ----------
-            interaction : discord.Interaction
-                The interaction that triggered the command.
-            """
-        start_time = time.perf_counter()
-        log_command_start(logger, "ping", interaction)
+        Parameters
+        ----------
+        interaction : discord.Interaction
+            The interaction that triggered the command.
+        """
 
-        try:
-            gateway_ms = round(bot.latency * 1000, 2)
+    start_time = time.perf_counter()
+    log_command_start(logger, "ping", interaction)
 
-            embed = discord.Embed(
-                title="Pong!",
-                color=discord.Color.blurple(),
-                description="Bot is responsive.",
+    try:
+        gateway_ms = round(bot.latency * 1000, 2)
+
+        embed = discord.Embed(
+            title="Pong!",
+            color=discord.Color.blurple(),
+            description="Bot is responsive.",
+        )
+        embed.add_field(name="Gateway Latency", value=f"{gateway_ms} ms", inline=True)
+
+        await interaction.response.send_message(embed=embed, ephemeral=True)
+
+        log_command_end(logger, "ping", start_time)
+    except Exception as exc:
+        log_command_error(logger, "ping", exc)
+        if not interaction.response.is_done():
+            await interaction.response.send_message(
+                "Error while checking latency.", ephemeral=True
             )
-            embed.add_field(
-                name="Gateway Latency", value=f"{gateway_ms} ms", inline=True
+        else:
+            await interaction.followup.send(
+                "Error while checking latency.", ephemeral=True
             )
-
-            await interaction.response.send_message(embed=embed, ephemeral=True)
-
-            log_command_end(logger, "ping", start_time)
-        except Exception as exc:
-            log_command_error(logger, "ping", exc)
-            if not interaction.response.is_done():
-                await interaction.response.send_message(
-                    "Error while checking latency.", ephemeral=True
-                )
-            else:
-                await interaction.followup.send(
-                    "Error while checking latency.", ephemeral=True
-                )

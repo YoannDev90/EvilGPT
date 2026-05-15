@@ -1,4 +1,4 @@
-"""_summary_."""
+"""Run Node.js snippets inside an ephemeral microsandbox."""
 
 import asyncio
 import json
@@ -16,28 +16,30 @@ DEFAULT_NODE_IMAGE = "node:22-slim"
 
 
 async def run_nodejs(code: str, timeout: int = 10, image: Optional[str] = None) -> str:
-    """Execute Node.js code in sandboxed environment using ephemeral sandbox.
-
-    Mirrors the approach used by `run_python` to avoid direct Sandbox constructor calls.
+    """Execute Node.js code in an ephemeral sandbox.
 
     Parameters
     ----------
     code : str
-        _description_
+        JavaScript source code to execute.
     timeout : int
-        _description_ (Default value = 10)
+        Maximum execution time in seconds (default: 10).
     image : Optional[str]
-        _description_ (Default value = None)
+        Optional container image to use (default: None uses built-in image).
 
     Returns
     -------
     str
-        _description_
+        JSON string containing stdout, stderr, exit code and success.
 
     Raises
     ------
-    __UnknownError__
-        _description_
+    RuntimeError
+        If the sandbox does not expose a supported execution API.
+    asyncio.TimeoutError
+        If execution exceeds the configured timeout.
+    Exception
+        If sandbox creation, execution or cleanup fails.
     """
     name = f"run-nodejs-{int(time.time() * 1000)}"
     sandbox = None
@@ -65,18 +67,17 @@ async def run_nodejs(code: str, timeout: int = 10, image: Optional[str] = None) 
             sandbox = await sandbox
 
         def _extract_exec_result(result: Any) -> Dict[str, Any]:
-            # Support multiple SDK result shapes (ExecOutput, simple namespaces)
-            """_summary_.
+            """Normalize a sandbox execution result into a JSON-friendly dict.
 
             Parameters
             ----------
             result : Any
-                _description_
+                Raw execution result returned by microsandbox.
 
             Returns
             -------
             Dict[str, Any]
-                _description_
+                Dictionary with stdout, stderr, exit code and success.
             """
             stdout = None
             stderr = None

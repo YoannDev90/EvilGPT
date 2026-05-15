@@ -1,4 +1,4 @@
-"""_summary_."""
+"""Remove microsandbox instances from the runtime."""
 
 import asyncio
 import json
@@ -11,19 +11,19 @@ logger = get_logger()
 
 
 async def sandbox_remove(name: str, force: bool = False) -> str:
-    """_summary_.
+    """Remove a sandbox by name, optionally killing it first.
 
     Parameters
     ----------
     name : str
-        _description_
+        Sandbox name.
     force : bool
-        _description_ (Default value = False)
+        If True, kill the sandbox before removing it (default: False).
 
     Returns
     -------
     str
-        _description_
+        JSON string describing the removal result.
     """
     try:
         if force:
