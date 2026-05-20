@@ -1,26 +1,9 @@
 # EvilGPT 🤖
 
 <!-- Badges -->
-<table>
-   <tr>
-      <td valign="middle" width="120">
-         <img src="assets/images/evilgpt.png" alt="EvilGPT Icon" width="120" style="border-radius:8px; display:block; margin:0 auto;">
-      </td>
-      <td valign="middle">
-           <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
-            <a href="https://github.com/YoannDev90/EvilGPT/actions" style="display:inline-block">
-            <img src="https://github.com/YoannDev90/EvilGPT/actions/workflows/pre-commit.yml/badge.svg" alt="Lint" style="height:20px; vertical-align:middle;"/>
-            </a>
-            <a href="https://www.python.org/" style="display:inline-block">
-            <img src="https://img.shields.io/badge/python-3.12%2B-blue" alt="Python" style="height:20px; vertical-align:middle;"/>
-            </a>
-            <a href="LICENSE" style="display:inline-block">
-            <img src="https://img.shields.io/badge/license-MIT-green" alt="License" style="height:20px; vertical-align:middle;"/>
-            </a>
-         </div>
-      </td>
-   </tr>
-</table>
+|||
+|---|---|
+| <img src="assets/images/evilgpt.png" alt="EvilGPT Icon" width="96" style="border-radius:8px; display:block; margin:0 auto;" /> |[![Python](https://img.shields.io/badge/python-3.12%2B-blue?style=for-the-badge)](https://www.python.org/) [![License](https://img.shields.io/badge/license-MIT-green?style=for-the-badge)](LICENSE) |
 
 A powerful Discord bot integrating AI models to respond intelligently to user messages in real-time.
 
