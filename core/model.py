@@ -31,6 +31,8 @@ from utils.logger import get_logger
 
 logger = get_logger()
 
+DEFAULT_MAX_CONTEXT_CHARS = 128000
+
 
 def _validate_tools_payload(raw_tools: list) -> list:
     """Validate and normalize tools payload before sending to LLM provider.
@@ -92,10 +94,6 @@ def _validate_tools_payload(raw_tools: list) -> list:
         )
 
     return valid
-
-
-# Simple message truncation to avoid provider context-length errors.
-DEFAULT_MAX_CONTEXT_CHARS = 90000
 
 
 def _messages_char_size(msgs: list) -> int:

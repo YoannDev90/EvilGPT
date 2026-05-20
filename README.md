@@ -80,16 +80,24 @@ A powerful Discord bot integrating AI models to respond intelligently to user me
 ```env
 BOT_TOKEN=
 WEBHOOK_URL=
+AICHIXIA_API_KEY=
+AIHUBMIX_API_KEY=
+AQUA_API_KEY=
+BLAZE_API_KEY=
 ELECTRONHUB_API_KEY=
+EVOLVEX_API_KEY=
+HAPUPPY_API_KEY=
+LOGFLARE_API_KEY=
 MEGANOVA_API_KEY=
 MISTRAL_API_KEY=
 MNN_API_KEY=
 NAVY_API_KEY=
-PAXSENIX_API_KEY=
-ZANITY_API_KEY=
-EVOLVEX_API_KEY=
-AQUA_API_KEY=
+NEXUSIFY_API_KEY=
 NVIDIA_NIM_API_KEY=
+PAXSENIX_API_KEY=
+SECRETS_API_KEY=
+TOKEN_REPLY_API_KEY=
+ZANITY_API_KEY=
 ```
 <!--ENV-END-->
 
@@ -250,7 +258,7 @@ Below is current snapshot of repository. This section is auto-updated by `./lint
 
 **Text:** 7 files, 177 lines of code
 
-**Total:** 81 files, 4729 lines of code, 1938 comments, 1155 blank lines
+**Total:** 81 files, 4729 lines of code, 1937 comments, 1154 blank lines
 <!-- CODE-STATS-END -->
 
 Run `./lint.sh` to format code and regenerate this project tree snapshot. CI runs the same script on every push/PR.
@@ -284,7 +292,7 @@ The bot automatically selects the most appropriate model based on:
 ```markdown
 - `discord.py==2.7.1` - A Python wrapper for the Discord API (latest: 2.7.1)
 - `python-dotenv==1.2.2` - Read key-value pairs from a .env file and set them as environment variables (latest: 1.2.2)
-- `litellm==1.84.0` - Library to easily interface with LLM API providers (latest: 1.84.0)
+- `litellm==1.84.0` - Library to easily interface with LLM API providers (latest: 1.85.0)
 - `requests==2.34.2` - Python HTTP for Humans. (latest: 2.34.2)
 - `colorama==0.4.6` - Cross-platform colored terminal text. (latest: 0.4.6)
 - `cairosvg==2.9.0` - A Simple SVG Converter based on Cairo (latest: 2.9.0)
@@ -293,7 +301,7 @@ The bot automatically selects the most appropriate model based on:
 - `microsandbox==0.4.6` - Python SDK for microsandbox — secure, fast microVM-based sandboxing. (latest: 0.4.6)
 - `aiohttp==3.13.5` - Async http client/server framework (asyncio) (latest: 3.13.5)
 - `discord-webhook==1.4.1` - Easily send Discord webhooks with Python (latest: 1.4.1)
-- `cocoindex==1.0.5` - With CocoIndex, users declare the transformation, CocoIndex creates & maintains an index, and keeps the derived index up to date based on source update, with minimal computation and changes. (latest: 1.0.5)
+- `cocoindex==1.0.5` - With CocoIndex, users declare the transformation, CocoIndex creates & maintains an index, and keeps the derived index up to date based on source update, with minimal computation and changes. (latest: 1.0.6)
 - `fastmcp==3.3.0` - The fast, Pythonic way to build MCP servers and clients. (latest: 3.3.1)
 - `pytesseract==0.3.13` - Python-tesseract is a python wrapper for Google's Tesseract-OCR (latest: 0.3.13)
 - `pint==0.25.3` - Physical quantities module (latest: 0.25.3)
