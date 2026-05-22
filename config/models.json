@@ -1,12 +1,13 @@
 [
-  "mistral/mistral-small-latest",
+  "mistral/mistral/mistral-medium-3.5",
   "aqua/mistral",
   "meganova/mistralai/Mistral-Small-3.2-24B-Instruct-2506",
   "zanity/mistral-medium",
-  "nvidia-nim/mistralai/mistral-medium-3.5-128b",
-  "navy/mistral-small-latest",
+  "nvidia-nim/mistralai/mistral-small-4-119b-2603",
+  "navy/navy/mistral-small-2603",
   "mnn/mistral-small-latest",
-  "evolvex/mistralai/mistral-medium-3-instruct",
-  "electronhub/mistral-small-24b-instruct:free",
-  "paxsenix/mistral-small-3.1-24b"
+  "evolvex/mistralai/mistral-small-4-119b-2603",
+  "paxsenix/mistral-small-latest",
+  "nexusify/mistral-small-24b-instruct",
+  "aichixia/mistral-3.1"
 ]

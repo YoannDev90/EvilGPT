@@ -67,7 +67,6 @@ AICHIXIA_API_KEY=
 AIHUBMIX_API_KEY=
 AQUA_API_KEY=
 BLAZE_API_KEY=
-ELECTRONHUB_API_KEY=
 EVOLVEX_API_KEY=
 HAPUPPY_API_KEY=
 LOGFLARE_API_KEY=
@@ -217,7 +216,7 @@ Below is current snapshot of repository. This section is auto-updated by `./lint
 
 **Shell:** 1 files, 167 lines of code
 
-**JSON:** 25 files, 402 lines of code
+**JSON:** 25 files, 443 lines of code
 
 **Markdown:** 1 files, 267 lines of code
 
@@ -229,7 +228,7 @@ Below is current snapshot of repository. This section is auto-updated by `./lint
 
 **Text:** 7 files, 177 lines of code
 
-**Total:** 81 files, 4717 lines of code, 1937 comments, 1158 blank lines
+**Total:** 81 files, 4758 lines of code, 1937 comments, 1158 blank lines
 <!-- CODE-STATS-END -->
 
 Run `./lint.sh` to format code and regenerate this project tree snapshot. CI runs the same script on every push/PR.

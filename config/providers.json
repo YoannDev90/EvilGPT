@@ -1,47 +1,87 @@
 [
   {
-    "provider": "ELECTRONHUB",
-    "env_key": "ELECTRONHUB_API_KEY",
-    "api_base": "https://api.electronhub.ai/v1"
+    "api_base": "https://www.aichixia.xyz/api/v1",
+    "env_key": "AICHIXIA_API_KEY",
+    "provider": "AICHIXIA"
   },
   {
-    "provider": "MEGANOVA",
-    "env_key": "MEGANOVA_API_KEY",
-    "api_base": "https://api.meganova.ai/v1"
+    "api_base": "https://aihubmix.com/v1",
+    "env_key": "AIHUBMIX_API_KEY",
+    "provider": "AIHUBMIX"
   },
   {
-    "provider": "MISTRAL",
-    "env_key": "MISTRAL_API_KEY",
-    "api_base": "https://api.mistral.ai/v1"
-  },
-  {
-    "provider": "MNN",
-    "env_key": "MNN_API_KEY",
-    "api_base": "https://api2.mnnai.ru/v1"
-  },
-  {
-    "provider": "NAVY",
-    "env_key": "NAVY_API_KEY",
-    "api_base": "https://api.navy/v1"
-  },
-  {
-    "provider": "PAXSENIX",
-    "env_key": "PAXSENIX_API_KEY",
-    "api_base": "https://api.paxsenix.org/v1"
-  },
-  {
-    "provider": "ZANITY",
-    "env_key": "ZANITY_API_KEY",
-    "api_base": "https://api.zanity.xyz/v1/"
-  },
-  {
-    "provider": "EVOLVEX",
-    "env_key": "EVOLVEX_API_KEY",
-    "api_base": "https://api.evolvex.gg/v1"
-  },
-  {
-    "provider": "AQUA",
+    "api_base": "https://api.aquadevs.com/v1",
     "env_key": "AQUA_API_KEY",
-    "api_base": "https://api.aquadevs.com/v1"
+    "provider": "AQUA"
+  },
+  {
+    "api_base": "https://blazeai.boxu.dev/api",
+    "env_key": "BLAZE_API_KEY",
+    "provider": "BLAZE"
+  },
+  {
+    "api_base": "https://api.evolvex.gg/v1",
+    "env_key": "EVOLVEX_API_KEY",
+    "provider": "EVOLVEX"
+  },
+  {
+    "api_base": "https://beta.hapuppy.com/v1",
+    "env_key": "HAPUPPY_API_KEY",
+    "provider": "HAPUPPY"
+  },
+  {
+    "api_base": "https://logfare.ai/v1",
+    "env_key": "LOGFLARE_API_KEY",
+    "provider": "LOGFLARE"
+  },
+  {
+    "api_base": "https://api.meganova.ai/v1",
+    "env_key": "MEGANOVA_API_KEY",
+    "provider": "MEGANOVA"
+  },
+  {
+    "api_base": "https://api.mistral.ai/v1",
+    "env_key": "MISTRAL_API_KEY",
+    "provider": "MISTRAL"
+  },
+  {
+    "api_base": "https://api2.mnnai.ru/v1",
+    "env_key": "MNN_API_KEY",
+    "provider": "MNN"
+  },
+  {
+    "api_base": "https://api.navy/v1",
+    "env_key": "NAVY_API_KEY",
+    "provider": "NAVY"
+  },
+  {
+    "api_base": "https://api.nexusify.co/v1",
+    "env_key": "NEXUSIFY_API_KEY",
+    "provider": "NEXUSIFY"
+  },
+  {
+    "api_base": "https://integrate.api.nvidia.com/v1",
+    "env_key": "NVIDIA_NIM_API_KEY",
+    "provider": "NVIDIA_NIM"
+  },
+  {
+    "api_base": "https://api.paxsenix.org/v1",
+    "env_key": "PAXSENIX_API_KEY",
+    "provider": "PAXSENIX"
+  },
+  {
+    "api_base": "https://api.freetheai.xyz/v1",
+    "env_key": "SECRETS_API_KEY",
+    "provider": "SECRETS"
+  },
+  {
+    "api_base": "https://api.tokenreply.com/v1",
+    "env_key": "TOKEN_REPLY_API_KEY",
+    "provider": "TOKEN_REPLY"
+  },
+  {
+    "api_base": "https://api.zanity.xyz/v1/",
+    "env_key": "ZANITY_API_KEY",
+    "provider": "ZANITY"
   }
 ]
