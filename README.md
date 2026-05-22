@@ -219,7 +219,7 @@ Below is current snapshot of repository. This section is auto-updated by `./lint
 
 **JSON:** 25 files, 402 lines of code
 
-**Markdown:** 1 files, 257 lines of code
+**Markdown:** 1 files, 267 lines of code
 
 **Python:** 45 files, 3674 lines of code
 
@@ -229,7 +229,7 @@ Below is current snapshot of repository. This section is auto-updated by `./lint
 
 **Text:** 7 files, 177 lines of code
 
-**Total:** 81 files, 4707 lines of code, 1937 comments, 1151 blank lines
+**Total:** 81 files, 4717 lines of code, 1937 comments, 1158 blank lines
 <!-- CODE-STATS-END -->
 
 Run `./lint.sh` to format code and regenerate this project tree snapshot. CI runs the same script on every push/PR.
@@ -309,9 +309,26 @@ The bot automatically selects the most appropriate model based on:
 - API keys and tokens should never be committed to version control
 - Local memory state lives under `data/memory_state.json` and syncs into a local SQLite store through CocoIndex
 
+## 😈 Notes about prompts
+
+These prompts are directly inspired by the Evil model, which was available on Pollinations a few years ago.
+
+These prompts are commonly rejected by most models available via official APIs, given the strict guardrails in place. 
+
+It is worth noting, however, that the Mistral and Gemini models are much less likely to reject them. I have not yet tested this with models such as DeepSeek, Kimi, or Minimax, but it goes without saying that the OpenAI and Anthropic models will almost certainly fail.
+
 ## 📝 License
 
 This project is provided as-is. Please respect Discord's Terms of Service and API usage policies.
+
+## ⚠️ Disclaimer
+
+**As-is software**: Models may generate illegal or harmful content. 
+You are solely responsible for outputs and their use. 
+I provide no warranties and accept no liability.
+
+**Your obligations**: Don't use this for illegal purposes. 
+Monitor and filter outputs appropriately. Comply with all laws.
 
 ## 🤝 Contributing
 
