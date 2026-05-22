@@ -21,7 +21,7 @@ A powerful Discord bot integrating AI models to respond intelligently to user me
 
 - **Discord Integration**: Seamless integration with Discord using discord.py
 - **Multi-Model Support**: Support for multiple AI models via LiteLLM
-- **Multiple Providers**: Configure different API providers (e.g., Gratisfy) with ease
+- **Multiple Providers**: Configure different API providers with ease
 - **Async Processing**: Non-blocking message processing using asyncio
 - **Comprehensive Logging**: Detailed logging for debugging and monitoring
 - **Thread-Safe**: Prevents multiple concurrent requests from the same user
@@ -35,7 +35,7 @@ A powerful Discord bot integrating AI models to respond intelligently to user me
 
 - Python 3.8+
 - Discord Bot Token
-- API credentials for your chosen AI provider
+- API credentials for your chosen AI provider / fallback providers
 
 ### Installation
 
@@ -100,11 +100,6 @@ ZANITY_API_KEY=
 python main.py
 ```
 
-The bot will start and log in to Discord. You'll see a confirmation message like:
-```
-Logged in as BotName (ID: 123456789)
-```
-
 ## 📁 Project Structure
 Below is current snapshot of repository. This section is auto-updated by `./lint.sh` on demand.
 
@@ -132,21 +127,8 @@ Below is current snapshot of repository. This section is auto-updated by `./lint
 │   ├── ping.py
 │   ├── set_mood.py
 │   └── _shared.py
-├── config.toml
-├── core
-│   ├── config.py
-│   ├── model.py
-│   ├── models_loader.py
-│   └── tools.py
-├── data
-│   ├── cocoindex_memory.db
-│   │   └── mdb
-│   │       ├── data.mdb
-│   │       └── lock.mdb
-│   ├── command_sync_state.json
+├── config
 │   ├── mcp.json
-│   ├── memory.sqlite
-│   ├── memory_state.json
 │   ├── models.json
 │   ├── moods
 │   │   ├── aggressive.txt
@@ -177,6 +159,12 @@ Below is current snapshot of repository. This section is auto-updated by `./lint
 │       ├── sandbox_run.json
 │       ├── sandbox_shell.json
 │       └── sandbox_stop.json
+├── config.toml
+├── core
+│   ├── config.py
+│   ├── model.py
+│   ├── models_loader.py
+│   └── tools.py
 ├── .github
 │   └── workflows
 │       └── pre-commit.yml
@@ -220,7 +208,7 @@ Below is current snapshot of repository. This section is auto-updated by `./lint
     │   └── table.py
     └── logger.py
 
-17 directories, 92 files
+15 directories, 87 files
 ```
 <!-- TREE-END -->
 
@@ -231,7 +219,7 @@ Below is current snapshot of repository. This section is auto-updated by `./lint
 
 **JSON:** 25 files, 402 lines of code
 
-**Markdown:** 1 files, 279 lines of code
+**Markdown:** 1 files, 257 lines of code
 
 **Python:** 45 files, 3674 lines of code
 
@@ -241,7 +229,7 @@ Below is current snapshot of repository. This section is auto-updated by `./lint
 
 **Text:** 7 files, 177 lines of code
 
-**Total:** 81 files, 4729 lines of code, 1937 comments, 1154 blank lines
+**Total:** 81 files, 4707 lines of code, 1937 comments, 1151 blank lines
 <!-- CODE-STATS-END -->
 
 Run `./lint.sh` to format code and regenerate this project tree snapshot. CI runs the same script on every push/PR.
@@ -275,7 +263,7 @@ The bot automatically selects the most appropriate model based on:
 ```markdown
 - `discord.py==2.7.1` - A Python wrapper for the Discord API (latest: 2.7.1)
 - `python-dotenv==1.2.2` - Read key-value pairs from a .env file and set them as environment variables (latest: 1.2.2)
-- `litellm==1.84.0` - Library to easily interface with LLM API providers (latest: 1.85.0)
+- `litellm==1.84.0` - Library to easily interface with LLM API providers (latest: 1.85.1)
 - `requests==2.34.2` - Python HTTP for Humans. (latest: 2.34.2)
 - `colorama==0.4.6` - Cross-platform colored terminal text. (latest: 0.4.6)
 - `cairosvg==2.9.0` - A Simple SVG Converter based on Cairo (latest: 2.9.0)
@@ -328,7 +316,3 @@ This project is provided as-is. Please respect Discord's Terms of Service and AP
 ## 🤝 Contributing
 
 Feel free to submit issues and enhancement requests!
-
----
-
-**Made with ❤️ for Discord automation**
