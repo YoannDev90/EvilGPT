@@ -216,11 +216,11 @@ Below is current snapshot of repository. This section is auto-updated by `./lint
 
 **Shell:** 1 files, 167 lines of code
 
-**JSON:** 25 files, 443 lines of code
+**JSON:** 25 files, 455 lines of code
 
-**Markdown:** 1 files, 267 lines of code
+**Markdown:** 1 files, 266 lines of code
 
-**Python:** 45 files, 3674 lines of code
+**Python:** 45 files, 3677 lines of code
 
 **SVG:** 1 files, 17 lines of code
 
@@ -228,7 +228,7 @@ Below is current snapshot of repository. This section is auto-updated by `./lint
 
 **Text:** 7 files, 177 lines of code
 
-**Total:** 81 files, 4758 lines of code, 1937 comments, 1158 blank lines
+**Total:** 81 files, 4772 lines of code, 1939 comments, 1161 blank lines
 <!-- CODE-STATS-END -->
 
 Run `./lint.sh` to format code and regenerate this project tree snapshot. CI runs the same script on every push/PR.
@@ -262,7 +262,7 @@ The bot automatically selects the most appropriate model based on:
 ```markdown
 - `discord.py==2.7.1` - A Python wrapper for the Discord API (latest: 2.7.1)
 - `python-dotenv==1.2.2` - Read key-value pairs from a .env file and set them as environment variables (latest: 1.2.2)
-- `litellm==1.84.0` - Library to easily interface with LLM API providers (latest: 1.85.1)
+- `litellm==1.84.0` - Library to easily interface with LLM API providers (latest: 1.86.0)
 - `requests==2.34.2` - Python HTTP for Humans. (latest: 2.34.2)
 - `colorama==0.4.6` - Cross-platform colored terminal text. (latest: 0.4.6)
 - `cairosvg==2.9.0` - A Simple SVG Converter based on Cairo (latest: 2.9.0)

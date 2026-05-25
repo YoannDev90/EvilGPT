@@ -102,22 +102,25 @@ def get_model_catalog() -> List[Dict[str, str]]:
     catalog = []
     for m_id in models_data:
         parts = m_id.split("/", 1)
-        if len(parts) != 2:
-            continue
+        if len(parts) == 2:
+            prov_name = parts[0].lower()
+            model_name = parts[1]
 
-        prov_name = parts[0].lower()
-        model_name = parts[1]
-        provider = providers.get(prov_name)
+            # Strip redundant provider name if present at start of model_name
+            if model_name.lower().startswith(f"{prov_name}/"):
+                model_name = model_name[len(prov_name) + 1 :]
 
-        catalog.append(
-            {
-                "provider": prov_name,
-                "model": model_name,
-                "litellm_id": f"openai/{model_name}",
-                "api_base": provider.api_base if provider else "",
-                "api_key_set": bool(provider and provider.api_key),
-            }
-        )
+            provider = providers.get(prov_name)
+
+            catalog.append(
+                {
+                    "provider": prov_name,
+                    "model": model_name,
+                    "litellm_id": f"openai/{model_name}",
+                    "api_base": provider.api_base if provider else "",
+                    "api_key_set": bool(provider and provider.api_key),
+                }
+            )
 
     return catalog
 
@@ -169,6 +172,11 @@ def get_models() -> List[Model]:
         if len(parts) == 2:
             prov_name = parts[0].lower()
             model_name = parts[1]
+
+            # Strip redundant provider name if present at start of model_name
+            if model_name.lower().startswith(f"{prov_name}/"):
+                model_name = model_name[len(prov_name) + 1 :]
+
             if prov_name in providers and providers[prov_name].api_key:
                 models.append(Model(model_name, providers[prov_name]))
 

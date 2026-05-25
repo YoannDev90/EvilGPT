@@ -325,5 +325,5 @@ class MCPManager:
 
 
 # Singleton instance
-MCP_CONFIG_PATH = os.path.join(cfg.BASE_DIR, "data", "mcp.json")
+MCP_CONFIG_PATH = os.path.join(cfg.BASE_DIR, "config", "mcp.json")
 mcp_manager = MCPManager(MCP_CONFIG_PATH)

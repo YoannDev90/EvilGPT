@@ -300,10 +300,10 @@ class Config:
 
     # Path to system prompt and data
     BASE_DIR: str = BASE_DIR
-    SYSTEM_PROMPT_PATH: str = os.path.join(BASE_DIR, "data", "system_prompt.txt")
-    PROVIDERS_PATH: str = os.path.join(BASE_DIR, "data", "providers.json")
-    MODELS_PATH: str = os.path.join(BASE_DIR, "data", "models.json")
-    MOODS_DIR: str = os.path.join(BASE_DIR, "data", "moods")
+    SYSTEM_PROMPT_PATH: str = os.path.join(BASE_DIR, "config", "system_prompt.txt")
+    PROVIDERS_PATH: str = os.path.join(BASE_DIR, "config", "providers.json")
+    MODELS_PATH: str = os.path.join(BASE_DIR, "config", "models.json")
+    MOODS_DIR: str = os.path.join(BASE_DIR, "config", "moods")
     CONFIG_PATH: str = DEFAULT_CONFIG_PATH
 
 

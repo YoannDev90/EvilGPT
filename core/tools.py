@@ -10,7 +10,7 @@ from utils.logger import get_logger
 logger = get_logger()
 
 # Initialize tools loader
-TOOLS_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data", "tools")
+TOOLS_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "config", "tools")
 tools_loader = ToolsLoader(TOOLS_DIR)
 
 # Log summary of loaded native tools
