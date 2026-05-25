@@ -26,7 +26,7 @@ try:
             except Exception:
                 native_names.append(str(t))
 
-    logger.info("Native tools: %d found", len(native_names))
+    logger.debug("Native tools: %d found", len(native_names))
     logger.debug("Native tool names: %s", native_names)
 except Exception:
     logger.debug("Failed to summarize native tools")

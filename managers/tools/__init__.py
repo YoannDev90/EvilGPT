@@ -92,7 +92,7 @@ class ToolsLoader:
                     handler = getattr(module, tool_name)
                     self.tools_handlers[tool_name] = handler
                     loaded.append(tool_name)
-                    logger.info("Loaded tool: %s", tool_name)
+                    logger.debug("Loaded tool: %s", tool_name)
                 except ImportError as e:
                     failed.append(tool_name)
                     logger.error(

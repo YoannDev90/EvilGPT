@@ -96,15 +96,12 @@ class EvilBot(discord.Client):
         logger.info("Slash command sync completed in %.2fs", sync_elapsed)
 
     async def setup_hook(self):
-        start = time.perf_counter()
         # Bootstrap memory and MCP concurrently to speed startup
         try:
             await asyncio.gather(self.memory.bootstrap(), mcp_manager.initialize())
         except Exception as e:
             logger.error("Error during bootstrap/init: %s", e, exc_info=True)
             # continue to attempt loading commands even if one fails
-        elapsed = time.perf_counter() - start
-        logger.info("Bootstrap complete in %.2fs", elapsed)
 
         # load commands from cmds/ directory (loggers inside loader will report details)
         cmds_path = Path(__file__).parent / "cmds"

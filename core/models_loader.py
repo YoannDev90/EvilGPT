@@ -180,5 +180,5 @@ def get_models() -> List[Model]:
             if prov_name in providers and providers[prov_name].api_key:
                 models.append(Model(model_name, providers[prov_name]))
 
-    logger.info("Loaded %d models with valid API keys", len(models))
+    logger.debug("Loaded %d models with valid API keys", len(models))
     return models

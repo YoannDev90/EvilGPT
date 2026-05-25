@@ -154,7 +154,7 @@ class MCPManager:
             Server configuration dictionary.
         """
         try:
-            logger.info(f"Initializing MCP server: {name}")
+            logger.debug(f"Initializing MCP server: {name}")
 
             # persist raw server config for later debug
             self.server_raw_configs[name] = srv_config
@@ -223,7 +223,7 @@ class MCPManager:
                             },
                         }
                     )
-                logger.info(f"Loaded {len(tools)} tools from {name}")
+                logger.debug(f"Loaded {len(tools)} tools from {name}")
                 try:
                     fnames = [f"mcp_{name}_{t.name}" for t in tools]
                     logger.debug(f"Exposed functions from {name}: {fnames}")

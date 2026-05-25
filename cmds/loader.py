@@ -119,8 +119,6 @@ async def load_commands(bot: Any, tree: app_commands.CommandTree, cmds_path: Pat
 
     total = time.perf_counter() - start
     logger.info("Loaded %d command modules (%d failed) in %.2fs", loaded, failed, total)
-    if loaded_modules:
-        logger.info("Command modules loaded: %s", ", ".join(loaded_modules))
     if failed_modules:
         logger.warning("Command modules failed: %s", ", ".join(failed_modules))
     for name, t in module_times:
