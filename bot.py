@@ -23,6 +23,7 @@ logger = get_logger()
 intents = discord.Intents.default()
 intents.message_content = True
 intents.members = True
+intents.presences = True
 
 
 class EvilBot(discord.Client):

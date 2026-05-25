@@ -32,16 +32,14 @@ async def get_server_context(guild: discord.Guild):
         except Exception:
             pass
 
+    online_members = [
+        m.display_name for m in guild.members if m.status != discord.Status.offline
+    ]
+
     context = {
         "server_name": guild.name,
         "member_count": guild.member_count,
-        "members": [
-            m.display_name for m in guild.members[:30]
-        ],  # Limité pour éviter de saturer le prompt
-        "emojis": [str(e) for e in guild.emojis[:20]],  # Limit to avoid bloat
-        "roles": [
-            r.name for r in guild.roles if not r.managed and r.name != "@everyone"
-        ][:15],
+        "online_members": online_members[:30],
     }
     return context
 
@@ -62,16 +60,11 @@ def format_context_for_prompt(context: dict):
     lines = [
         f"Information about the current Discord server '{context['server_name']}':"
     ]
-    if context.get("members"):
+    if context.get("online_members"):
         lines.append(
-            f"- Members ({context['member_count']}): {', '.join(context['members'])}"
+            f"- Online members ({len(context['online_members'])}): {', '.join(context['online_members'])}"
         )
     else:
         lines.append(f"- Total member count: {context['member_count']}")
-
-    if context["emojis"]:
-        lines.append(f"- Some available emojis: {' '.join(context['emojis'])}")
-    if context["roles"]:
-        lines.append(f"- Main roles: {', '.join(context['roles'])}")
 
     return "\n".join(lines)

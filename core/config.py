@@ -8,7 +8,7 @@ try:
     import tomllib as _toml
 except Exception:
     try:
-        import toml as _toml
+        import toml as _toml  # type: ignore
     except Exception:
         _toml = None
 
