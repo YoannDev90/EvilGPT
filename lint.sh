@@ -70,63 +70,7 @@ if new_content != content:
 EOF
 
 # ---------------------------------------------------------------------------
-# 3. Code stats (cloc) → stdout + README (between <!-- CODE-STATS-START --> / <!-- CODE-STATS-END -->)
-# ---------------------------------------------------------------------------
-python3 << 'EOF'
-import subprocess, json, re, sys
-from pathlib import Path
-
-README = Path("README.md")
-
-if subprocess.run(["which", "cloc"], capture_output=True).returncode != 0:
-    print("cloc not installed. Install with: brew install cloc / apt-get install cloc")
-    sys.exit(0)
-
-result = subprocess.run(
-    ["cloc", ".", "--exclude-dir=.venv,.git,__pycache__,.github", "--json"],
-    capture_output=True, text=True
-)
-try:
-    data = json.loads(result.stdout)
-except json.JSONDecodeError:
-    print("Could not parse cloc output.")
-    sys.exit(0)
-
-DISPLAY = {"Bourne Shell": "Shell", "Python": "Python", "Markdown": "Markdown",
-           "JSON": "JSON", "TOML": "TOML", "Text": "Text", "SVG": "SVG"}
-
-lines = ["## Code Statistics", ""]
-for lang in sorted(data):
-    if lang in ("header", "SUM"):
-        continue
-    label = DISPLAY.get(lang, lang)
-    d = data[lang]
-    lines.append(f"**{label}:** {d['nFiles']} files, {d['code']} lines of code")
-    lines.append("")
-
-total = data.get("SUM", {})
-summary = (f"**Total:** {total.get('nFiles',0)} files, {total.get('code',0)} lines of code, "
-           f"{total.get('comment',0)} comments, {total.get('blank',0)} blank lines")
-lines.append(summary)
-print("Code Statistics:")
-print(summary)
-
-if not README.exists():
-    sys.exit(0)
-
-block = "\n" + "\n".join(lines) + "\n"
-content = README.read_text()
-new_content = re.sub(
-    r"(<!-- CODE-STATS-START -->).*?(<!-- CODE-STATS-END -->)",
-    lambda m: m.group(1) + block + m.group(2),
-    content, flags=re.DOTALL
-)
-if new_content != content:
-    README.write_text(new_content)
-EOF
-
-# ---------------------------------------------------------------------------
-# 4. PyPI dependencies → README (between <!--DEPS-START--> / <!--DEPS-END-->)
+# 3. PyPI dependencies → README (between <!--DEPS-START--> / <!--DEPS-END-->)
 # ---------------------------------------------------------------------------
 python3 << 'EOF'
 import re, json, sys
@@ -177,7 +121,7 @@ if new_content != content:
 EOF
 
 # ---------------------------------------------------------------------------
-# 5. Env var names → README (between <!--ENV-START--> / <!--ENV-END-->)
+# 4. Env var names → README (between <!--ENV-START--> / <!--ENV-END-->)
 # ---------------------------------------------------------------------------
 python3 << 'EOF'
 import re, sys

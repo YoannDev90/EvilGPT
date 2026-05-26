@@ -1,11 +1,34 @@
+<div align="center">
+
 # EvilGPT 🤖
 
-<!-- Badges -->
-|||
-|---|---|
-| <img src="assets/images/evilgpt.png" alt="EvilGPT Icon" width="96" style="border-radius:8px; display:block; margin:0 auto;" /> |[![Python](https://img.shields.io/badge/python-3.12%2B-blue?style=for-the-badge)](https://www.python.org/) [![License](https://img.shields.io/badge/license-MIT-green?style=for-the-badge)](LICENSE) |
+### *The sophisticated, AI-powered Discord agent with an attitude.*
 
-A powerful Discord bot integrating AI models to respond intelligently to user messages in real-time.
+<img src="assets/images/evilgpt.png" alt="EvilGPT Icon" width="160" style="border-radius:24px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); margin: 20px 0;" />
+
+[![Python](https://img.shields.io/badge/Python-3.12%2B-blue?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
+[![Discord](https://img.shields.io/badge/Discord.py-2.7.1-5865F2?style=for-the-badge&logo=discord&logoColor=white)](https://discordpy.readthedocs.io/)
+[![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)](LICENSE)
+[![Uv](https://img.shields.io/badge/Package--Manager-uv-F43F5E?style=for-the-badge)](https://github.com/astral-sh/uv)
+[![Code Style](https://img.shields.io/badge/Code%20Style-Ruff-000000?style=for-the-badge&logo=ruff&logoColor=white)](https://github.com/astral-sh/ruff)
+[![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-004d40?style=for-the-badge)](https://github.com/YoannDev90/EvilGPT/graphs/commit-activity)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-673ab7?style=for-the-badge)](https://github.com/YoannDev90/EvilGPT/pulls)
+[![Open Issues](https://img.shields.io/github/issues-raw/YoannDev90/EvilGPT?style=for-the-badge&logo=github&color=CE93D8)](https://github.com/YoannDev90/EvilGPT/issues)
+[![Stars](https://img.shields.io/github/stars/YoannDev90/EvilGPT?style=for-the-badge&logo=github&color=FFF176&logoColor=black)](https://github.com/YoannDev90/EvilGPT/stargazers)
+[![Repo Size](https://img.shields.io/github/repo-size/YoannDev90/EvilGPT?style=for-the-badge&logo=git-lfs&color=4DB6AC)](https://github.com/YoannDev90/EvilGPT)
+[![Last Commit](https://img.shields.io/github/last-commit/YoannDev90/EvilGPT?style=for-the-badge&logo=git&color=FF8A65)](https://github.com/YoannDev90/EvilGPT/commits/master)
+[![CI](https://img.shields.io/github/actions/workflow/status/YoannDev90/EvilGPT/pre-commit.yml?style=for-the-badge&logo=github-actions&label=CI&color=4CAF50)](https://github.com/YoannDev90/EvilGPT/actions)
+[![OS](https://img.shields.io/badge/OS-Linux-E95420?style=for-the-badge&logo=linux&logoColor=white)](https://www.linux.org/)
+[![Made with LiteLLM](https://img.shields.io/badge/Powered%20by-LiteLLM-black?style=for-the-badge)](https://github.com/BerriAI/litellm)
+[![Profile](https://img.shields.io/badge/Follow-YoannDev90-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/YoannDev90)
+
+---
+
+**EvilGPT** is a powerful Discord bot integrating state-of-the-art AI models to provide intelligent, contextual, and often sarcastic responses.
+
+Built for performance and extensibility.
+
+</div>
 
 ## Table of contents
 
@@ -39,21 +62,20 @@ A powerful Discord bot integrating AI models to respond intelligently to user me
 
 ### Installation
 
-1. **Clone the repository**
+1. **Clone and Setup**
+
    ```bash
    git clone https://github.com/YoannDev90/EvilGPT.git
    cd EvilGPT
-   ```
-
-2. **Create a virtual environment** (recommended)
-   ```bash
    python -m venv .venv
-   source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+   source .venv/bin/activate
    ```
 
-3. **Install dependencies**
+2. **Install Dependencies** (Using `uv` is recommended for speed)
+
    ```bash
-   pip install -r requirements.txt
+   pip install uv
+   uv pip install -r requirements.txt
    ```
 
 ### Configuration
@@ -87,10 +109,9 @@ DEPLOY_SERVICE_NAME=
 ```
 <!--ENV-END-->
 
-
 2. **Configure providers** (optional)
-   - Edit `providers.json` to add or modify API providers
-   - Edit `models.json` to configure available AI models
+   - Edit [`config/providers.json`](config/providers.json) to add or modify API providers
+   - Edit [`config/models.json`](config/models.json) to configure available AI models
 
 3. **Set up your Discord bot**
    - Create a bot on [Discord Developer Portal](https://discord.com/developers/applications)
@@ -103,7 +124,30 @@ DEPLOY_SERVICE_NAME=
 python main.py
 ```
 
+## � Deployment
+
+EvilGPT is designed for simple and reliable deployment on Linux servers.
+
+### 1. Automated SSH Deployment
+
+A powerful [`deploy.sh`](deploy.sh) script is provided to automate the entire process (transfer, dependencies, service restart).
+
+1. **Prerequisites**: Install `sshpass` locally: `sudo apt install sshpass`.
+2. **Setup**: Configure your server details in the `.env` file (see [Configuration](#configuration)).
+3. **Execute**:
+
+   ```bash
+   chmod +x deploy.sh
+   ./deploy.sh
+   ```
+
+### 2. Systemd Service
+
+The bot includes a pre-configured [`evilgpt.service`](evilgpt.service) file.
+The deployment script automatically installs this for you in `/etc/systemd/system/`, ensuring the bot starts on boot and restarts automatically if it crashes.
+
 ## 📁 Project Structure
+
 Below is current snapshot of repository. This section is auto-updated by `./lint.sh` on demand.
 
 <!-- TREE-START -->
@@ -217,37 +261,20 @@ Below is current snapshot of repository. This section is auto-updated by `./lint
 ```
 <!-- TREE-END -->
 
-<!-- CODE-STATS-START -->
-## Code Statistics
-
-**Shell:** 2 files, 242 lines of code
-
-**JSON:** 25 files, 494 lines of code
-
-**Markdown:** 1 files, 268 lines of code
-
-**Python:** 45 files, 3666 lines of code
-
-**SVG:** 1 files, 17 lines of code
-
-**TOML:** 1 files, 13 lines of code
-
-**Text:** 7 files, 177 lines of code
-
-**Total:** 82 files, 4877 lines of code, 1950 comments, 1178 blank lines
-<!-- CODE-STATS-END -->
-
 Run `./lint.sh` to format code and regenerate this project tree snapshot. CI runs the same script on every push/PR.
 
 ## 🔧 Technical Details
 
 ### AI Model Selection
+
 The bot automatically selects the most appropriate model based on:
+
 - Required input/output formats
 - API parameters support
 - Model availability
 
 ### Message Processing
+
 1. Message received from Discord user
 2. Bot checks if user is already processing a request (prevents spam)
 3. Message payload is constructed
@@ -255,6 +282,7 @@ The bot automatically selects the most appropriate model based on:
 5. Response is sent back to Discord
 
 ### Supported Features
+
 - Text-to-text AI generation
 - Configurable API endpoints
 - Fallback model selection
@@ -288,7 +316,7 @@ The bot automatically selects the most appropriate model based on:
 
 ### Linting & CI
 
-- Project provides `lint.sh` at repo root. 
+- Project provides `lint.sh` at repo root.
 - Run locally before commit:
 
 ```bash
@@ -298,12 +326,14 @@ The bot automatically selects the most appropriate model based on:
 - CI: GitHub Actions workflow runs `lint.sh` on `push` and `pull_request` to `master` and feature branches. Fix issues locally and push again.
 
 ### Adding New Providers
-1. Add provider configuration to `providers.json`
+
+1. Add provider configuration to `config/providers.json`
 2. Set up environment variable for API key
 3. Update `config.py` if needed
 
 ### Adding New Models
-1. Configure the model in `models.json`
+
+1. Configure the model in `config/models.json`
 2. Ensure the provider has the necessary API credentials
 
 ## ⚠️ Important Notes
@@ -318,7 +348,7 @@ The bot automatically selects the most appropriate model based on:
 
 These prompts are directly inspired by the Evil model, which was available on Pollinations a few years ago.
 
-These prompts are commonly rejected by most models available via official APIs, given the strict guardrails in place. 
+These prompts are commonly rejected by most models available via official APIs, given the strict guardrails in place.
 
 It is worth noting, however, that the Mistral and Gemini models are much less likely to reject them. I have not yet tested this with models such as DeepSeek, Kimi, or Minimax, but it goes without saying that the OpenAI and Anthropic models will almost certainly fail.
 
@@ -328,11 +358,11 @@ This project is provided as-is. Please respect Discord's Terms of Service and AP
 
 ## ⚠️ Disclaimer
 
-**As-is software**: Models may generate illegal or harmful content. 
-You are solely responsible for outputs and their use. 
+**As-is software**: Models may generate illegal or harmful content.
+You are solely responsible for outputs and their use.
 I provide no warranties and accept no liability.
 
-**Your obligations**: Don't use this for illegal purposes. 
+**Your obligations**: Don't use this for illegal purposes.
 Monitor and filter outputs appropriately. Comply with all laws.
 
 ## 🤝 Contributing
