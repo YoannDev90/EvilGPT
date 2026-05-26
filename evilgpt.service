@@ -1,0 +1,15 @@
+[Unit]
+Description=EvilGPT Discord Bot
+After=network.target
+
+[Service]
+Type=simple
+User=user
+Group=group
+WorkingDirectory=/.evil
+ExecStart=/.evil/.venv/bin/python main.py
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
