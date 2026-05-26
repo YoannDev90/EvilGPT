@@ -6,22 +6,22 @@ set -euo pipefail
 # ---------------------------------------------------------------------------
 echo "Running formatters if available..."
 if command -v ruff >/dev/null 2>&1; then
-    echo "  Running ruff format..."
+    echo "1️⃣  Running ruff format..."
     ruff format . || true
 else
-    echo "  Skipping ruff (not installed)"
+    echo " ⛔ Skipping ruff (not installed)"
 fi
 if command -v isort >/dev/null 2>&1; then
-    echo "  Running isort..."
+    echo "2️⃣  Running isort..."
     isort **/*.py || true
 else
-    echo "  Skipping isort (not installed)"
+    echo " ⛔ Skipping isort (not installed)"
 fi
 if command -v removestar >/dev/null 2>&1; then
-    echo "  Running removestar..."
+    echo "3️⃣  Running removestar..."
     removestar . || true
 else
-    echo "  Skipping removestar (not installed)"
+    echo " ⛔ Skipping removestar (not installed)"
 fi
 
 # ---------------------------------------------------------------------------
@@ -51,9 +51,6 @@ tree_output = subprocess.run(
     ["tree", "-a", "-I", pattern],
     capture_output=True, text=True
 ).stdout
-
-print("Project tree:")
-print(tree_output)
 
 if not README.exists():
     sys.exit(0)
@@ -92,7 +89,7 @@ def fetch_pypi(pkg):
     except (URLError, KeyError):
         return "", ""
 
-print("Updating dependencies list (fetching from PyPI)...")
+print("♻️ Updating dependencies list (fetching from PyPI)...")
 lines = ["```markdown"]
 for raw in REQUIREMENTS.read_text().splitlines():
     raw = raw.strip()
@@ -133,7 +130,7 @@ ENV_FILE = Path(".env")
 if not README.exists() or not ENV_FILE.exists():
     sys.exit(0)
 
-print("Copying environment variable names to README...")
+print("✂️ Copying environment variable names to README...")
 var_names = []
 for line in ENV_FILE.read_text().splitlines():
     line = line.strip()
@@ -159,7 +156,7 @@ EOF
 # 5. Command documentation → README (between <!-- COMMANDS-START --> / <!-- COMMANDS-END -->)
 # ---------------------------------------------------------------------------
 if [ -f scripts/generate_docs.py ]; then
-    echo "Updating command documentation..."
+    echo "🔄 Updating command documentation..."
     python3 scripts/generate_docs.py
 fi
 
