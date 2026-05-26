@@ -6,6 +6,8 @@
 
 <img src="assets/images/evilgpt.png" alt="EvilGPT Icon" width="160" style="border-radius:24px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); margin: 20px 0;" />
 
+---
+
 [![Python](https://img.shields.io/badge/Python-3.12%2B-blue?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
 [![Discord](https://img.shields.io/badge/Discord.py-2.7.1-5865F2?style=for-the-badge&logo=discord&logoColor=white)](https://discordpy.readthedocs.io/)
 [![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)](LICENSE)
@@ -26,7 +28,6 @@
 
 **EvilGPT** is a powerful Discord bot integrating state-of-the-art AI models to provide intelligent, contextual, and often sarcastic responses.
 
-Built for performance and extensibility.
 
 </div>
 
