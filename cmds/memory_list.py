@@ -14,7 +14,7 @@ logger = get_logger()
 
 async def setup(tree: app_commands.CommandTree, bot):
     @tree.command(
-        name="memory_list", description="List the most recent turns in memory"
+        name="memory-list", description="List the most recent turns in memory"
     )
     @app_commands.describe(
         limit="Number of turns to display", user="Target user (optional)"

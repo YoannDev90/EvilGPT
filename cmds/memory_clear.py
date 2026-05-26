@@ -14,7 +14,7 @@ logger = get_logger()
 
 async def setup(tree: app_commands.CommandTree, bot):
     @tree.command(
-        name="memory_clear", description="Clear the conversation history for a user"
+        name="memory-clear", description="Clear the conversation history for a user"
     )
     @app_commands.describe(user="Target user (optional)")
     async def memory_clear(

@@ -34,12 +34,35 @@
 ## Table of contents
 
 - [Features](#-features)
+- [Hosted Version](#🌐-hosted-version)
+- [Commands](#📜-commands)
 - [Quick Start](#-quick-start)
 - [Project Structure](#-project-structure)
 - [Dependencies](#-dependencies)
 - [Development](#-development)
 - [Adding Providers / Models](#adding-new-providers)
 - [License](#-license)
+
+## 🌐 Hosted Version
+
+You can invite the official hosted version of **EvilGPT** to your server:
+
+[**Invite EvilGPT**](https://discord.com/oauth2/authorize?client_id=1501258658179186748)
+
+## 📜 Commands
+
+<!-- COMMANDS-START -->
+| Command | Description |
+| :--- | :--- |
+| `/health` | Show runtime health for bot subsystems |
+| `/list-tools` | List all tools available to the model |
+| `/memory-clear` | Clear the conversation history for a user |
+| `/memory-delete` | Delete a specific turn from conversation history |
+| `/memory-list` | List the most recent turns in memory |
+| `/ping` | Check bot latency and responsiveness |
+| `/set-mood` | Change the mood/personality of the EvilGPT |
+
+<!-- COMMANDS-END -->
 
 ## ✨ Features
 
@@ -173,6 +196,7 @@ Below is current snapshot of repository. This section is auto-updated by `./lint
 │   ├── memory_delete.py
 │   ├── memory_list.py
 │   ├── ping.py
+│   ├── _registry.py
 │   ├── set_mood.py
 │   └── _shared.py
 ├── config
@@ -250,6 +274,8 @@ Below is current snapshot of repository. This section is auto-updated by `./lint
 │       └── sandbox_stop.py
 ├── README.md
 ├── requirements.txt
+├── scripts
+│   └── generate_docs.py
 └── utils
     ├── handlers
     │   ├── codeblock.py
@@ -258,7 +284,7 @@ Below is current snapshot of repository. This section is auto-updated by `./lint
     │   └── table.py
     └── logger.py
 
-15 directories, 89 files
+16 directories, 91 files
 ```
 <!-- TREE-END -->
 

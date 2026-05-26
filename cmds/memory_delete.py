@@ -12,7 +12,7 @@ logger = get_logger()
 
 async def setup(tree: app_commands.CommandTree, bot):
     @tree.command(
-        name="memory_delete",
+        name="memory-delete",
         description="Delete a specific turn from conversation history",
     )
     @app_commands.describe(turn_id="Turn ID to delete")

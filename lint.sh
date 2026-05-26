@@ -155,4 +155,12 @@ if new_content != content:
     print("  Environment variables updated ✓")
 EOF
 
+# ---------------------------------------------------------------------------
+# 5. Command documentation → README (between <!-- COMMANDS-START --> / <!-- COMMANDS-END -->)
+# ---------------------------------------------------------------------------
+if [ -f scripts/generate_docs.py ]; then
+    echo "Updating command documentation..."
+    python3 scripts/generate_docs.py
+fi
+
 echo "✅ All updates completed!"

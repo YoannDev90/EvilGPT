@@ -12,7 +12,7 @@ logger = get_logger()
 
 async def setup(tree: app_commands.CommandTree, bot):
     @tree.command(
-        name="set_mood", description="Change the mood/personality of the EvilGPT"
+        name="set-mood", description="Change the mood/personality of the EvilGPT"
     )
     @app_commands.describe(mood="Desired mood")
     @app_commands.choices(
