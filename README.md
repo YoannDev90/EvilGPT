@@ -124,7 +124,7 @@ DEPLOY_SERVICE_NAME=
 python main.py
 ```
 
-## � Deployment
+## 🖥️ Deployment
 
 EvilGPT is designed for simple and reliable deployment on Linux servers.
 
