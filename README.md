@@ -28,7 +28,6 @@
 
 **EvilGPT** is a powerful Discord bot integrating state-of-the-art AI models to provide intelligent, contextual, and often sarcastic responses.
 
-
 </div>
 
 ## Table of contents
@@ -133,11 +132,11 @@ DEPLOY_SERVICE_NAME=
 ```
 <!--ENV-END-->
 
-2. **Configure providers** (optional)
+1. **Configure providers** (optional)
    - Edit [`config/providers.json`](config/providers.json) to add or modify API providers
    - Edit [`config/models.json`](config/models.json) to configure available AI models
 
-3. **Set up your Discord bot**
+2. **Set up your Discord bot**
    - Create a bot on [Discord Developer Portal](https://discord.com/developers/applications)
    - Enable the "Message Content Intent" for the bot to read messages
    - Copy the bot token to your `.env` file
@@ -391,6 +390,8 @@ I provide no warranties and accept no liability.
 
 **Your obligations**: Don't use this for illegal purposes.
 Monitor and filter outputs appropriately. Comply with all laws.
+
+**FOR EDUCATIONAL PURPOSES ONLY !**
 
 ## 🤝 Contributing
 
