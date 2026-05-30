@@ -1,6 +1,6 @@
 <div align="center">
 
-# EvilGPT 🤖
+# EvilGPT
 
 ### *The sophisticated, AI-powered Discord agent with an attitude.*
 
@@ -42,13 +42,13 @@
 - [Adding Providers / Models](#adding-new-providers)
 - [License](#-license)
 
-## 🌐 Hosted Version
+## Hosted Version
 
 You can invite the official hosted version of **EvilGPT** to your server:
 
 [**Invite EvilGPT**](https://discord.com/oauth2/authorize?client_id=1501258658179186748)
 
-## 📜 Commands
+## Commands
 
 <!-- COMMANDS-START -->
 | Command | Description |
@@ -63,7 +63,7 @@ You can invite the official hosted version of **EvilGPT** to your server:
 
 <!-- COMMANDS-END -->
 
-## ✨ Features
+## Features
 
 - **Discord Integration**: Seamless integration with Discord using discord.py
 - **Multi-Model Support**: Support for multiple AI models via LiteLLM
@@ -75,7 +75,7 @@ You can invite the official hosted version of **EvilGPT** to your server:
 - **Persistent Memory**: Conversation history stays in a local CocoIndex-backed SQLite store
 - **Transparent Deletion**: Use `/memory list`, `/memory delete`, and `/memory clear` to inspect or purge stored turns
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Prerequisites
 
@@ -147,7 +147,7 @@ DEPLOY_SERVICE_NAME=
 python main.py
 ```
 
-## 🖥️ Deployment
+## Deployment
 
 EvilGPT is designed for simple and reliable deployment on Linux servers.
 
@@ -169,7 +169,7 @@ A powerful [`deploy.sh`](deploy.sh) script is provided to automate the entire pr
 The bot includes a pre-configured [`evilgpt.service`](evilgpt.service) file.
 The deployment script automatically installs this for you in `/etc/systemd/system/`, ensuring the bot starts on boot and restarts automatically if it crashes.
 
-## 📁 Project Structure
+## Project Structure
 
 Below is current snapshot of repository. This section is auto-updated by `./lint.sh` on demand.
 
@@ -289,7 +289,7 @@ Below is current snapshot of repository. This section is auto-updated by `./lint
 
 Run `./lint.sh` to format code and regenerate this project tree snapshot. CI runs the same script on every push/PR.
 
-## 🔧 Technical Details
+## Technical Details
 
 ### AI Model Selection
 
@@ -316,7 +316,7 @@ The bot automatically selects the most appropriate model based on:
 - Performance timing
 - Persistent conversation memory with per-turn deletion
 
-## 📦 Dependencies
+## Dependencies
 
 <!--DEPS-START-->
 ```markdown
@@ -338,7 +338,7 @@ The bot automatically selects the most appropriate model based on:
 ```
 <!--DEPS-END-->
 
-## 🛠️ Development
+## Development
 
 ### Linting & CI
 
@@ -362,7 +362,7 @@ The bot automatically selects the most appropriate model based on:
 1. Configure the model in `config/models.json`
 2. Ensure the provider has the necessary API credentials
 
-## ⚠️ Important Notes
+## Important Notes
 
 - The bot ignores messages from other bots and direct messages
 - Users cannot send multiple concurrent requests (prevents API overload)
@@ -370,7 +370,7 @@ The bot automatically selects the most appropriate model based on:
 - API keys and tokens should never be committed to version control
 - Local memory state lives under `data/memory_state.json` and syncs into a local SQLite store through CocoIndex
 
-## 😈 Notes about prompts
+## Notes about prompts
 
 These prompts are directly inspired by the Evil model, which was available on Pollinations a few years ago.
 
@@ -378,11 +378,11 @@ These prompts are commonly rejected by most models available via official APIs, 
 
 It is worth noting, however, that the Mistral and Gemini models are much less likely to reject them. I have not yet tested this with models such as DeepSeek, Kimi, or Minimax, but it goes without saying that the OpenAI and Anthropic models will almost certainly fail.
 
-## 📝 License
+## License
 
 This project is provided as-is. Please respect Discord's Terms of Service and API usage policies.
 
-## ⚠️ Disclaimer
+## Disclaimer
 
 **As-is software**: Models may generate illegal or harmful content.
 You are solely responsible for outputs and their use.
@@ -393,6 +393,6 @@ Monitor and filter outputs appropriately. Comply with all laws.
 
 **FOR EDUCATIONAL PURPOSES ONLY !**
 
-## 🤝 Contributing
+## Contributing
 
 Feel free to submit issues and enhancement requests!
